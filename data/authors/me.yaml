@@ -22,7 +22,7 @@ bio: |
 
 affiliations:
   - name: University of Winchester
-    url: https://ai.meta.com/
+    url: https://www.winchester.ac.uk/About-Us/Leadership-and-governance/Staff-Directory/Staff-Profiles/Hannah.php
 
 links:
   - icon: at-symbol
@@ -33,23 +33,23 @@ links:
   - icon: brands/github
     url: https://github.com/Scott-S-Hannah
   - icon: brands/linkedin
-    url: https://www.linkedin.com/in/example/
-  - icon: academicons/google-scholar
-    url: https://scholar.google.com/citations?user=example
+    url: www.linkedin.com/in/scott-hannah-1182a999
+  - icon: academicons/researchgate
+    url: https://www.researchgate.net/profile/Scott-Hannah
   - icon: academicons/orcid
-    url: https://orcid.org/0000-0002-1825-0097
+    url: https://orcid.org/0000-0003-2761-2798
 
 interests:
-  - Large Language Models
-  - Computer Vision
-  - Reinforcement Learning
-  - AI Ethics
+  - Cardiovascular Disease
+  - Bone Health
+  - Metabolic Thresholds
+  - Data Science
 
 education:
   - degree: PhD Exercise Physiology
     institution: Ulster University
-    start: 2017-10-01
-    end: 2022-10-30
+    start: 
+    end: 
     summary: |
       Thesis on the effects of acute exercise on calcium and bone metabolism. Investigated the role of acid-base changes on calicum-bone interactions.
     button:
@@ -58,29 +58,29 @@ education:
       icon: hero/arrow-down-tray
   - degree: MSc Sport and Exercise Physiology
     institution: Middlesex University
-    start: 2014-09-01
-    end: 2015-05-31
+    start: 
+    end: 
   - degree: BSc (Hons) Sport and Exercise Science
     institution: University of Suffolk
-    start: 2011-09-01
-    end: 2014-05-31
+    start: 
+    end: 
 
 experience:
-  - role: Senior AI Research Scientist
-    org: Meta AI
-    start: 2020-01-01
+  - role: Senior Lecturer in Exercise Physiology
+    org: University of Winchester
+    start: 2022-08-01
     summary: |
-      Leading research on multimodal AI systems. Contributed to Llama 2 and other open-source models.
+      Programme leader for the BSc (Hons) Sport and exercise science degree. PhD and MRes supervisor. Module lead and lecturer of 5 physiology modules across levels 4-7. 
     button:
       text: View portfolio
       url: /
       icon: hero/arrow-down-tray
-  - role: AI Research Intern
-    org: OpenAI
-    start: 2019-06-01
-    end: 2019-12-31
+  - role: Associate Lecturer in Exercise Physiology
+    org: Ulster University
+    start: 2017-09-01
+    end: 2020-05-30
     summary: |
-      Worked on GPT-3 scaling. Co-authored paper on prompt engineering.
+      Lectured topics of exercise physiology on the undergraduate sport and exercise science programme. Supervised undergraduate and postgraduate dissertations.
 
 skills:
   - name: Technical Skills
