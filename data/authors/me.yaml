@@ -16,9 +16,7 @@ status:
   icon: "☕️"
 role: Senior Lecturer in Exercise Physiology
 bio: |
-  Scott Hannah is a Senior Lecturer in Exercise Physiology at the University of Winchester. His research
-  focuses on the intersection.... Scott is passionate about pushing the boundaries of AI
-  while ensuring ethical development.
+  Scott Hannah is a Senior Lecturer in Exercise Physiology at the University of Winchester. His research focuses on applied cardiovascular and exercise physiology, examining physiological responses to exercise in health and clinical populations, with an emphasis on data-driven, translational assessment.
 
 affiliations:
   - name: University of Winchester
@@ -40,10 +38,12 @@ links:
     url: https://orcid.org/0000-0003-2761-2798
 
 interests:
-  - Cardiovascular Disease
-  - Bone Health
-  - Metabolic Thresholds
-  - Data Science
+	- Cardiovascular Physiology
+	- Clinical Exercise Rehabilitation
+	- Exercise Thresholds
+	- Bone Health
+	- Statistical Modelling
+	- Reproducible Data Science
 
 education:
   - degree: PhD Exercise Physiology
