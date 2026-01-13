@@ -38,12 +38,12 @@ links:
     url: https://orcid.org/0000-0003-2761-2798
 
 interests:
-	- Cardiovascular Physiology
-	- Clinical Exercise Rehabilitation
-	- Exercise Thresholds
-	- Bone Health
-	- Statistical Modelling
-	- Reproducible Data Science
+  - Cardiovascular Physiology
+  - Bone Health
+  - Clinical Exercise Rehabilitation
+  - Exercise Thresholds
+  - Statistical Modelling
+  - Reproducible Data Science
 
 education:
   - degree: PhD Exercise Physiology
