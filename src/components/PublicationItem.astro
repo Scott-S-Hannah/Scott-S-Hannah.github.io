@@ -6,7 +6,7 @@ const { pub } = Astro.props;
 <article class="pub" data-theme={pub.theme}>
   <div class="pub__year mono">{pub.year}</div>
   <div class="pub__body">
-    <h3 class="pub__title">{pub.title}</h3>
+    <h2 class="pub__title">{pub.title}</h2>
     <p class="pub__authors">
       {pub.authors.map((a, i) => (
         <span class={a.isOwner ? 'is-owner' : ''}>{a.name}{i < pub.authors.length - 1 ? ', ' : ''}</span>
@@ -22,7 +22,7 @@ const { pub } = Astro.props;
 <style>
   .pub { display: grid; grid-template-columns: 4rem 1fr; gap: 1.25rem; padding: 1.4rem 0; border-bottom: 1px solid var(--line); }
   .pub__year { color: var(--faint); font-size: var(--step--1); padding-top: 0.2rem; }
-  .pub__title { font-size: var(--step-1); font-weight: 600; line-height: 1.25; }
+  .pub__title { font-size: var(--step-1); font-weight: 600; line-height: 1.25; font-family: var(--font-body); letter-spacing: normal; }
   .pub__authors { font-size: var(--step--1); color: var(--mut); margin-top: 0.4rem; }
   .pub__authors .is-owner { color: var(--ink); font-weight: 500; }
   .pub__meta { font-size: var(--step--1); color: var(--mut); margin-top: 0.3rem; }
