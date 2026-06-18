@@ -9,6 +9,9 @@
 # Generated site output
 public/
 
+# Superpowers visual-brainstorm scratch files
+.superpowers/
+
 # Hugo resources (processed assets)
 resources/
 
