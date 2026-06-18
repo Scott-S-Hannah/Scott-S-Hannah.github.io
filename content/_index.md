@@ -39,14 +39,14 @@ sections:
         shape: circle # Options: circle (default), square, rounded
   - block: markdown
     content:
-      title: '📚 My Research'
+      title: 'Research'
       subtitle: ''
       text: |-
-        Use this area to speak to your mission. I'm a research scientist in the Moonshot team at DeepMind. I blog about machine learning, deep learning, and moonshots.
+        I'm a Senior Lecturer in Exercise Physiology at the University of Winchester, where I research how the body responds to exercise — spanning cardiovascular and vascular function, bone and calcium metabolism, and recovery — in both healthy and clinical populations.
 
-        I apply a range of qualitative and quantitative methods to comprehensively investigate the role of science and technology in the economy.
+        My work is applied and translational: I'm interested in turning physiological measurement into assessment that is reproducible and genuinely useful, from arterial stiffness and resistance-training responses to exercise rehabilitation.
 
-        Please reach out to collaborate 😃
+        I lead the BSc (Hons) Sport and Exercise Science programme and supervise postgraduate research. I'm always glad to hear from prospective students and collaborators.
     design:
       columns: '1'
   - block: collection
