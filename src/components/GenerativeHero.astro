@@ -1,0 +1,156 @@
+---
+/* Generative hero (v3, 2D canvas). Concept: ONE particle system. Teal points
+   flow in from the field and settle into a running silhouette sampled from
+   public/runner.svg, so the figure is constructed from the flowing points
+   (flow and figure are the same thing). Athlete faces away; energy flows into
+   him. White base, Helvetica/Swiss type, teal #02ABBF. Exploratory, not locked.
+   Next layer: WebGL (three.js) + GSAP ScrollTrigger. */
+---
+<section class="gh">
+  <header class="gh__nav">
+    <span class="gh__brand">Dr. Scott Hannah</span>
+    <nav class="gh__links" aria-label="Primary">
+      <a href="#">Research</a>
+      <a href="#">Work</a>
+      <a href="#">Contact</a>
+      <span class="gh__dot" aria-hidden="true"></span>
+    </nav>
+  </header>
+  <div class="gh__stage" id="gh-stage">
+    <canvas id="gh-canvas"></canvas>
+    <div class="gh__ovl">
+      <div class="gh__id">
+        <h1 class="gh__name">Dr. Scott<br>Hannah<span>.</span></h1>
+        <p class="gh__role">Exercise Physiologist</p>
+        <p class="gh__org">University of Winchester</p>
+        <p class="gh__lede">I measure how the body responds to exercise, effort, and recovery, for elite sport and clinical care.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gh { min-height: 100vh; display: flex; flex-direction: column; background: #fff; color: #0a0a0b; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .gh__nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid #ededed; }
+  .gh__brand { font-weight: 700; letter-spacing: -0.02em; font-size: 15px; }
+  .gh__links { display: flex; gap: 22px; align-items: center; font-size: 11px; letter-spacing: 0.1em; color: #71717a; text-transform: uppercase; }
+  .gh__links a { color: #71717a; text-decoration: none; }
+  .gh__links a:hover { color: #0a0a0b; }
+  .gh__dot { width: 7px; height: 7px; border-radius: 50%; background: #02abbf; }
+  .gh__stage { position: relative; flex: 1; overflow: hidden; }
+  #gh-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .gh__ovl { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 32px; pointer-events: none; }
+  .gh__id { width: 44%; }
+  .gh__name { font-weight: 700; font-size: clamp(40px, 6.4vw, 86px); line-height: 0.84; letter-spacing: -0.045em; margin: 0; }
+  .gh__name span { color: #02abbf; }
+  .gh__role { font-size: clamp(14px, 1.4vw, 18px); font-weight: 500; margin: 18px 0 0; }
+  .gh__org { font-size: 13px; color: #71717a; margin: 2px 0 0; }
+  .gh__lede { font-size: clamp(12px, 1.1vw, 14px); line-height: 1.55; color: #26262a; max-width: 24em; margin: 18px 0 0; }
+  @media (max-width: 760px) { .gh__id { width: 84%; } .gh__ovl { align-items: flex-start; padding-top: 36px; } }
+</style>
+
+<script>
+  const canvas = document.getElementById('gh-canvas');
+  const stage = document.getElementById('gh-stage');
+  if (canvas && stage) {
+    const ctx = canvas.getContext('2d');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const FLIP = false;
+    let W = 0, H = 0, DPR = 1, amb = [], body = [], raf = 0, imgReady = false;
+    const img = new Image();
+
+    function srcPoint() {
+      return { x: -W * 0.05 + Math.random() * W * 0.30, y: H * 0.08 + Math.random() * H * 0.84 };
+    }
+
+    function buildFigure() {
+      if (!imgReady) return;
+      const ar = (img.naturalWidth / img.naturalHeight) || 1.12;
+      let bh = H * 0.76, bw = bh * ar;
+      if (bw > W * 0.54) { bw = W * 0.54; bh = bw / ar; }
+      const off = document.createElement('canvas');
+      off.width = Math.round(bw); off.height = Math.round(bh);
+      const o = off.getContext('2d');
+      o.fillStyle = '#fff'; o.fillRect(0, 0, off.width, off.height);
+      if (FLIP) { o.translate(off.width, 0); o.scale(-1, 1); }
+      o.drawImage(img, 0, 0, off.width, off.height);
+      const d = o.getImageData(0, 0, off.width, off.height).data;
+      const fx = W - bw - W * 0.05, fy = (H - bh) / 2;
+      body = [];
+      for (let j = 0; j < off.height; j += 3) for (let i = 0; i < off.width; i += 3) {
+        const idx = (j * off.width + i) * 4;
+        const lum = d[idx] * 0.299 + d[idx + 1] * 0.587 + d[idx + 2] * 0.114;
+        if (lum < 232 && body.length < 7000) {
+          body.push({ x: fx + i, y: fy + j, px: fx + i, py: fy + j, vx: 0, vy: 0, hx: fx + i, hy: fy + j });
+        }
+      }
+    }
+
+    function size() {
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      const r = stage.getBoundingClientRect();
+      W = r.width; H = r.height;
+      canvas.width = W * DPR; canvas.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      amb = [];
+      for (let i = 0; i < 220; i++) amb.push({ x: Math.random() * W, y: Math.random() * H, life: Math.random() * 240 });
+      buildFigure();
+      if (reduce) renderStatic();
+    }
+
+    let t = 0;
+    const ang = (x, y) => { const s = 0.0016; return (Math.sin(x * s + t * 0.6) + Math.cos(y * s - t * 0.42) + Math.sin((x + y) * s * 0.5 + t * 0.22)) * Math.PI; };
+
+    function renderStatic() {
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(2,171,191,0.72)';
+      for (const p of body) ctx.fillRect(p.hx, p.hy, 1.6, 1.6);
+    }
+
+    function frame() {
+      t += 0.007;
+      ctx.fillStyle = 'rgba(255,255,255,0.17)'; ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = 'rgba(2,171,191,0.09)'; ctx.lineWidth = 1; ctx.beginPath();
+      for (const p of amb) {
+        const a = ang(p.x, p.y);
+        const nx = p.x + Math.cos(a) * 1.5, ny = p.y + Math.sin(a) * 1.5;
+        ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny);
+        p.x = nx; p.y = ny; p.life--;
+        if (p.x < 0 || p.x > W || p.y < 0 || p.y > H || p.life < 0) { p.x = Math.random() * W; p.y = Math.random() * H; p.life = 150 + Math.random() * 200; }
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(2,171,191,0.92)';
+      ctx.strokeStyle = 'rgba(2,171,191,0.34)'; ctx.lineWidth = 1; ctx.beginPath();
+      for (const p of body) {
+        p.px = p.x; p.py = p.y;
+        const dx = p.hx - p.x, dy = p.hy - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const a = ang(p.x, p.y);
+        if (dist > 44) {
+          const inv = 1 / dist;
+          p.vx += dx * inv * 2.4 + Math.cos(a) * 0.5;
+          p.vy += dy * inv * 2.4 + Math.sin(a) * 0.5;
+        } else {
+          p.vx += dx * 0.16 + Math.cos(a) * 0.05;
+          p.vy += dy * 0.16 + Math.sin(a) * 0.05;
+        }
+        p.vx *= 0.8; p.vy *= 0.8; p.x += p.vx; p.y += p.vy;
+        if (Math.abs(p.vx) + Math.abs(p.vy) > 0.7) { ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); }
+        else { ctx.fillRect(p.x, p.y, 1.6, 1.6); }
+        if (Math.random() < 0.004) { const s = srcPoint(); p.x = s.x; p.y = s.y; p.vx = 0; p.vy = 0; }
+      }
+      ctx.stroke();
+
+      raf = requestAnimationFrame(frame);
+    }
+
+    const init = () => { cancelAnimationFrame(raf); size(); if (!reduce) frame(); };
+    img.onload = () => { imgReady = true; init(); };
+    img.onerror = () => { if (img.src.indexOf('runner.png') !== -1) img.src = '/runner.svg'; };
+    img.src = '/runner.png';
+    let to; window.addEventListener('resize', () => { clearTimeout(to); to = setTimeout(init, 150); });
+  }
+</script>
