@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import { byYearDesc, THEME_LABELS } from '../lib/publications';
+
+const themes = Object.keys(THEME_LABELS).filter((t) => byYearDesc.some((p) => p.theme === t));
+---
+<Base title="Publications | Dr Scott Hannah" description="Peer-reviewed research by Dr Scott Hannah on cardiovascular physiology, clinical exercise rehabilitation, and athlete health.">
+  <section class="section container">
+    <p class="kicker">Publications</p>
+    <h1 class="pubs__head">Peer-reviewed research</h1>
+
+    <div class="filters" role="group" aria-label="Filter publications by theme">
+      <button class="filter is-active" data-filter="all" aria-pressed="true">All</button>
+      {themes.map((t) => (
+        <button class="filter" data-filter={t} aria-pressed="false">{THEME_LABELS[t]}</button>
+      ))}
+    </div>
+
+    <div id="pub-list">
+      {byYearDesc.map((pub) => <PublicationItem pub={pub} />)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .pubs__head { font-size: var(--step-3); margin-top: 0.4rem; margin-bottom: 2rem; }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .filter {
+    font-family: var(--font-body); font-size: var(--step--1); color: var(--mut);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.45rem 0.95rem; cursor: pointer; transition: all 0.2s ease;
+  }
+  .filter:hover { border-color: var(--teal); color: var(--teal-deep); }
+  .filter.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
+  const items = document.querySelectorAll<HTMLElement>('#pub-list .pub');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      buttons.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
+      items.forEach((item) => {
+        const show = filter === 'all' || item.dataset.theme === filter;
+        item.style.display = show ? '' : 'none';
+      });
+    });
+  });
+</script>
