@@ -14,7 +14,8 @@ sections:
     content:
       # Choose a user profile to display (a folder name within `content/authors/`)
       username: me
-      text: ''
+      # Short intro shown under the identity (high-level; the specifics live in the Research section).
+      text: 'I study how the body responds to exercise, across the cardiovascular system, bone, and recovery. My focus is turning those measurements into assessment that works in both health and clinical care.'
       # Show a call-to-action button under your biography? (optional)
       button:
         text: Download CV
@@ -31,19 +32,17 @@ sections:
 
       # Name heading sizing to accommodate long or short names
       name:
-        size: md # Options: xs, sm, md, lg (default), xl
+        size: lg # Options: xs, sm, md, lg (default), xl
 
       # Avatar customization
       avatar:
-        size: medium # Options: small (150px), medium (200px, default), large (320px), xl (400px), xxl (500px)
+        size: xl # Options: small (150px), medium (200px, default), large (320px), xl (400px), xxl (500px)
         shape: circle # Options: circle (default), square, rounded
   - block: markdown
     content:
       title: 'Research'
       subtitle: ''
       text: |-
-        My work spans exercise physiology and clinical physiology. I study how the body responds to physical activity, and how those responses can inform the assessment and management of health and disease.
-
         Most of my research focuses on the cardiovascular and vascular system, including how the arteries respond to resistance training, to effort, and to prolonged sitting, alongside work on bone and calcium metabolism during exercise. A growing part of it takes these measurements into clinical settings, such as gait rehabilitation after stroke.
 
         I lead the BSc (Hons) Sport and Exercise Science programme at Winchester and supervise postgraduate researchers. Please get in touch if our interests overlap.
