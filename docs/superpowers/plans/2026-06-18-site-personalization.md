@@ -25,11 +25,11 @@
 
 - [ ] **Step 1: Remove the emoji status icon**
 
-Delete these two lines (the `☕️` violates the no-emoji rule; the avatar status badge will simply not render):
+Set the status icon to empty (do **not** delete the whole `status:` key — the theme's `resume-biography-3/block.html:84` dereferences `$profile.status.icon` unguarded and a missing `status` throws a nil-pointer build error). Empty string renders no badge:
 
 ```yaml
 status:
-  icon: "☕️"
+  icon: ''  # No status badge (theme requires the key to exist; emoji removed)
 ```
 
 - [ ] **Step 2: Remove the fake award**

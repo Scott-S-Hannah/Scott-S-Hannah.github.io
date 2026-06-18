@@ -13,7 +13,7 @@ postnominals:
   - MSc
   - BSc (Hons)
 status:
-  icon: "☕️"
+  icon: ''  # No status badge (theme requires the key to exist; emoji removed)
 role: Senior Lecturer in Exercise Physiology
 bio: |
   Scott Hannah is a Senior Lecturer in Exercise Physiology at the University of Winchester. His research focuses on applied cardiovascular and exercise physiology, examining physiological responses to exercise in health and clinical populations, with an emphasis on data-driven, translational assessment.
@@ -52,10 +52,6 @@ education:
     end: 
     summary: |
       Thesis on the effects of acute exercise on calcium and bone metabolism. Investigated the role of acid-base changes on calicum-bone interactions.
-    button:
-      text: Download dissertation
-      url: /resume.pdf
-      icon: hero/arrow-down-tray
   - degree: MSc Sport and Exercise Physiology
     institution: Middlesex University
     start: 
@@ -83,34 +79,24 @@ experience:
       Lectured topics of exercise physiology on the undergraduate sport and exercise science programme. Supervised undergraduate and postgraduate dissertations.
 
 skills:
-  - name: Technical Skills
+  - name: Research & Assessment
     items:
-      - label: Python
+      - label: Arterial Stiffness & Pulse-Wave Analysis
         level: 5
-      - label: Machine Learning
+      - label: Cardiopulmonary & Exercise Testing
         level: 5
-      - label: Cloud Computing
+      - label: Bone & Calcium Metabolism Assessment
         level: 4
-  - name: Research & Communication
+  - name: Data & Communication
     items:
+      - label: R & Statistical Modelling
+        level: 4
       - label: Academic Writing
         level: 5
       - label: Conference Presentations
-        level: 4
-      - label: Grant Proposals
         level: 4
 
 languages:
   - name: English
     level: 5
     label: Native
-  - name: Spanish
-    level: 4
-    label: Fluent
-
-awards:
-  - title: Best Paper Award
-    awarder: NeurIPS
-    date: "2022-12-01"
-    summary: Awarded for groundbreaking work on efficient training of large models.
-    icon: hero/trophy
