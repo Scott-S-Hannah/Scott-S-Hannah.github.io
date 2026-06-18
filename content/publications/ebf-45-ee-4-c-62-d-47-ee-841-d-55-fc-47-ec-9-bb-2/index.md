@@ -1,0 +1,53 @@
+---
+title: The Effect of Acute Hypoxic Exercise on Calcium Metabolism.
+authors:
+- Scott Hannah
+- Sonyia McFadden
+- Andrea McNeilly
+- Conor McClean
+date: '2020-07-01'
+publishDate: '2026-06-18T14:22:54.187889Z'
+publication_types:
+- paper-conference
+publication: '*Future Physiology 2020*'
+abstract: 'Several investigations show exercise induces a decrease of ionised calcium
+  which may be responsible for increased bone breakdown following acute exercise (1-3).
+  While the general mechanism of decreased Ca2+stimulating PTH and subsequent bone
+  resorption has been comprehensively detailed (1-2), what causes Ca2+ to decrease
+  remains unknown. We suggest it may be the result of the complex acid-base changes
+  seen during exercise (4) as Ca2+ is heavily influenced by pH. We investigated whether
+  pH alterations, achieved by use of exercise and hypoxia, influenced calcium metabolism.
+  Sixteen healthy physically active males volunteered for our study ([mean ± 1 SD]
+  age 24 ± 5 years, height 1.80 ± 0.08m, body mass ± 78.5 ± 12.6kg), approved by the
+  Universitytextquoterights Research Ethics Committee and in accordance with the Declaration
+  of Helsinki. Participants were randomly assigned in a counter-balanced manner to
+  perform two V̇O2max tests on a cycle ergometer in either normoxia (21% FiO2) or
+  hypoxia (13% FiO2), one week apart. Participants then completed 60 minutes of cycle
+  exercise at 70% of their respective ̇O2max/peak in both conditions. Venous blood
+  was collected via venepuncture: pre-exercise; immediately post- exercise; and 1h,
+  4h and 24h post exercise, to measure markers of calcium metabolism. A sub-sample
+  of participants (n = 5) provided additional blood samples during the exercise trials
+  (see Figure 1a) for analysis of Ca2+ and pH. Data were analysed using two-way repeated
+  measures ANOVAs and regression. We observed that exercise caused a transient increase
+  in Ca2+ at the onset of exercise and later decrease until cessation (Figure 1a).
+  Ca2+ was positively correlated with PTH (Figure 1d: R = -0.82, p < .001) further
+  supporting previous observations. Although hypoxic exercise reduced relative Ca2+
+  to a greater degree, and despite pH being higher during hypoxia (Figure 1c: Condition*Time
+  p = .01), the interaction of time and condition was non-significant. The respiratory
+  alkalosis during hypoxia appeared to reduce competition for albumin binding positions,
+  demonstrated by the positive correlation between pH and albumin (Figure 2b: R =
+  0.7, p < .001). We speculate that a greater sample size may observe a difference
+  between conditions. The higher total calcium concentration following hypoxic exercise
+  (Figure 3c; MD = 0.04±0.01, p < .001) and the negative correlation between Ca2+
+  and pH (Figure 2c-d: R = -0.57, p < 0.0001) support that Ca2+ is bound to albumin
+  during respiratory alkalosis. Hypoxia attenuated the phosphate response to exercise,
+  demonstrated at the post exercise time point (Figure 3d: MD = -0.21±0.02, p < .001),
+  which may be explained by hypocapnia. The reduced CO2 increased pH (Figure 2a),
+  known to stimulate the glycolytic system and the production of phosphofructokinase
+  (PFK). PFK enhances sugar phosphate production and subsequently stimulates phosphate
+  entry to muscle (5). It is possible that the decrease in phosphate may have been
+  compounded by the hypoxic-induced transcription of fibroblast growth factor 23 (FGF23).
+  FGF23 is known to reduce serum phosphate concentrations and negatively regulate
+  PTH, possibly explaining the lower PTH response post hypoxic exercise (Figure 3f;
+  MD = -0.11 ± 0.05, p < .05).'
+---

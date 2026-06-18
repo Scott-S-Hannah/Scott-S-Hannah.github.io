@@ -1,0 +1,36 @@
+---
+title: 'When Load Does not Tell the Whole Story: Acute Effects of Effort Matched Resistance
+  Training Protocols on Arterial Stiffness'
+authors:
+- Eleftherios Karanasios
+- James Faulkner
+- Scott Hannah
+date: '2026-03-01'
+publishDate: '2026-06-18T14:22:54.093266Z'
+publication_types:
+- article-journal
+publication: '*European Journal of Sport Science*'
+doi: 10.1002/ejsc.70164
+abstract: 'This study examined acute vascular responses to three resistance training
+  (RT) protocols differing in load and volume but matched for proximity to failure.
+  Eleven adults (6 males and 5 females) performed three RT protocols consisting of
+  the hexagonal deadlift and bench pull exercises with the following: (i). Low-volume,
+  moderate-load, and high-repetition (Condition A: 2 × 10 repetitions), (ii). Low-volume,
+  high-load, and low-repetition (Condition B: 2 × 4 repetitions), and (iii). Moderate-volume,
+  high-load, and low-repetition (Condition C: 5 × 4 repetitions). Proximity to failure
+  was set at 2 repetitions in reserve. Measurements of carotid-femoral pulse wave
+  velocity (cfPWV) and pulse wave analysis (e.g., augmentation index) were collected
+  at baseline, immediately post, and 15 min posttraining, whereas muscle oxygenation
+  was monitored during performance the hexagonal deadlift. Condition A induced significantly
+  greater increases in cfPWV (6.2 ± 0.6 to 6.9 ± 0.8 m/s) when compared to both Condition
+  B (6.5 ± 0.8 to 6.4 ± 0.7 m/s) and Condition C (6.3 ± 0.8 to 6.4 ± 0.6 m/s), (all
+  p < 0.05). No significant changes were observed in muscle oxygenation variables
+  across conditions. These findings suggest that the number of repetitions per set
+  and total time under tension (Condition A), rather than absolute load or set volume,
+  play a more important role in mediating acute hemodynamic responses following RT.'
+tags:
+- central haemodynamics
+- proximity to failure
+- pulse wave velocity
+- repetitions in reserve
+---
