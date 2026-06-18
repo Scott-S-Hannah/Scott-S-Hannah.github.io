@@ -42,11 +42,11 @@ sections:
       title: 'Research'
       subtitle: ''
       text: |-
-        I'm a Senior Lecturer in Exercise Physiology at the University of Winchester, where I research how the body responds to exercise — spanning cardiovascular and vascular function, bone and calcium metabolism, and recovery — in both healthy and clinical populations.
+        My work spans exercise physiology and clinical physiology. I study how the body responds to physical activity, and how those responses can inform the assessment and management of health and disease.
 
-        My work is applied and translational: I'm interested in turning physiological measurement into assessment that is reproducible and genuinely useful, from arterial stiffness and resistance-training responses to exercise rehabilitation.
+        Most of my research focuses on the cardiovascular and vascular system, including how the arteries respond to resistance training, to effort, and to prolonged sitting, alongside work on bone and calcium metabolism during exercise. A growing part of it takes these measurements into clinical settings, such as gait rehabilitation after stroke.
 
-        I lead the BSc (Hons) Sport and Exercise Science programme and supervise postgraduate research. I'm always glad to hear from prospective students and collaborators.
+        I lead the BSc (Hons) Sport and Exercise Science programme at Winchester and supervise postgraduate researchers. Please get in touch if our interests overlap.
     design:
       columns: '1'
   - block: collection

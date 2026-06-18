@@ -78,23 +78,17 @@ experience:
     summary: |
       Lectured topics of exercise physiology on the undergraduate sport and exercise science programme. Supervised undergraduate and postgraduate dissertations.
 
-skills:
-  - name: Research & Assessment
-    items:
-      - label: Arterial Stiffness & Pulse-Wave Analysis
-        level: 5
-      - label: Cardiopulmonary & Exercise Testing
-        level: 5
-      - label: Bone & Calcium Metabolism Assessment
-        level: 4
-  - name: Data & Communication
-    items:
-      - label: R & Statistical Modelling
-        level: 4
-      - label: Academic Writing
-        level: 5
-      - label: Conference Presentations
-        level: 4
+# Skills section is hidden until you fill this in. Uncomment and edit with your own
+# skills and 1-5 levels, then it will appear on the homepage automatically.
+# skills:
+#   - name: Research & Methods
+#     items:
+#       - label: Your skill
+#         level: 5
+#   - name: Teaching & Leadership
+#     items:
+#       - label: Your skill
+#         level: 5
 
 languages:
   - name: English
