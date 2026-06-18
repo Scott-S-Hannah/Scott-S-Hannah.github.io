@@ -1,0 +1,21 @@
+---
+const email = 'Scott.Hannah@Winchester.ac.uk';
+---
+<section id="contact" class="cta">
+  <div class="container cta__inner">
+    <p class="cta__label">Collaborate · consult · study</p>
+    <h2 class="cta__title">Let's work together.</h2>
+    <p class="cta__lede">Whether you're a researcher, clinician, athlete, or organisation, I'd be glad to talk.</p>
+    <a class="cta__btn" href={`mailto:${email}`}>{email}</a>
+    <p class="cta__creds">Fellow, Higher Education Academy · Full Member, The Physiological Society · University of Winchester</p>
+  </div>
+</section>
+
+<style>
+  .cta { background: var(--teal-deep); color: #eafafb; padding-block: clamp(3rem, 2rem + 5vw, 6rem); text-align: center; }
+  .cta__label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: #9fdfe4; }
+  .cta__title { color: #fff; font-size: var(--step-3); margin: 0.8rem 0 0.6rem; }
+  .cta__lede { color: #c7ecee; max-width: 32ch; margin: 0 auto 1.6rem; }
+  .cta__btn { display: inline-block; background: var(--paper); color: var(--teal-deep) !important; font-weight: 500; padding: 0.8rem 1.6rem; border-radius: var(--radius); }
+  .cta__creds { font-size: var(--step--1); color: #8fcdd1; margin-top: 1.8rem; }
+</style>

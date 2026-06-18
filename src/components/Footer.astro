@@ -1,0 +1,23 @@
+---
+const year = new Date().getFullYear();
+const social = [
+  { href: 'https://orcid.org/0000-0003-2761-2798', label: 'ORCID' },
+  { href: 'https://www.researchgate.net/profile/Scott-Hannah', label: 'ResearchGate' },
+  { href: 'https://uk.linkedin.com/in/dr-scott-hannah', label: 'LinkedIn' },
+  { href: 'https://x.com/Scott_Hannah_v2', label: 'X' },
+];
+---
+<footer class="footer">
+  <div class="container footer__inner">
+    <span>© {year} Dr Scott Hannah</span>
+    <nav class="footer__social" aria-label="Profiles">
+      {social.map((s) => <a href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .footer { border-top: 1px solid var(--line); padding-block: 1.6rem; font-size: var(--step--1); color: var(--mut); }
+  .footer__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+  .footer__social { display: flex; gap: 1.2rem; }
+</style>

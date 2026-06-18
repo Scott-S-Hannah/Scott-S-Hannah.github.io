@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/portrait.jpg';
+---
+<section class="hero section">
+  <div class="container hero__inner">
+    <div class="hero__text">
+      <p class="kicker">Dr Scott Hannah · Exercise Physiologist</p>
+      <h1 class="hero__title">The physiology of effort, performance, and recovery.</h1>
+      <p class="hero__lede">I measure how the body responds to exercise and inactivity, and translate it into assessment that sharpens elite performance and clinical care.</p>
+      <div class="hero__actions">
+        <a class="btn" href="/#focus">Explore the work</a>
+        <a class="btn-text" href="/publications">Read the research</a>
+      </div>
+    </div>
+    <div class="hero__portrait">
+      <Image src={portrait} alt="Dr Scott Hannah" widths={[280, 460, 640]} sizes="(max-width: 48rem) 60vw, 320px" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero__inner { display: grid; grid-template-columns: 1.4fr 0.9fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
+  .hero__title { font-size: var(--step-4); margin: 1rem 0 0; max-width: 14ch; }
+  .hero__lede { font-size: var(--step-1); color: var(--ink-soft); margin-top: 1.4rem; max-width: 32ch; line-height: 1.45; }
+  .hero__actions { display: flex; align-items: center; gap: 1.4rem; margin-top: 2rem; flex-wrap: wrap; }
+  .btn { background: var(--teal); color: #fff; font-weight: 500; padding: 0.85rem 1.4rem; border-radius: var(--radius); }
+  .btn:hover { background: var(--teal-deep); color: #fff; }
+  .btn-text { font-weight: 500; }
+  .hero__portrait img { border-radius: var(--radius); width: 100%; object-fit: cover; aspect-ratio: 4 / 5; }
+  @media (max-width: 48rem) {
+    .hero__inner { grid-template-columns: 1fr; }
+    .hero__portrait { order: -1; max-width: 220px; }
+  }
+</style>

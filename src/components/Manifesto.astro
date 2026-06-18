@@ -1,0 +1,15 @@
+---
+import Reveal from './Reveal.astro';
+---
+<section class="manifesto">
+  <div class="container">
+    <p class="manifesto__label">Approach</p>
+    <Reveal as="p" class="manifesto__quote">Good physiology isn't about collecting more data. It's about the right measurement, at the right moment, made to matter.</Reveal>
+  </div>
+</section>
+
+<style>
+  .manifesto { background: var(--feature); color: var(--on-feature); padding-block: clamp(3rem, 2rem + 5vw, 6rem); }
+  .manifesto__label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: #7fc4d0; }
+  .manifesto__quote { font-family: var(--font-display); font-weight: 600; font-size: var(--step-2); line-height: 1.35; letter-spacing: -0.02em; margin-top: 1rem; max-width: 24ch; color: #f3f8f8; }
+</style>

@@ -1,0 +1,39 @@
+---
+import Reveal from './Reveal.astro';
+import { featured } from '../lib/publications';
+const [lead, ...rest] = featured;
+---
+<section class="section container">
+  <div class="sw__head">
+    <p class="label">Selected work</p>
+    <a class="btn-text" href="/publications">All publications</a>
+  </div>
+  {lead && (
+    <Reveal class="sw__lead">
+      <span class="sw__meta mono">{lead.year}</span>
+      <h2 class="sw__lead-title">{lead.title}</h2>
+      <p class="sw__journal">{lead.journal}</p>
+    </Reveal>
+  )}
+  <div class="sw__grid">
+    {rest.map((p) => (
+      <Reveal class="sw__item">
+        <span class="sw__meta mono">{p.year}</span>
+        <h3 class="sw__item-title">{p.title}</h3>
+        <p class="sw__journal">{p.journal}</p>
+      </Reveal>
+    ))}
+  </div>
+</section>
+
+<style>
+  .sw__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.4rem; }
+  .sw__lead { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 1.6rem 1.8rem; margin-bottom: 1rem; }
+  .sw__lead-title { font-size: var(--step-2); margin: 0.4rem 0; max-width: 24ch; }
+  .sw__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .sw__item { border-top: 2px solid var(--ink); padding-top: 0.9rem; }
+  .sw__item-title { font-size: var(--step-1); margin-top: 0.3rem; line-height: 1.25; }
+  .sw__meta { color: var(--faint); font-size: var(--step--1); }
+  .sw__journal { font-style: italic; color: var(--mut); font-size: var(--step--1); margin-top: 0.4rem; }
+  @media (max-width: 38rem) { .sw__grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,31 @@
+---
+import Reveal from './Reveal.astro';
+const areas = [
+  { n: '01', title: 'Cardiovascular & vascular physiology', body: 'How arteries respond to resistance training, effort, and prolonged sitting, measured beat by beat.' },
+  { n: '02', title: 'Clinical exercise rehabilitation', body: 'Translating physiology into recovery after stroke and spinal-cord injury, alongside NHS partners.' },
+  { n: '03', title: 'Applied performance physiology', body: 'Assessment and testing for elite sport, from the laboratory to the field.' },
+];
+---
+<section id="focus" class="section container">
+  <p class="label">Areas of focus</p>
+  <div class="focus">
+    {areas.map((a) => (
+      <Reveal class="focus__row">
+        <span class="focus__n mono">{a.n}</span>
+        <div>
+          <h2 class="focus__title">{a.title}</h2>
+          <p class="focus__body">{a.body}</p>
+        </div>
+      </Reveal>
+    ))}
+  </div>
+</section>
+
+<style>
+  .focus { margin-top: 1.6rem; }
+  .focus__row { display: grid; grid-template-columns: 4rem 1fr; gap: 1.4rem; padding: 1.6rem 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .focus__n { color: var(--teal); font-size: var(--step-2); font-weight: 400; }
+  .focus__title { font-size: var(--step-2); }
+  .focus__body { color: var(--mut); margin-top: 0.5rem; max-width: 48ch; }
+  @media (max-width: 38rem) { .focus__row { grid-template-columns: 1fr; gap: 0.5rem; } }
+</style>
