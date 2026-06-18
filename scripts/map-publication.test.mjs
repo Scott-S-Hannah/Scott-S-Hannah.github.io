@@ -46,6 +46,48 @@ describe('mapCslToPublication', () => {
   });
 });
 
+describe('mapCslToPublication – conference venue fallback', () => {
+  it('paper-conference type maps to "conference" and uses container-title as journal', () => {
+    const csl = {
+      id: 'c1',
+      type: 'paper-conference',
+      title: 'A conference talk on arterial stiffness',
+      author: [{ family: 'Hannah', given: 'Scott' }],
+      issued: { 'date-parts': [[2025, 6]] },
+      'container-title': 'Physiology 2025',
+    };
+    const pub = mapCslToPublication(csl);
+    expect(pub.type).toBe('conference');
+    expect(pub.journal).toBe('Physiology 2025');
+  });
+
+  it('falls back to the note venue when container-title and publisher are absent', () => {
+    const csl = {
+      id: 'c2',
+      type: 'paper-conference',
+      title: 'Training to volitional failure in clinical populations',
+      author: [{ family: 'Hannah', given: 'Scott' }],
+      issued: { 'date-parts': [[2025, 6]] },
+      note: 'Some Society Meeting ; Conference date: 02-06-2025',
+    };
+    const pub = mapCslToPublication(csl);
+    expect(pub.journal).toBe('Some Society Meeting');
+  });
+
+  it('joins a publisher array when there is no container-title or note', () => {
+    const csl = {
+      id: 'c3',
+      type: 'paper-conference',
+      title: 'Resistance training and arterial stiffness',
+      author: [{ family: 'Hannah', given: 'Scott' }],
+      issued: { 'date-parts': [[2025, 6]] },
+      publisher: ['John Wiley', 'Sons Inc.'],
+    };
+    const pub = mapCslToPublication(csl);
+    expect(pub.journal).toBe('John Wiley Sons Inc.');
+  });
+});
+
 describe('assignTheme', () => {
   it('tags sitting / Long COVID work as sedentary-vascular', () => {
     expect(assignTheme('Uninterrupted and interrupted sitting on vascular function in adults with Long COVID', '')).toBe('sedentary-vascular');

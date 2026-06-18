@@ -36,6 +36,8 @@ export function mapCslToPublication(csl) {
     ? csl.issued['date-parts'][0]
     : [];
   const keywords = Array.isArray(csl.keyword) ? csl.keyword.join(' ') : (csl.keyword || '');
+  const noteVenue = (csl.note || '').split(/\s*;\s*Conference date/i)[0].trim();
+  const publisher = Array.isArray(csl.publisher) ? csl.publisher.join(' ') : (csl.publisher || '');
   return {
     id: csl.id,
     type: TYPE_MAP[csl.type] || 'article',
@@ -46,7 +48,7 @@ export function mapCslToPublication(csl) {
     }),
     year: dateParts[0] ?? null,
     month: dateParts[1] ?? null,
-    journal: csl['container-title'] || csl['publisher'] || '',
+    journal: csl['container-title'] || noteVenue || publisher || '',
     doi: csl.DOI || '',
     abstract: (csl.abstract || '').replace(/\s+/g, ' ').trim(),
     featured: csl.DOI ? FEATURED_DOIS.has(csl.DOI) : false,
