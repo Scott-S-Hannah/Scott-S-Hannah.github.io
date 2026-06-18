@@ -1,9 +1,0 @@
-/* Custom styling for Dr. Scott Hannah's HugoBlox Academic CV.
-   Direction: bold + light, cyan accent. Restyles EXISTING blocks only, adds no markup.
-   Uses the theme's --color-primary-* variables so it stays on-theme and adapts to dark mode.
-   Theme reference: blox resume-biography-3 uses .resume-biography, .avatar, .bio-text.
-   Note: the theme already ships a font-black name, primary-coloured role, and cyan
-   interest chips, so this file stays intentionally small. */
-
-/* Sentinel so we can verify the file is loaded in the built HTML. */
-:root { --shannah-custom-css: 1; }
