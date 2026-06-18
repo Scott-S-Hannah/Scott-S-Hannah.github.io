@@ -1,0 +1,28 @@
+:root {
+  --paper: #f7f4ee;
+  --surface: #fffdf9;
+  --ink: #1a2422;
+  --ink-soft: #494e4b;
+  --mut: #5f6360;
+  --faint: #9c978d;
+  --line: #e6e1d7;
+  --teal: #0a7488;
+  --teal-deep: #0c6b72;
+  --feature: #16242e;
+  --on-feature: #eef1ee;
+
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.6rem + 2.2vw, 3rem);
+  --step-4: clamp(2.6rem, 1.9rem + 3.4vw, 4.2rem);
+
+  --maxw: 72rem;
+  --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.75rem);
+  --radius: 10px;
+}
