@@ -1,7 +1,7 @@
 ---
 title: '“Take My Bone Away?” Hypoxia and bone: A narrative review'
 authors:
-- \Scott S.\ Hannah
+- Scott Hannah
 - Sonyia McFadden
 - Andrea McNeilly
 - Conor McClean

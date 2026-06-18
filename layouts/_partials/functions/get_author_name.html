@@ -1,0 +1,29 @@
+{{/* Get name of primary author. */}}
+{{/* LOCAL OVERRIDE of blox@v0.0.0-20260105203838-3526fb1ca1e5: pass the original
+     author name to get_author_profile so the primary-author meta tag / JSON-LD
+     keeps its capitalization when the author has no data/authors profile. */}}
+
+{{ $page := . }}
+
+{{/* Get publisher as fall back. */}}
+{{ $branding := partialCached "functions/get_branding" $page "branding" }}
+{{ $publisher := $branding.organization }}
+
+{{ $author := "" }}
+{{ $author_slug := "" }}
+
+{{ if and (not $page.Params.authors) ($page.Scratch.Get "superuser_slug") }}
+  {{ $author_slug = $page.Scratch.Get "superuser_slug" }}
+{{ else if $page.Params.authors }}
+  {{ $author = index $page.Params.authors 0 }}
+  {{ $author_slug = urlize $author }}
+{{ end }}
+
+{{ $profile := partial "functions/get_author_profile" (dict "slug" $author_slug "name" $author) }}
+{{ if $profile.title }}
+  {{ $author = $profile.title }}
+{{ else }}
+  {{ $author = $author | default $publisher }}
+{{ end }}
+
+{{ return $author }}
