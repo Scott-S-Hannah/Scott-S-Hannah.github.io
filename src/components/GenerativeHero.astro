@@ -1,10 +1,9 @@
 ---
-/* Generative hero (v3, 2D canvas). Concept: ONE particle system. Teal points
-   flow in from the field and settle into a running silhouette sampled from
-   public/runner.svg, so the figure is constructed from the flowing points
-   (flow and figure are the same thing). Athlete faces away; energy flows into
-   him. White base, Helvetica/Swiss type, teal #02ABBF. Exploratory, not locked.
-   Next layer: WebGL (three.js) + GSAP ScrollTrigger. */
+/* Generative hero (v4-loose, 2D canvas). Persistent teal particles stream in
+   and chase a 6-phase run cycle (public/run/phase0..5.png) with long trails and
+   index-based matching, so the runner reads as flowing energy that runs more
+   than a hard silhouette. White base, Helvetica/Swiss, teal #02ABBF.
+   Exploratory, not locked. Next: WebGL + GSAP ScrollTrigger. */
 ---
 <section class="gh">
   <header class="gh__nav">
@@ -55,113 +54,110 @@
   if (canvas && stage) {
     const ctx = canvas.getContext('2d');
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const FLIP = false;
-    let W = 0, H = 0, DPR = 1, amb = [], body = [], raf = 0, imgReady = false, gf = 0;
-    const img = new Image();
+    const NPH = 6, K = 2200, DPP = 9;
+    let W = 0, H = 0, DPR = 1, raf = 0, gf = 0, ready = false;
+    let parts = [], clouds = [], edges = [];
+    const imgs = [];
 
-    function srcPoint() {
-      return { x: -W * 0.05 + Math.random() * W * 0.30, y: H * 0.08 + Math.random() * H * 0.84 };
-    }
+    const srcPoint = () => ({ x: -W * 0.05 + Math.random() * W * 0.26, y: H * 0.1 + Math.random() * H * 0.8 });
 
-    function buildFigure() {
-      if (!imgReady) return;
-      const ar = (img.naturalWidth / img.naturalHeight) || 1.12;
-      let bh = H * 0.76, bw = bh * ar;
-      if (bw > W * 0.54) { bw = W * 0.54; bh = bw / ar; }
-      const off = document.createElement('canvas');
-      off.width = Math.round(bw); off.height = Math.round(bh);
+    function samplePhase(img) {
+      const sw = 240, sh = Math.max(1, Math.round(sw * img.naturalHeight / img.naturalWidth));
+      const off = document.createElement('canvas'); off.width = sw; off.height = sh;
       const o = off.getContext('2d');
-      o.fillStyle = '#fff'; o.fillRect(0, 0, off.width, off.height);
-      if (FLIP) { o.translate(off.width, 0); o.scale(-1, 1); }
-      o.drawImage(img, 0, 0, off.width, off.height);
-      const d = o.getImageData(0, 0, off.width, off.height).data;
-      const ow = off.width, oh = off.height;
-      const bgAt = (x, y) => {
-        if (x < 0 || y < 0 || x >= ow || y >= oh) return true;
-        const q = (y * ow + x) * 4;
-        return (d[q] * 0.299 + d[q + 1] * 0.587 + d[q + 2] * 0.114) >= 232;
-      };
-      const fx = W - bw - W * 0.05, fy = (H - bh) / 2;
-      body = [];
-      for (let j = 0; j < oh; j += 3) for (let i = 0; i < ow; i += 3) {
-        const idx = (j * ow + i) * 4;
-        const lum = d[idx] * 0.299 + d[idx + 1] * 0.587 + d[idx + 2] * 0.114;
-        if (lum < 232 && body.length < 7000) {
-          const edge = bgAt(i - 3, j) || bgAt(i + 3, j) || bgAt(i, j - 3) || bgAt(i, j + 3);
-          const t0 = edge ? Math.random() * 60 : 80 + Math.random() * 340;
-          const s = srcPoint();
-          body.push({ x: s.x, y: s.y, px: s.x, py: s.y, vx: 0, vy: 0, hx: fx + i, hy: fy + j, t0: t0 });
+      o.fillStyle = '#fff'; o.fillRect(0, 0, sw, sh); o.drawImage(img, 0, 0, sw, sh);
+      const d = o.getImageData(0, 0, sw, sh).data;
+      const fig = (x, y) => { if (x < 0 || y < 0 || x >= sw || y >= sh) return false; const k = (y * sw + x) * 4; return d[k] * 0.299 + d[k + 1] * 0.587 + d[k + 2] * 0.114 < 150; };
+      const pts = [];
+      for (let j = 0; j < sh; j++) for (let i = 0; i < sw; i++) {
+        if (fig(i, j)) {
+          const edge = !fig(i - 2, j) || !fig(i + 2, j) || !fig(i, j - 2) || !fig(i, j + 2);
+          pts.push([i / sw, j / sh, edge ? 1 : 0]);
         }
       }
+      return pts;
+    }
+
+    function buildClouds() {
+      const raw = imgs.map(samplePhase);
+      let minx = 1, miny = 1, maxx = 0, maxy = 0;
+      for (const pts of raw) for (const p of pts) { if (p[0] < minx) minx = p[0]; if (p[0] > maxx) maxx = p[0]; if (p[1] < miny) miny = p[1]; if (p[1] > maxy) maxy = p[1]; }
+      const uw = (maxx - minx) || 1, uh = (maxy - miny) || 1, uar = uw / uh;
+      let bh = H * 0.86, bw = bh * uar;
+      if (bw > W * 0.5) { bw = W * 0.5; bh = bw / uar; }
+      const fx = W - bw - W * 0.06, fy = (H - bh) / 2;
+      clouds = []; edges = [];
+      for (const pts of raw) {
+        pts.sort((a, b) => (Math.floor(a[1] * 44) - Math.floor(b[1] * 44)) || (a[0] - b[0]));
+        const cloud = new Float32Array(K * 2), eg = new Uint8Array(K), n = pts.length || 1;
+        for (let i = 0; i < K; i++) {
+          const p = pts[Math.min(n - 1, Math.floor(i / K * n))] || [0.5, 0.5, 0];
+          cloud[i * 2] = fx + ((p[0] - minx) / uw) * bw;
+          cloud[i * 2 + 1] = fy + ((p[1] - miny) / uh) * bh;
+          eg[i] = p[2] || 0;
+        }
+        clouds.push(cloud); edges.push(eg);
+      }
+      parts = [];
+      for (let i = 0; i < K; i++) { const s = srcPoint(); parts.push({ x: s.x, y: s.y, vx: 0, vy: 0, t0: Math.random() * 190 }); }
     }
 
     function size() {
       DPR = Math.min(window.devicePixelRatio || 1, 2);
-      const r = stage.getBoundingClientRect();
-      W = r.width; H = r.height;
+      const r = stage.getBoundingClientRect(); W = r.width; H = r.height;
       canvas.width = W * DPR; canvas.height = H * DPR;
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
-      amb = [];
-      for (let i = 0; i < 220; i++) amb.push({ x: Math.random() * W, y: Math.random() * H, life: Math.random() * 240 });
       gf = 0;
-      buildFigure();
-      if (reduce) renderStatic();
+      if (ready) { buildClouds(); if (reduce) renderStatic(); }
     }
 
     let t = 0;
-    const ang = (x, y) => { const s = 0.0016; return (Math.sin(x * s + t * 0.6) + Math.cos(y * s - t * 0.42) + Math.sin((x + y) * s * 0.5 + t * 0.22)) * Math.PI; };
+    const ang = (x, y) => { const s = 0.0017; return (Math.sin(x * s + t * 0.6) + Math.cos(y * s - t * 0.42) + Math.sin((x + y) * s * 0.5 + t * 0.22)) * Math.PI; };
 
     function renderStatic() {
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = 'rgba(2,171,191,0.72)';
-      for (const p of body) ctx.fillRect(p.hx, p.hy, 1.6, 1.6);
+      const c = clouds[0];
+      for (let i = 0; i < K; i++) ctx.fillRect(c[i * 2], c[i * 2 + 1], 1.6, 1.6);
     }
 
     function frame() {
       t += 0.007; gf++;
-      ctx.fillStyle = 'rgba(255,255,255,0.17)'; ctx.fillRect(0, 0, W, H);
-
-      ctx.strokeStyle = 'rgba(2,171,191,0.09)'; ctx.lineWidth = 1; ctx.beginPath();
-      for (const p of amb) {
-        const a = ang(p.x, p.y);
-        const nx = p.x + Math.cos(a) * 1.5, ny = p.y + Math.sin(a) * 1.5;
-        ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny);
-        p.x = nx; p.y = ny; p.life--;
-        if (p.x < 0 || p.x > W || p.y < 0 || p.y > H || p.life < 0) { p.x = Math.random() * W; p.y = Math.random() * H; p.life = 150 + Math.random() * 200; }
-      }
-      ctx.stroke();
-
-      ctx.fillStyle = 'rgba(2,171,191,0.92)';
-      ctx.strokeStyle = 'rgba(2,171,191,0.34)'; ctx.lineWidth = 1; ctx.beginPath();
-      for (const p of body) {
+      ctx.fillStyle = 'rgba(255,255,255,0.36)'; ctx.fillRect(0, 0, W, H);
+      const pt = gf / DPP, curr = Math.floor(pt) % NPH, next = (curr + 1) % NPH, fr = pt - Math.floor(pt);
+      const c0 = clouds[curr], c1 = clouds[next];
+      ctx.fillStyle = 'rgba(2,171,191,0.9)';
+      ctx.strokeStyle = 'rgba(2,171,191,0.33)'; ctx.lineWidth = 1; ctx.beginPath();
+      for (let i = 0; i < K; i++) {
+        const p = parts[i];
         if (gf < p.t0) continue;
-        p.px = p.x; p.py = p.y;
-        const dx = p.hx - p.x, dy = p.hy - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const hx = c0[i * 2] + (c1[i * 2] - c0[i * 2]) * fr;
+        const hy = c0[i * 2 + 1] + (c1[i * 2 + 1] - c0[i * 2 + 1]) * fr;
+        const px = p.x, py = p.y;
+        const dx = hx - p.x, dy = hy - p.y, dist = Math.sqrt(dx * dx + dy * dy) || 1;
         const a = ang(p.x, p.y);
-        if (dist > 44) {
+        if (dist > 50) {
           const inv = 1 / dist;
-          p.vx += dx * inv * 2.4 + Math.cos(a) * 0.5;
-          p.vy += dy * inv * 2.4 + Math.sin(a) * 0.5;
+          p.vx += dx * inv * 2.6 + Math.cos(a) * 0.5; p.vy += dy * inv * 2.6 + Math.sin(a) * 0.5;
+          p.vx *= 0.72; p.vy *= 0.72; p.x += p.vx; p.y += p.vy;
+          ctx.moveTo(px, py); ctx.lineTo(p.x, p.y);
         } else {
-          p.vx += dx * 0.13 + Math.cos(a) * 0.22;
-          p.vy += dy * 0.13 + Math.sin(a) * 0.22;
+          p.vx += dx * 0.42 + Math.cos(a) * 0.1; p.vy += dy * 0.42 + Math.sin(a) * 0.1;
+          p.vx *= 0.72; p.vy *= 0.72; p.x += p.vx; p.y += p.vy;
+          if (edges[curr][i]) ctx.fillRect(p.x - 0.4, p.y - 0.4, 2.4, 2.4);
+          else ctx.fillRect(p.x, p.y, 1.5, 1.5);
         }
-        p.vx *= 0.8; p.vy *= 0.8; p.x += p.vx; p.y += p.vy;
-        if (Math.abs(p.vx) + Math.abs(p.vy) > 0.7) { ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); }
-        else { ctx.fillRect(p.x, p.y, 1.6, 1.6); }
-        if (Math.random() < 0.004) { const s = srcPoint(); p.x = s.x; p.y = s.y; p.vx = 0; p.vy = 0; }
+        if (Math.random() < 0.0018) { const s = srcPoint(); p.x = s.x; p.y = s.y; p.vx = 0; p.vy = 0; }
       }
       ctx.stroke();
-
       raf = requestAnimationFrame(frame);
     }
 
     const init = () => { cancelAnimationFrame(raf); size(); if (!reduce) frame(); };
-    img.onload = () => { imgReady = true; init(); };
-    img.onerror = () => { if (img.src.indexOf('runner.png') !== -1) img.src = '/runner.svg'; };
-    img.src = '/runner.png';
+    let loaded = 0;
+    const oneDone = () => { loaded++; if (loaded === NPH) { ready = true; init(); } };
+    for (let i = 0; i < NPH; i++) { const im = new Image(); im.onload = oneDone; im.onerror = oneDone; im.src = '/run/phase' + i + '.png'; imgs.push(im); }
     let to; window.addEventListener('resize', () => { clearTimeout(to); to = setTimeout(init, 150); });
   }
 </script>
