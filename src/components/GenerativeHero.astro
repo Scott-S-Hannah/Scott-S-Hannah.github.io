@@ -56,7 +56,7 @@
     const ctx = canvas.getContext('2d');
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const FLIP = false;
-    let W = 0, H = 0, DPR = 1, amb = [], body = [], raf = 0, imgReady = false;
+    let W = 0, H = 0, DPR = 1, amb = [], body = [], raf = 0, imgReady = false, gf = 0;
     const img = new Image();
 
     function srcPoint() {
@@ -75,13 +75,22 @@
       if (FLIP) { o.translate(off.width, 0); o.scale(-1, 1); }
       o.drawImage(img, 0, 0, off.width, off.height);
       const d = o.getImageData(0, 0, off.width, off.height).data;
+      const ow = off.width, oh = off.height;
+      const bgAt = (x, y) => {
+        if (x < 0 || y < 0 || x >= ow || y >= oh) return true;
+        const q = (y * ow + x) * 4;
+        return (d[q] * 0.299 + d[q + 1] * 0.587 + d[q + 2] * 0.114) >= 232;
+      };
       const fx = W - bw - W * 0.05, fy = (H - bh) / 2;
       body = [];
-      for (let j = 0; j < off.height; j += 3) for (let i = 0; i < off.width; i += 3) {
-        const idx = (j * off.width + i) * 4;
+      for (let j = 0; j < oh; j += 3) for (let i = 0; i < ow; i += 3) {
+        const idx = (j * ow + i) * 4;
         const lum = d[idx] * 0.299 + d[idx + 1] * 0.587 + d[idx + 2] * 0.114;
         if (lum < 232 && body.length < 7000) {
-          body.push({ x: fx + i, y: fy + j, px: fx + i, py: fy + j, vx: 0, vy: 0, hx: fx + i, hy: fy + j });
+          const edge = bgAt(i - 3, j) || bgAt(i + 3, j) || bgAt(i, j - 3) || bgAt(i, j + 3);
+          const t0 = edge ? Math.random() * 60 : 80 + Math.random() * 340;
+          const s = srcPoint();
+          body.push({ x: s.x, y: s.y, px: s.x, py: s.y, vx: 0, vy: 0, hx: fx + i, hy: fy + j, t0: t0 });
         }
       }
     }
@@ -95,6 +104,7 @@
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
       amb = [];
       for (let i = 0; i < 220; i++) amb.push({ x: Math.random() * W, y: Math.random() * H, life: Math.random() * 240 });
+      gf = 0;
       buildFigure();
       if (reduce) renderStatic();
     }
@@ -109,7 +119,7 @@
     }
 
     function frame() {
-      t += 0.007;
+      t += 0.007; gf++;
       ctx.fillStyle = 'rgba(255,255,255,0.17)'; ctx.fillRect(0, 0, W, H);
 
       ctx.strokeStyle = 'rgba(2,171,191,0.09)'; ctx.lineWidth = 1; ctx.beginPath();
@@ -125,6 +135,7 @@
       ctx.fillStyle = 'rgba(2,171,191,0.92)';
       ctx.strokeStyle = 'rgba(2,171,191,0.34)'; ctx.lineWidth = 1; ctx.beginPath();
       for (const p of body) {
+        if (gf < p.t0) continue;
         p.px = p.x; p.py = p.y;
         const dx = p.hx - p.x, dy = p.hy - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -134,8 +145,8 @@
           p.vx += dx * inv * 2.4 + Math.cos(a) * 0.5;
           p.vy += dy * inv * 2.4 + Math.sin(a) * 0.5;
         } else {
-          p.vx += dx * 0.16 + Math.cos(a) * 0.05;
-          p.vy += dy * 0.16 + Math.sin(a) * 0.05;
+          p.vx += dx * 0.13 + Math.cos(a) * 0.22;
+          p.vy += dy * 0.13 + Math.sin(a) * 0.22;
         }
         p.vx *= 0.8; p.vy *= 0.8; p.x += p.vx; p.y += p.vy;
         if (Math.abs(p.vx) + Math.abs(p.vy) > 0.7) { ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); }
