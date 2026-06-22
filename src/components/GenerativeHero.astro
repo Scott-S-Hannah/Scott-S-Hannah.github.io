@@ -1,9 +1,11 @@
 ---
-/* Generative hero (v4-loose, 2D canvas). Persistent teal particles stream in
-   and chase a 6-phase run cycle (public/run/phase0..5.png) with long trails and
-   index-based matching, so the runner reads as flowing energy that runs more
-   than a hard silhouette. White base, Helvetica/Swiss, teal #02ABBF.
-   Exploratory, not locked. Next: WebGL + GSAP ScrollTrigger. */
+/* Generative hero (v8, three.js). A real rigged run animation (public/models/xbot.glb,
+   Mixamo 'run' clip) rendered ABSTRACTLY: ~320 animated skinned-mesh vertices are
+   sampled on the CPU each frame, projected side-on (orthographic), and drawn as a
+   teal low-poly wireframe + shedding particles on a 2D canvas. Real mocap gives
+   symmetric motion, true near/far depth (the far arm passes behind the torso),
+   ground-contact timing and ballistic follow-through for free. White base, teal
+   #02ABBF only, Helvetica/Swiss. Exploratory, not locked. */
 ---
 <section class="gh">
   <header class="gh__nav">
@@ -49,115 +51,336 @@
 </style>
 
 <script>
+  import * as THREE from 'three';
+  import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+
   const canvas = document.getElementById('gh-canvas');
   const stage = document.getElementById('gh-stage');
   if (canvas && stage) {
     const ctx = canvas.getContext('2d');
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const NPH = 6, K = 2200, DPP = 9;
-    let W = 0, H = 0, DPR = 1, raf = 0, gf = 0, ready = false;
-    let parts = [], clouds = [], edges = [];
-    const imgs = [];
+    const BODY = '2,171,191', CORE = '2,108,122', MIST = '127,216,225';
+    const NSAMP = 320;
 
-    const srcPoint = () => ({ x: -W * 0.05 + Math.random() * W * 0.26, y: H * 0.1 + Math.random() * H * 0.8 });
+    let W = 0, H = 0, DPR = 1, raf = 0, last = 0, ready = false;
+    let root = null, mesh = null, mixer = null;
+    let sIdx = [];                                  // sampled vertex indices
+    let edges = [];                                 // [a,b,restLen3D]
+    // per-sample buffers
+    let sx = null, sy = null, sz = null, psx = null, psy = null; // screen + prev
+    let bb = null, sc = 1, ox = 0, oy = 0;          // model-space bbox + screen fit
+    const v = new THREE.Vector3();
 
-    function samplePhase(img) {
-      const sw = 240, sh = Math.max(1, Math.round(sw * img.naturalHeight / img.naturalWidth));
-      const off = document.createElement('canvas'); off.width = sw; off.height = sh;
-      const o = off.getContext('2d');
-      o.fillStyle = '#fff'; o.fillRect(0, 0, sw, sh); o.drawImage(img, 0, 0, sw, sh);
-      const d = o.getImageData(0, 0, sw, sh).data;
-      const fig = (x, y) => { if (x < 0 || y < 0 || x >= sw || y >= sh) return false; const k = (y * sw + x) * 4; return d[k] * 0.299 + d[k + 1] * 0.587 + d[k + 2] * 0.114 < 150; };
-      const pts = [];
-      for (let j = 0; j < sh; j++) for (let i = 0; i < sw; i++) {
-        if (fig(i, j)) {
-          const edge = !fig(i - 2, j) || !fig(i + 2, j) || !fig(i, j - 2) || !fig(i, j + 2);
-          pts.push([i / sw, j / sh, edge ? 1 : 0]);
-        }
+    // ENERGY WAKE: the wireframe sheds its own nodes off the posterior (back + legs); each detached node
+    // FLOWS off as a tapered trailing streak, with a few tumbling edge shards for the wireframe-coming-apart
+    // character. Streams left toward the name, fades before the text, reacts to the cursor, clears the figure.
+    let groundY = 0, haveGround = false, planted = false, plantX = 0, plantY = 0, plantAge = 1, tflow = 0;
+    let bxMin = 0, bxMax = 0, byMin = 0, byMax = 0, cx = 0;   // body bbox + centroid (set in sample)
+    let mX = -1, mY = -1, mOn = false;
+    // PAGE-LOAD REVEAL: he RUNS in from near the name and BUILDS (core-out) while moving to his final spot, then sheds
+    let phase = 'assembling';                            // 'assembling' | 'running'
+    let asmT = 0; const ASM_DUR = 3.2, ASM_DX = 0.42, RV_WIN = 0.16;
+    let rv = null, introDX0 = 0;                          // per-node build order + run-in x offset
+    // posterior emission picker: a body-node index biased to the BACK third (low x) + LEGS (high y),
+    // suppressing the forward upper body. Shared by all styles; must run after sample().
+    function pickPosterior() {
+      const n = sIdx.length, bw = (bxMax - bxMin) || 1, bh = (byMax - byMin) || 1;
+      let k = (Math.random() * n) | 0;
+      for (let tries = 0; tries < 8; tries++) {
+        const c = (Math.random() * n) | 0;
+        const fxn = (sx[c] - bxMin) / bw, fyn = (sy[c] - byMin) / bh;
+        const isLegs = fyn > 0.55, isBack = fxn < 0.34, frontUpper = (fxn > 0.5 && fyn < 0.55);
+        if ((isLegs || isBack) && !frontUpper) { k = c; break; } k = c;
       }
-      return pts;
+      return k;
     }
 
-    function buildClouds() {
-      const raw = imgs.map(samplePhase);
-      let minx = 1, miny = 1, maxx = 0, maxy = 0;
-      for (const pts of raw) for (const p of pts) { if (p[0] < minx) minx = p[0]; if (p[0] > maxx) maxx = p[0]; if (p[1] < miny) miny = p[1]; if (p[1] > maxy) maxy = p[1]; }
-      const uw = (maxx - minx) || 1, uh = (maxy - miny) || 1, uar = uw / uh;
-      let bh = H * 0.86, bw = bh * uar;
-      if (bw > W * 0.5) { bw = W * 0.5; bh = bw / uar; }
-      const fx = W - bw - W * 0.06, fy = (H - bh) / 2;
-      clouds = []; edges = [];
-      for (const pts of raw) {
-        pts.sort((a, b) => (Math.floor(a[1] * 44) - Math.floor(b[1] * 44)) || (a[0] - b[0]));
-        const cloud = new Float32Array(K * 2), eg = new Uint8Array(K), n = pts.length || 1;
-        for (let i = 0; i < K; i++) {
-          const p = pts[Math.min(n - 1, Math.floor(i / K * n))] || [0.5, 0.5, 0];
-          cloud[i * 2] = fx + ((p[0] - minx) / uw) * bw;
-          cloud[i * 2 + 1] = fy + ((p[1] - miny) / uh) * bh;
-          eg[i] = p[2] || 0;
-        }
-        clouds.push(cloud); edges.push(eg);
+    // === SHED: the wireframe sheds its own nodes + short edge shards off the back ===
+    const shN = 560;
+    const shX = new Float32Array(shN), shY = new Float32Array(shN), shVX = new Float32Array(shN), shVY = new Float32Array(shN);
+    const shL = new Float32Array(shN), shDr = new Float32Array(shN), shTone = new Float32Array(shN), shSeed = new Float32Array(shN);
+    const shKind = new Uint8Array(shN), shFdx = new Float32Array(shN), shFdy = new Float32Array(shN), shSpin = new Float32Array(shN);
+    const SH_HIST = 13;                                  // per-particle trail length so the shed parts FLOW off
+    const shHX = new Float32Array(shN * SH_HIST), shHY = new Float32Array(shN * SH_HIST), shHead = new Uint8Array(shN), shCnt = new Uint8Array(shN);
+    let shEmitAcc = 0, shedPulse = 0;                    // shedPulse spikes at toe-off so the wake breathes with the stride
+    const SH_NEMIT = 40; const shEmit = new Int32Array(SH_NEMIT); let shEmitRot = 0, shEmitRefresh = 0;   // limited, slowly-migrating spawn positions -> distinct streams, less uniform clumping
+    const SH_DRIFT = 128, SH_LIFT = 5, SH_CURL = 24, SH_RELAX = 0.075, SH_EMIT = 104, SH_FRAG_FRAC = 0.10, SH_LIFE_MIN = 5.8, SH_LIFE_VAR = 4.0, SH_VMAX = 290;
+    function seedShed() { shEmitAcc = 0; for (let i = 0; i < shN; i++) { shL[i] = 0; shVX[i] = 0; shVY[i] = 0; shKind[i] = 0; shX[i] = -100; shY[i] = -100; shCnt[i] = 0; shHead[i] = 0; shSeed[i] = Math.random() * 6.2832; } for (let j = 0; j < SH_NEMIT; j++) shEmit[j] = pickPosterior(); }
+
+
+    const loader = new FBXLoader();
+    loader.load('/models/running.fbx', (obj) => {
+      root = obj;
+      root.rotation.set(0, 0, 0);                    // Y-up, faces +Z; we project Z->screenX for a right-facing side profile
+      root.updateMatrixWorld(true);
+      let best = null;
+      root.traverse(o => { if (o.isSkinnedMesh && (!best || o.geometry.attributes.position.count > best.geometry.attributes.position.count)) best = o; });
+      mesh = best;
+      mixer = new THREE.AnimationMixer(root);
+      mixer.timeScale = 0.5;                          // slow-motion: half speed
+      const clip = obj.animations[0];
+      mixer.clipAction(clip).play();
+
+      // sample a representative run frame; compute all world verts once
+      mixer.update(0.25); root.updateMatrixWorld(true); mesh.skeleton.update();
+      const total = mesh.geometry.attributes.position.count;
+      bb = { minx: 1e9, maxx: -1e9, miny: 1e9, maxy: -1e9, minz: 1e9, maxz: -1e9 };
+      const allw = new Float32Array(total * 3);
+      for (let i = 0; i < total; i++) { mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); allw[i * 3] = v.x; allw[i * 3 + 1] = v.y; allw[i * 3 + 2] = v.z;
+        if (v.x < bb.minx) bb.minx = v.x; if (v.x > bb.maxx) bb.maxx = v.x; if (v.y < bb.miny) bb.miny = v.y; if (v.y > bb.maxy) bb.maxy = v.y; if (v.z < bb.minz) bb.minz = v.z; if (v.z > bb.maxz) bb.maxz = v.z; }
+      // even spatial sample: one vertex per occupied grid cell
+      const cell = (bb.maxy - bb.miny) / 26;
+      const map = new Map();
+      for (let i = 0; i < total; i++) { const key = Math.floor(allw[i * 3] / cell) + '_' + Math.floor(allw[i * 3 + 1] / cell) + '_' + Math.floor(allw[i * 3 + 2] / cell); if (!map.has(key)) map.set(key, i); }
+      sIdx = [...map.values()];
+      const n = sIdx.length;
+      sx = new Float32Array(n); sy = new Float32Array(n); sz = new Float32Array(n); psx = new Float32Array(n); psy = new Float32Array(n);
+      const pts = sIdx.map(i => new THREE.Vector3(allw[i * 3], allw[i * 3 + 1], allw[i * 3 + 2]));
+      const k = 3, seen = new Set(), maxE = (bb.maxy - bb.miny) * 0.15;   // cull cross-body links
+      for (let i = 0; i < n; i++) { const ds = [];
+        for (let j = 0; j < n; j++) { if (i === j) continue; ds.push([pts[i].distanceToSquared(pts[j]), j]); }
+        ds.sort((a, b) => a[0] - b[0]);
+        for (let m = 0; m < k; m++) { const j = ds[m][1], d = Math.sqrt(ds[m][0]); if (d > maxE) break; const a = Math.min(i, j), b = Math.max(i, j), key = a + '_' + b; if (seen.has(key)) continue; seen.add(key); edges.push([a, b, d]); }
       }
-      parts = [];
-      for (let i = 0; i < K; i++) { const s = srcPoint(); parts.push({ x: s.x, y: s.y, vx: 0, vy: 0, t0: Math.random() * 190 }); }
+      console.log('runner sampled:', n, 'nodes,', edges.length, 'edges');
+      ready = true; init();
+    });
+
+    const smooth = (e0, e1, x) => { const u = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return u * u * (3 - 2 * u); };
+
+    function fit() {                                 // model bbox -> figure box on the right
+      const mw = bb.maxz - bb.minz, mh = bb.maxy - bb.miny;   // side profile: Z=horizontal, Y=vertical, X=depth
+      const targetH = H * 0.80; sc = targetH / mh;
+      const figW = mw * sc;
+      ox = W - figW - W * 0.085 - bb.minz * sc;
+      oy = (H - targetH) / 2 + bb.maxy * sc;          // y flips: screenY = oy - worldY*sc
+    }
+
+    function sample() {
+      root.updateMatrixWorld(true); mesh.skeleton.update();
+      bxMin = 1e9; bxMax = -1e9; byMin = 1e9; byMax = -1e9; let sxSum = 0;
+      for (let i = 0; i < sIdx.length; i++) {
+        mesh.getVertexPosition(sIdx[i], v); v.applyMatrix4(mesh.matrixWorld);
+        psx[i] = sx[i]; psy[i] = sy[i];
+        sx[i] = ox + v.z * sc; sy[i] = oy - v.y * sc; sz[i] = v.x; sxSum += sx[i];
+        if (sx[i] < bxMin) bxMin = sx[i]; if (sx[i] > bxMax) bxMax = sx[i];
+        if (sy[i] < byMin) byMin = sy[i]; if (sy[i] > byMax) byMax = sy[i];
+      }
+      cx = sxSum / sIdx.length;                         // body centroid x (stable back-line reference)
+    }
+
+    const TIERS = 7;
+    const M = [127, 216, 225], Bc = [2, 171, 191], C = [2, 108, 122];   // mist -> body -> core
+    const col = (t) => { let r, g, b; if (t < 0.5) { const u = t * 2; r = M[0] + (Bc[0] - M[0]) * u; g = M[1] + (Bc[1] - M[1]) * u; b = M[2] + (Bc[2] - M[2]) * u; } else { const u = (t - 0.5) * 2; r = Bc[0] + (C[0] - Bc[0]) * u; g = Bc[1] + (C[1] - Bc[1]) * u; b = Bc[2] + (C[2] - Bc[2]) * u; } return `${r | 0},${g | 0},${b | 0}`; };
+
+    function draw() {
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      if (haveGround) {                                  // ground line: anchors the runner, binds figure to the name
+        const gy = groundY + 3, grad = ctx.createLinearGradient(0, 0, W, 0);
+        grad.addColorStop(0, `rgba(${BODY},0)`); grad.addColorStop(0.32, `rgba(${BODY},0.08)`); grad.addColorStop(0.6, `rgba(${BODY},0.34)`); grad.addColorStop(1, `rgba(${BODY},0.62)`);
+        ctx.strokeStyle = grad; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+      }
+      if (haveGround && plantAge < 0.5) { const a = 0.15 * (1 - plantAge / 0.5); ctx.fillStyle = `rgba(${CORE},${a.toFixed(3)})`; ctx.beginPath(); ctx.ellipse(plantX, plantY + 2, 26, 5, 0, 0, 6.2832); ctx.fill(); }
+      drawShed();
+      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1;     // depth axis = X
+      ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
+      // edges: far -> near, each tier toned + faded by depth (far = pale/faint, near = deep/bold)
+      for (let tier = 0; tier < TIERS; tier++) {
+        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS;
+        ctx.strokeStyle = `rgba(${col(t)},${(0.28 + 0.5 * t).toFixed(3)})`;
+        ctx.beginPath();
+        for (let e = 0; e < edges.length; e++) {
+          const a = edges[e][0], b = edges[e][1], za = (sz[a] + sz[b]) * 0.5;
+          if (za < za0 || za >= za1) continue;
+          const cl = Math.hypot((sx[a] - sx[b]) / sc, (sy[a] - sy[b]) / sc);
+          if (cl > edges[e][2] * 2.0) continue;        // stretch cull
+          ctx.moveTo(sx[a], sy[a]); ctx.lineTo(sx[b], sy[b]);
+        }
+        ctx.stroke();
+      }
+      // nodes: same depth toning
+      for (let tier = 0; tier < TIERS; tier++) {
+        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS;
+        ctx.fillStyle = `rgba(${col(t)},${(0.35 + 0.55 * t).toFixed(3)})`;
+        const r = t > 0.8 ? 2.0 : 1.4;
+        for (let i = 0; i < sIdx.length; i++) { if (sz[i] < za0 || sz[i] >= za1) continue; ctx.fillRect(sx[i] - r * 0.5, sy[i] - r * 0.5, r, r); }
+      }
+    }
+
+    function footPlant(dt) {                            // ground level + foot-strike (drives the ground shadow)
+      let lowI = 0, lowY = -1e9;
+      for (let i = 0; i < sIdx.length; i++) if (sy[i] > lowY) { lowY = sy[i]; lowI = i; }
+      if (!haveGround) { groundY = lowY; haveGround = true; }
+      if (lowY > groundY) groundY = lowY; else groundY = groundY * 0.9996 + lowY * 0.0004;
+      const footVY = (sy[lowI] - psy[lowI]) / Math.max(dt, 1e-3);
+      if (!planted && lowY > groundY - 9 && footVY < 90) { planted = true; plantX = sx[lowI]; plantY = groundY; plantAge = 0; }
+      if (planted && lowY < groundY - 28) { planted = false; shedPulse = 1; }   // toe-off: release a burst of energy
+      plantAge += dt;
+    }
+    function updateShed(dt) {
+      shedPulse *= Math.exp(-dt / 0.18);                                          // the toe-off burst decays over ~0.4s
+      const kick = 1 + shedPulse * 0.8;                                           // burst particles get a propulsion kick
+      const wf = Math.max(0.85, Math.min(1.75, W / 1200));                       // scale wake density to viewport width
+      shEmitRefresh += dt * 8; while (shEmitRefresh >= 1) { shEmitRefresh -= 1; shEmit[shEmitRot] = pickPosterior(); shEmitRot = (shEmitRot + 1) % SH_NEMIT; }   // slowly migrate the limited spawn points
+      shEmitAcc += SH_EMIT * wf * (1 + shedPulse * 1.7) * dt; let toEmit = shEmitAcc | 0; shEmitAcc -= toEmit; if (toEmit > 42) toEmit = 42;
+      for (let e = 0; e < toEmit; e++) {
+        let slot = -1; for (let t = 0; t < 6; t++) { const c = (Math.random() * shN) | 0; if (shL[c] <= 0) { slot = c; break; } } if (slot < 0) continue;
+        const k = shEmit[(Math.random() * SH_NEMIT) | 0], bx = sx[k], by = sy[k], nvx = (sx[k] - psx[k]) || 0, nvy = (sy[k] - psy[k]) || 0;
+        shX[slot] = bx - 2 - Math.random() * 4; shY[slot] = by + (Math.random() - 0.5) * 4;
+        shVX[slot] = (-(SH_DRIFT * 0.45 + Math.random() * SH_DRIFT * 0.4) - nvx * 1.5) * kick; shVY[slot] = (-SH_LIFT - Math.random() * 14 + nvy * 0.8) * kick;
+        shL[slot] = 1; shDr[slot] = 1 / (SH_LIFE_MIN + Math.random() * SH_LIFE_VAR); shTone[slot] = 0.25 + Math.random() * 0.6; shSeed[slot] = Math.random() * 6.2832;
+        if (Math.random() < SH_FRAG_FRAC) {
+          shKind[slot] = 1; let k2 = k, best = 1e9;
+          for (let t = 0; t < 4; t++) { const c = pickPosterior(), ddx = sx[c] - bx, ddy = sy[c] - by, d2 = ddx * ddx + ddy * ddy; if (d2 > 4 && d2 < best) { best = d2; k2 = c; } }
+          let hdx = (sx[k2] - bx) * 0.5, hdy = (sy[k2] - by) * 0.5; const hl = Math.hypot(hdx, hdy);
+          if (hl > 22) { const s = 22 / hl; hdx *= s; hdy *= s; } if (hl < 1) { hdx = 6; hdy = 0; }
+          shFdx[slot] = hdx; shFdy[slot] = hdy; shSpin[slot] = (Math.random() - 0.5) * 1.4;
+        } else { shKind[slot] = 0; shFdx[slot] = 0; shFdy[slot] = 0; shSpin[slot] = 0; }
+        shHead[slot] = 0; shCnt[slot] = 1; shHX[slot * SH_HIST] = shX[slot]; shHY[slot * SH_HIST] = shY[slot];
+      }
+      const inv = 1 / W, ph = tflow * 0.16, kx = 3.0;                             // mostly-horizontal flow with low-freq vertical swells -> occasional gentle up-curls
+      for (let i = 0; i < shN; i++) {
+        if (shL[i] <= 0) continue;
+        const x = shX[i], y = shY[i], nx = x * inv, ny = y * inv;
+        const a1 = kx * nx + 0.5 * ny + ph, a2 = 0.7 * kx * nx - 0.9 * ny - 0.6 * ph;
+        const cfx = (Math.sin(a1) * 0.35 + Math.sin(a2) * 0.25) * SH_CURL;        // small horizontal wobble
+        const sw = Math.cos(a1) * 0.9 - Math.cos(a2) * 0.5, cfy = -Math.max(0, sw) * SH_CURL;   // UP-only swells: curl up now and again, never down
+        let fx = -SH_DRIFT + cfx, fy = -SH_LIFT + cfy;
+        if (mOn) { const dx = x - mX, dy = y - mY, d = Math.hypot(dx, dy); if (d < 140) { const f = (1 - d / 140) * 280, ii = 1 / (d + 1); fx += dx * ii * f; fy += dy * ii * f; } }
+        shVX[i] += (fx - shVX[i]) * SH_RELAX; shVY[i] += (fy - shVY[i]) * SH_RELAX;
+        const sp2 = shVX[i] * shVX[i] + shVY[i] * shVY[i]; if (sp2 > SH_VMAX * SH_VMAX) { const cl = SH_VMAX / Math.sqrt(sp2); shVX[i] *= cl; shVY[i] *= cl; }   // cap speed -> no long stray streaks from the fast toe-off ejecta
+        shX[i] = x + shVX[i] * dt; shY[i] = y + shVY[i] * dt;
+        const hh = (shHead[i] + 1) % SH_HIST; shHead[i] = hh; shHX[i * SH_HIST + hh] = shX[i]; shHY[i * SH_HIST + hh] = shY[i]; if (shCnt[i] < SH_HIST) shCnt[i]++;
+        if (shKind[i] === 1) { const a = shSpin[i] * dt, ca = Math.cos(a), sa = Math.sin(a), ndx = shFdx[i] * ca - shFdy[i] * sa, ndy = shFdx[i] * sa + shFdy[i] * ca; shFdx[i] = ndx * 0.998; shFdy[i] = ndy * 0.998; }
+        shL[i] -= shDr[i] * dt;
+        if (shL[i] <= 0 || shX[i] < W * 0.01 || shY[i] < -40 || shY[i] > H + 40) shL[i] = 0;
+      }
+    }
+    function drawShed() {                                 // shed nodes FLOW off: a tapered trailing streak + a crisp detached-vertex head
+      const tEdge = W * 0.17, tFade = W * 0.005, back = cx - 0.16 * (bxMax - bxMin), fadeBand = 64;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (let i = 0; i < shN; i++) {
+        if (shL[i] <= 0) continue; const x = shX[i], y = shY[i];
+        let a = shL[i] * 0.85; a *= smooth(back, back - fadeBand, x); if (x < tEdge) a *= smooth(tFade, tEdge, x); if (a < 0.02) continue;
+        let tone = 0.24 + 0.62 * shL[i] + (shTone[i] - 0.5) * 0.12;        // deep teal at the body, lightening as it dissipates
+        if (tone < 0) tone = 0; else if (tone > 1) tone = 1;
+        if (shKind[i] === 1) {                            // tumbling edge shard (keeps the wireframe-breaking character)
+          ctx.globalAlpha = a * 0.9; ctx.strokeStyle = `rgb(${col(tone * 0.9)})`; ctx.lineWidth = 1.1;
+          ctx.beginPath(); ctx.moveTo(x - shFdx[i], y - shFdy[i]); ctx.lineTo(x + shFdx[i], y + shFdy[i]); ctx.stroke();
+          continue;
+        }
+        const cnt = shCnt[i], hd = shHead[i];
+        if (cnt >= 2) {                                   // the flowing trail
+          ctx.strokeStyle = `rgb(${col(tone)})`;
+          const start = (hd - cnt + 1 + SH_HIST) % SH_HIST;
+          ctx.globalAlpha = a * 0.45; ctx.lineWidth = 1.0; ctx.beginPath();   // faint full streak
+          for (let s = 0; s < cnt; s++) { const id = (start + s) % SH_HIST, X = shHX[i * SH_HIST + id], Y = shHY[i * SH_HIST + id]; if (s === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); }
+          ctx.stroke();
+          const half = Math.max(2, cnt >> 1), st2 = (hd - half + 1 + SH_HIST) % SH_HIST;
+          ctx.globalAlpha = a * 0.85; ctx.lineWidth = 1.5; ctx.beginPath();   // brighter head half
+          for (let s = 0; s < half; s++) { const id = (st2 + s) % SH_HIST, X = shHX[i * SH_HIST + id], Y = shHY[i * SH_HIST + id]; if (s === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = a; ctx.fillStyle = `rgb(${col(tone)})`;            // detached-vertex head node
+        const r = shL[i] > 0.7 ? 1.9 : 1.4; ctx.fillRect(x - r * 0.5, y - r * 0.5, r, r);
+      }
+      ctx.globalAlpha = 1;
+    }
+    function setupAssembly() {                           // build order (core-out) + run-in offset; he RUNS while building
+      const n = sIdx.length;
+      if (!rv || rv.length !== n) rv = new Float32Array(n);
+      mixer.setTime(0); root.updateMatrixWorld(true); mesh.skeleton.update(); sample();   // frame-0 layout for the build order
+      const bh = (byMax - byMin) || 1;
+      const adj = [];                                                                      // adjacency from the mesh edge graph
+      for (let i = 0; i < n; i++) adj.push([]);
+      for (let e = 0; e < edges.length; e++) { const a = edges[e][0], b = edges[e][1]; adj[a].push(b); adj[b].push(a); }
+      const depth = new Int32Array(n).fill(-1), queue = [];
+      for (let i = 0; i < n; i++) { if ((sy[i] - byMin) / bh > 0.92) { depth[i] = 0; queue.push(i); } }   // seed = the feet
+      if (!queue.length) { let lo = 0; for (let i = 1; i < n; i++) if (sy[i] > sy[lo]) lo = i; depth[lo] = 0; queue.push(lo); }
+      let qi = 0, maxD = 0;                                                                 // BFS: grow outward hop-by-hop through the struts
+      while (qi < queue.length) { const u = queue[qi++], d = depth[u]; if (d > maxD) maxD = d; const nb = adj[u]; for (let j = 0; j < nb.length; j++) { const w = nb[j]; if (depth[w] < 0) { depth[w] = d + 1; queue.push(w); } } }
+      for (let i = 0; i < n; i++) if (depth[i] < 0) depth[i] = maxD;                        // any disconnected -> build last
+      const md = maxD || 1;
+      for (let i = 0; i < n; i++) {
+        const jit = ((i * 9301 + 49297) % 233280) / 233280;
+        rv[i] = Math.min(1 - RV_WIN, (depth[i] / md) * (1 - RV_WIN) + jit * 0.02);          // build order = graph distance from the feet (wires outward, not a wipe)
+      }
+      introDX0 = -W * ASM_DX;                             // start shifted left toward the name; eases to 0
+      mixer.setTime(0); asmT = 0; phase = 'assembling'; haveGround = false; planted = false;
+    }
+    function stepAssemble(dt) {
+      asmT += dt;
+      const p = Math.min(1, asmT / ASM_DUR), dx = introDX0 * (1 - smooth(0, 1, p));
+      tflow += dt; mixer.update(dt); sample();            // he RUNS during the build
+      for (let i = 0; i < sIdx.length; i++) sx[i] += dx;  // translate from near-name to his final spot
+      drawAssemble(p);
+      if (p >= 1) handoff();
+    }
+    function drawAssemble(p) {                            // MESH CONSTRUCTION: vertices snap in, struts draw on between them (bottom-up)
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
+      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1, NW = 0.05, EW = 0.05;
+      for (let tier = 0; tier < TIERS; tier++) {           // EDGES draw-on: strut extends from the earlier vertex to the later one
+        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS, baseEdge = 0.28 + 0.5 * t, cstr = col(t);
+        for (let e = 0; e < edges.length; e++) {
+          const a = edges[e][0], b = edges[e][1], za = (sz[a] + sz[b]) * 0.5;
+          if (za < za0 || za >= za1) continue;
+          const eStart = rv[a] > rv[b] ? rv[a] : rv[b];    // both vertices placed before the strut connects them
+          if (p < eStart) continue;
+          const eu = smooth(eStart, eStart + EW, p);        // 0..1 draw fraction
+          let ax, ay, ex, ey;
+          if (rv[a] <= rv[b]) { ax = sx[a]; ay = sy[a]; ex = sx[b]; ey = sy[b]; } else { ax = sx[b]; ay = sy[b]; ex = sx[a]; ey = sy[a]; }
+          const cl = Math.hypot((ex - ax) / sc, (ey - ay) / sc);
+          if (cl > edges[e][2] * 2.0) continue;             // stretch cull (running pose is fine)
+          ctx.strokeStyle = `rgba(${cstr},${(baseEdge * Math.min(1, eu * 2)).toFixed(3)})`;
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + (ex - ax) * eu, ay + (ey - ay) * eu); ctx.stroke();
+        }
+      }
+      for (let tier = 0; tier < TIERS; tier++) {           // VERTICES snap in crisply with a brief size-pop (a placed point)
+        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS, baseA = 0.35 + 0.55 * t, rr = t > 0.8 ? 2.0 : 1.4, cf = col(t);
+        for (let i = 0; i < sIdx.length; i++) {
+          if (sz[i] < za0 || sz[i] >= za1) continue;
+          if (p < rv[i]) continue;
+          const a = baseA * smooth(rv[i], rv[i] + NW, p);
+          if (a < 0.02) continue;
+          const r = rr * (1 + 0.7 * Math.max(0, 1 - (p - rv[i]) / 0.09));   // pop bigger on placement, settle
+          ctx.fillStyle = `rgba(${cf},${a.toFixed(3)})`; ctx.fillRect(sx[i] - r * 0.5, sy[i] - r * 0.5, r, r);
+        }
+      }
+    }
+    function handoff() {                                  // mixer ran continuously + dx=0 at the end -> seamless; just start the wake
+      phase = 'running'; seedShed(); haveGround = false; planted = false; last = 0;
+    }
+    function step(dt) {
+      if (phase === 'assembling') { stepAssemble(dt); return; }
+      tflow += dt; mixer.update(dt); sample(); footPlant(dt); updateShed(dt); draw();
+    }
+    function frame(now) {
+      const T = now / 1000; if (!last) last = T; let dt = T - last; last = T; if (dt > 1 / 30) dt = 1 / 30; if (dt < 0) dt = 0;
+      step(dt);
+      raf = requestAnimationFrame(frame);
     }
 
     function size() {
       DPR = Math.min(window.devicePixelRatio || 1, 2);
       const r = stage.getBoundingClientRect(); W = r.width; H = r.height;
-      canvas.width = W * DPR; canvas.height = H * DPR;
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
-      gf = 0;
-      if (ready) { buildClouds(); if (reduce) renderStatic(); }
-    }
-
-    let t = 0;
-    const ang = (x, y) => { const s = 0.0017; return (Math.sin(x * s + t * 0.6) + Math.cos(y * s - t * 0.42) + Math.sin((x + y) * s * 0.5 + t * 0.22)) * Math.PI; };
-
-    function renderStatic() {
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = 'rgba(2,171,191,0.72)';
-      const c = clouds[0];
-      for (let i = 0; i < K; i++) ctx.fillRect(c[i * 2], c[i * 2 + 1], 1.6, 1.6);
-    }
-
-    function frame() {
-      t += 0.007; gf++;
-      ctx.fillStyle = 'rgba(255,255,255,0.36)'; ctx.fillRect(0, 0, W, H);
-      const pt = gf / DPP, curr = Math.floor(pt) % NPH, next = (curr + 1) % NPH, fr = pt - Math.floor(pt);
-      const c0 = clouds[curr], c1 = clouds[next];
-      ctx.fillStyle = 'rgba(2,171,191,0.9)';
-      ctx.strokeStyle = 'rgba(2,171,191,0.33)'; ctx.lineWidth = 1; ctx.beginPath();
-      for (let i = 0; i < K; i++) {
-        const p = parts[i];
-        if (gf < p.t0) continue;
-        const hx = c0[i * 2] + (c1[i * 2] - c0[i * 2]) * fr;
-        const hy = c0[i * 2 + 1] + (c1[i * 2 + 1] - c0[i * 2 + 1]) * fr;
-        const px = p.x, py = p.y;
-        const dx = hx - p.x, dy = hy - p.y, dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const a = ang(p.x, p.y);
-        if (dist > 50) {
-          const inv = 1 / dist;
-          p.vx += dx * inv * 2.6 + Math.cos(a) * 0.5; p.vy += dy * inv * 2.6 + Math.sin(a) * 0.5;
-          p.vx *= 0.72; p.vy *= 0.72; p.x += p.vx; p.y += p.vy;
-          ctx.moveTo(px, py); ctx.lineTo(p.x, p.y);
-        } else {
-          p.vx += dx * 0.42 + Math.cos(a) * 0.1; p.vy += dy * 0.42 + Math.sin(a) * 0.1;
-          p.vx *= 0.72; p.vy *= 0.72; p.x += p.vx; p.y += p.vy;
-          if (edges[curr][i]) ctx.fillRect(p.x - 0.4, p.y - 0.4, 2.4, 2.4);
-          else ctx.fillRect(p.x, p.y, 1.5, 1.5);
-        }
-        if (Math.random() < 0.0018) { const s = srcPoint(); p.x = s.x; p.y = s.y; p.vx = 0; p.vy = 0; }
+      canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      if (ready) {
+        fit();
+        if (phase === 'assembling') { setupAssembly(); }   // (re)capture frame-0 targets at this size, re-scatter
+        else { sample(); for (let i = 0; i < sIdx.length; i++) { psx[i] = sx[i]; psy[i] = sy[i]; } haveGround = false; planted = false; seedShed(); }
       }
-      ctx.stroke();
-      raf = requestAnimationFrame(frame);
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
     }
 
-    const init = () => { cancelAnimationFrame(raf); size(); if (!reduce) frame(); };
-    let loaded = 0;
-    const oneDone = () => { loaded++; if (loaded === NPH) { ready = true; init(); } };
-    for (let i = 0; i < NPH; i++) { const im = new Image(); im.onload = oneDone; im.onerror = oneDone; im.src = '/run/phase' + i + '.png'; imgs.push(im); }
-    let to; window.addEventListener('resize', () => { clearTimeout(to); to = setTimeout(init, 150); });
+    const init = () => {
+      if (reduce) phase = 'running';                       // reduced motion: skip the reveal, show him assembled + static
+      cancelAnimationFrame(raf); size(); last = 0;
+      if (!reduce) raf = requestAnimationFrame(frame);
+      else { mixer.setTime(0); sample(); draw(); }
+    };
+    let to; window.addEventListener('resize', () => { clearTimeout(to); to = setTimeout(() => { if (ready) init(); }, 160); });
+    stage.addEventListener('pointermove', (e) => { const r = stage.getBoundingClientRect(); mX = e.clientX - r.left; mY = e.clientY - r.top; mOn = true; });
+    stage.addEventListener('pointerleave', () => { mOn = false; });
   }
 </script>
