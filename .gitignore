@@ -6,3 +6,6 @@ node_modules/
 .superpowers/
 .env
 .env.*
+
+# Large Mixamo source assets (FBX/glb) used only to re-bake runner-bake.json; kept local, not in git
+baking/

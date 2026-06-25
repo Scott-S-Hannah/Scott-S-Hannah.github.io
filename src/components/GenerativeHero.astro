@@ -1,24 +1,22 @@
 ---
-/* Generative hero (v8, three.js). A real rigged run animation (public/models/xbot.glb,
-   Mixamo 'run' clip) rendered ABSTRACTLY: ~320 animated skinned-mesh vertices are
-   sampled on the CPU each frame, projected side-on (orthographic), and drawn as a
-   teal low-poly wireframe + shedding particles on a 2D canvas. Real mocap gives
-   symmetric motion, true near/far depth (the far arm passes behind the torso),
-   ground-contact timing and ballistic follow-through for free. White base, teal
-   #02ABBF only, Helvetica/Swiss. Exploratory, not locked. */
+/* Generative hero. A real Mixamo run cycle (from baking/running.fbx) is BAKED offline to a
+   compact file (public/runner-bake.json: 531 node positions over 36 frames + the static
+   topology, ~190KB). The runtime plays it back on a 2D canvas with NO three.js: each frame
+   lerps the baked positions into world space and projects side-on (Z=horizontal, Y=vertical,
+   X=depth). The wireframe is the model's REAL faces vertex-clustered onto grid-cell nodes
+   (a properly connected mesh); translucent depth-shaded face fills give form + shorts; the
+   figure sheds posterior nodes as a trailing energy wake. Entry: a static poster (28KB webp,
+   also the no-JS / reduced-motion / load-error fallback) crossfades into the running figure.
+   White base, single teal #02ABBF, Helvetica/Swiss. Re-bake instructions: baking/README.md. */
 ---
 <section class="gh">
   <header class="gh__nav">
     <span class="gh__brand">Dr. Scott Hannah</span>
-    <nav class="gh__links" aria-label="Primary">
-      <a href="#">Research</a>
-      <a href="#">Work</a>
-      <a href="#">Contact</a>
-      <span class="gh__dot" aria-hidden="true"></span>
-    </nav>
+    <span class="gh__status"><span class="gh__dot" aria-hidden="true"></span>Open to collaboration</span>
   </header>
   <div class="gh__stage" id="gh-stage">
-    <canvas id="gh-canvas"></canvas>
+    <canvas id="gh-canvas" aria-hidden="true"></canvas>
+    <img id="gh-poster" class="gh__poster" src="/hero-poster.webp" width="1500" height="651" decoding="async" alt="Dr. Scott Hannah rendered as a teal low-poly running figure" />
     <div class="gh__ovl">
       <div class="gh__id">
         <h1 class="gh__name">Dr. Scott<br>Hannah<span>.</span></h1>
@@ -34,42 +32,42 @@
   .gh { min-height: 100vh; display: flex; flex-direction: column; background: #fff; color: #0a0a0b; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
   .gh__nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid #ededed; }
   .gh__brand { font-weight: 700; letter-spacing: -0.02em; font-size: 15px; }
-  .gh__links { display: flex; gap: 22px; align-items: center; font-size: 11px; letter-spacing: 0.1em; color: #71717a; text-transform: uppercase; }
-  .gh__links a { color: #71717a; text-decoration: none; }
-  .gh__links a:hover { color: #0a0a0b; }
+  .gh__status { display: flex; gap: 9px; align-items: center; font-size: 11px; letter-spacing: 0.1em; color: #71717a; text-transform: uppercase; }
   .gh__dot { width: 7px; height: 7px; border-radius: 50%; background: #02abbf; }
   .gh__stage { position: relative; flex: 1; overflow: hidden; }
   #gh-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .gh__ovl { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 32px; pointer-events: none; }
+  .gh__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: right center; pointer-events: none; opacity: 1; transition: opacity 0.6s ease; }
+  .gh__poster.is-hidden { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { .gh__poster { transition: none; } }
+  .gh__ovl { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 0 clamp(40px, 5vw, 76px) 7vh; pointer-events: none; }   /* generous frame; wordmark on the shared baseline with the runner */
   .gh__id { width: 44%; }
-  .gh__name { font-weight: 700; font-size: clamp(40px, 6.4vw, 86px); line-height: 0.84; letter-spacing: -0.045em; margin: 0; }
+  .gh__name { font-weight: 700; font-size: clamp(44px, 7.8vw, 108px); line-height: 0.82; letter-spacing: -0.046em; margin: 0; }   /* name leads: prominent wordmark */
   .gh__name span { color: #02abbf; }
   .gh__role { font-size: clamp(14px, 1.4vw, 18px); font-weight: 500; margin: 18px 0 0; }
   .gh__org { font-size: 13px; color: #71717a; margin: 2px 0 0; }
   .gh__lede { font-size: clamp(12px, 1.1vw, 14px); line-height: 1.55; color: #26262a; max-width: 24em; margin: 18px 0 0; }
-  @media (max-width: 760px) { .gh__id { width: 84%; } .gh__ovl { align-items: flex-start; padding-top: 36px; } }
+  @media (max-width: 760px) { .gh__id { width: 84%; } .gh__ovl { align-items: flex-start; padding-top: 36px; } .gh__poster { object-position: center bottom; } }
 </style>
 
 <script>
-  import * as THREE from 'three';
-  import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-
   const canvas = document.getElementById('gh-canvas');
   const stage = document.getElementById('gh-stage');
+  const poster = document.getElementById('gh-poster');   // static fallback (no-JS / load-error / first paint); crossfaded out once the live canvas renders
   if (canvas && stage) {
     const ctx = canvas.getContext('2d');
+    let posterUp = true;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const BODY = '2,171,191', CORE = '2,108,122', MIST = '127,216,225';
-    const NSAMP = 320;
+    const BODY = '2,171,191', CORE = '2,108,122';
 
     let W = 0, H = 0, DPR = 1, raf = 0, last = 0, ready = false;
-    let root = null, mesh = null, mixer = null;
-    let sIdx = [];                                  // sampled vertex indices
-    let edges = [];                                 // [a,b,restLen3D]
+    let frames = null, wpos = null, nFrames = 0, cycleDur = 1, TS = 0.5, clipT = 0;   // baked run cycle: per-frame node world positions, played back (TS = original mixer.timeScale)
+    let sIdx = [];                                  // node identity list (one per grid cell node); sIdx[i] === i
+    let edges = [];                                 // [a,b,restLen3D]  real-mesh edges (vertex-clustered) -> drawn wireframe lines
+    let faces = null;                               // node triples = the model's real faces collapsed onto the cells (properly connected, fillable)
+    let wireKeep = 0.6;                              // fraction of wireframe edges drawn (lines only; fill uses all faces) -> thins the mesh look (~old kNN line density)
     // per-sample buffers
     let sx = null, sy = null, sz = null, psx = null, psy = null; // screen + prev
     let bb = null, sc = 1, ox = 0, oy = 0;          // model-space bbox + screen fit
-    const v = new THREE.Vector3();
 
     // ENERGY WAKE: the wireframe sheds its own nodes off the posterior (back + legs); each detached node
     // FLOWS off as a tapered trailing streak, with a few tumbling edge shards for the wireframe-coming-apart
@@ -77,10 +75,21 @@
     let groundY = 0, haveGround = false, planted = false, plantX = 0, plantY = 0, plantAge = 1, tflow = 0;
     let bxMin = 0, bxMax = 0, byMin = 0, byMax = 0, cx = 0;   // body bbox + centroid (set in sample)
     let mX = -1, mY = -1, mOn = false;
-    // PAGE-LOAD REVEAL: he RUNS in from near the name and BUILDS (core-out) while moving to his final spot, then sheds
-    let phase = 'assembling';                            // 'assembling' | 'running'
-    let asmT = 0; const ASM_DUR = 3.2, ASM_DX = 0.42, RV_WIN = 0.16;
-    let rv = null, introDX0 = 0;                          // per-node build order + run-in x offset
+    // CONSTELLATION ENTRY: the hero opens as a field of floating points (a proximity network); the points
+    // stream in and lock onto the runner as it runs left -> right to its final spot, then it sheds the wake.
+    let phase = 'entry';                                 // 'entry' (constellation) | 'running'
+    let cT = 0; const ENTRY_DUR = 3.2, BUILD_WIN = 0.24;  // kinetic-light entry: light streams from the name and the runner constructs bottom-up (per-node build window)
+    const flyin = new URLSearchParams(location.search).get('entry') !== 'stream';   // DEFAULT = build + travel from the name (mesh self-construction); ?entry=stream -> the light-stream variant
+    let rv = null, asmT = 0; const ASM_DUR = 3.2, ASM_DX = 0.42, RV_WIN = 0.16;   // fly-in: per-node build order (graph dist from feet) + length + run-in
+    let cArr = null, cStag = null;                       // per-node crystallisation 0..1 + inflow-start stagger
+    let bord = null, sox = null, soy = null, szNorm = null, emitX = 0, emitY = 0;   // construction-from-name: build order (feet->head), per-node source/emitter positions, depth, emitter point beside the wordmark
+    let enHX = null, enHY = null, enHead = null; const EN_HIST = 8;   // inflow light-trails (accretion arcs): per-node ring buffer of recent positions
+    let NPIECE = 0, introDX0 = 0, pc = null;             // NPIECE/pc come from the bake (regions); unused by the entry but kept
+    // PERSISTENT AMBIENT FIELD: a sparse, near-static "survey lattice" in the negative space around the runner that lives
+    // for the whole session (not just the 3.6s entry); same teal depth ramp as the figure; one shared breath; lifted by the wake.
+    let latN = 0, latX = null, latY = null, latT = null, latEdges = null, wakeEnergy = 0;
+    let tris = null, triRest = null, triWy = null, triGd = null;   // mesh faces + rest size + per-face height (0=feet..1=head) + graph-dist-from-feet (for the shorts band)
+    let shLo = 0.39, shHi = 0.57, shGArm = 0.66;         // SHORTS: world-height band mid-thigh -> waistband; shGArm excludes arms/hands that dip to that height
     // posterior emission picker: a body-node index biased to the BACK third (low x) + LEGS (high y),
     // suppressing the forward upper body. Shared by all styles; must run after sample().
     function pickPosterior() {
@@ -108,61 +117,53 @@
     function seedShed() { shEmitAcc = 0; for (let i = 0; i < shN; i++) { shL[i] = 0; shVX[i] = 0; shVY[i] = 0; shKind[i] = 0; shX[i] = -100; shY[i] = -100; shCnt[i] = 0; shHead[i] = 0; shSeed[i] = Math.random() * 6.2832; } for (let j = 0; j < SH_NEMIT; j++) shEmit[j] = pickPosterior(); }
 
 
-    const loader = new FBXLoader();
-    loader.load('/models/running.fbx', (obj) => {
-      root = obj;
-      root.rotation.set(0, 0, 0);                    // Y-up, faces +Z; we project Z->screenX for a right-facing side profile
-      root.updateMatrixWorld(true);
-      let best = null;
-      root.traverse(o => { if (o.isSkinnedMesh && (!best || o.geometry.attributes.position.count > best.geometry.attributes.position.count)) best = o; });
-      mesh = best;
-      mixer = new THREE.AnimationMixer(root);
-      mixer.timeScale = 0.5;                          // slow-motion: half speed
-      const clip = obj.animations[0];
-      mixer.clipAction(clip).play();
-
-      // sample a representative run frame; compute all world verts once
-      mixer.update(0.25); root.updateMatrixWorld(true); mesh.skeleton.update();
-      const total = mesh.geometry.attributes.position.count;
-      bb = { minx: 1e9, maxx: -1e9, miny: 1e9, maxy: -1e9, minz: 1e9, maxz: -1e9 };
-      const allw = new Float32Array(total * 3);
-      for (let i = 0; i < total; i++) { mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); allw[i * 3] = v.x; allw[i * 3 + 1] = v.y; allw[i * 3 + 2] = v.z;
-        if (v.x < bb.minx) bb.minx = v.x; if (v.x > bb.maxx) bb.maxx = v.x; if (v.y < bb.miny) bb.miny = v.y; if (v.y > bb.maxy) bb.maxy = v.y; if (v.z < bb.minz) bb.minz = v.z; if (v.z > bb.maxz) bb.maxz = v.z; }
-      // even spatial sample: one vertex per occupied grid cell
-      const cell = (bb.maxy - bb.miny) / 26;
-      const map = new Map();
-      for (let i = 0; i < total; i++) { const key = Math.floor(allw[i * 3] / cell) + '_' + Math.floor(allw[i * 3 + 1] / cell) + '_' + Math.floor(allw[i * 3 + 2] / cell); if (!map.has(key)) map.set(key, i); }
-      sIdx = [...map.values()];
-      const n = sIdx.length;
-      sx = new Float32Array(n); sy = new Float32Array(n); sz = new Float32Array(n); psx = new Float32Array(n); psy = new Float32Array(n);
-      const pts = sIdx.map(i => new THREE.Vector3(allw[i * 3], allw[i * 3 + 1], allw[i * 3 + 2]));
-      const k = 3, seen = new Set(), maxE = (bb.maxy - bb.miny) * 0.15;   // cull cross-body links
-      for (let i = 0; i < n; i++) { const ds = [];
-        for (let j = 0; j < n; j++) { if (i === j) continue; ds.push([pts[i].distanceToSquared(pts[j]), j]); }
-        ds.sort((a, b) => a[0] - b[0]);
-        for (let m = 0; m < k; m++) { const j = ds[m][1], d = Math.sqrt(ds[m][0]); if (d > maxE) break; const a = Math.min(i, j), b = Math.max(i, j), key = a + '_' + b; if (seen.has(key)) continue; seen.add(key); edges.push([a, b, d]); }
-      }
-      console.log('runner sampled:', n, 'nodes,', edges.length, 'edges');
+    // Load the pre-baked run cycle (compact: per-frame node positions + static topology) -> no three.js, no 35MB FBX at runtime.
+    // Reduced-motion: skip the load entirely; the static poster is the hero.
+    if (!reduce) fetch('/runner-bake.json').then(r => { if (!r.ok) throw new Error('bake ' + r.status); return r.json(); }).then(d => {
+      const dec = (s, Ctor) => { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Ctor(u.buffer); };
+      const n = d.n; nFrames = d.F; cycleDur = d.dur; TS = d.ts; NPIECE = d.NPIECE; bb = d.bb;
+      const q = dec(d.pos, Uint16Array), qb = d.qbb;
+      frames = new Float32Array(nFrames * n * 3);
+      for (let k = 0; k < frames.length; k++) { const a = k % 3, lo = qb[a]; frames[k] = lo + q[k] / 65535 * (qb[a + 3] - lo); }   // dequantize world positions
+      const ea = dec(d.ea, Uint16Array), eb = dec(d.eb, Uint16Array), er = dec(d.er, Float32Array);
+      edges = []; for (let e = 0; e < ea.length; e++) edges.push([ea[e], eb[e], er[e]]);
+      faces = new Int32Array(dec(d.fc, Uint16Array)); tris = faces; triRest = dec(d.trS, Float32Array);
+      const tW = dec(d.tW, Uint8Array), tG = dec(d.tG, Uint8Array);
+      triWy = new Float32Array(tW.length); triGd = new Float32Array(tG.length);
+      for (let i = 0; i < tW.length; i++) { triWy[i] = tW[i] / 255; triGd[i] = tG[i] / 255; }
+      pc = new Int16Array(dec(d.pc, Uint16Array));
+      sIdx = Array.from({ length: n }, (_, i) => i);
+      sx = new Float32Array(n); sy = new Float32Array(n); sz = new Float32Array(n); psx = new Float32Array(n); psy = new Float32Array(n); wpos = new Float32Array(n * 3);
       ready = true; init();
-    });
+    }).catch(e => { console.error('hero: bake load failed', e); });
 
     const smooth = (e0, e1, x) => { const u = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return u * u * (3 - 2 * u); };
 
-    function fit() {                                 // model bbox -> figure box on the right
+    function fit() {                                 // model bbox -> figure box (right on desktop; lower-centre on mobile to clear the headline)
       const mw = bb.maxz - bb.minz, mh = bb.maxy - bb.miny;   // side profile: Z=horizontal, Y=vertical, X=depth
-      const targetH = H * 0.80; sc = targetH / mh;
+      const mobile = W < 760;
+      const targetH = H * (mobile ? 0.50 : 0.78); sc = targetH / mh;   // figure supports the name (not competing)
       const figW = mw * sc;
-      ox = W - figW - W * 0.085 - bb.minz * sc;
-      oy = (H - targetH) / 2 + bb.maxy * sc;          // y flips: screenY = oy - worldY*sc
+      if (mobile) {                                   // centred and sat at the bottom, below the stacked text
+        ox = (W - figW) / 2 - bb.minz * sc;
+        oy = H - H * 0.03 + bb.miny * sc;             // y flips: screenY = oy - worldY*sc
+      } else {
+        ox = W - figW - W * 0.085 - bb.minz * sc;
+        oy = H * 0.93 + bb.miny * sc;                 // stand the runner on the baseline (feet near the bottom), not floating centred
+      }
     }
 
+    function getNodePositions() {                      // lerp the baked run cycle (clipT) into wpos[node*3 + x/y/z]
+      const N = sIdx.length, fp = (((clipT / cycleDur) % 1) + 1) % 1 * nFrames, fa = Math.floor(fp), t = fp - fa, fb = (fa + 1) % nFrames, ba = fa * N * 3, bbo = fb * N * 3;
+      for (let k = 0, m = N * 3; k < m; k++) wpos[k] = frames[ba + k] + (frames[bbo + k] - frames[ba + k]) * t;
+    }
     function sample() {
-      root.updateMatrixWorld(true); mesh.skeleton.update();
+      getNodePositions();
       bxMin = 1e9; bxMax = -1e9; byMin = 1e9; byMax = -1e9; let sxSum = 0;
       for (let i = 0; i < sIdx.length; i++) {
-        mesh.getVertexPosition(sIdx[i], v); v.applyMatrix4(mesh.matrixWorld);
         psx[i] = sx[i]; psy[i] = sy[i];
-        sx[i] = ox + v.z * sc; sy[i] = oy - v.y * sc; sz[i] = v.x; sxSum += sx[i];
+        const wx = wpos[i * 3], wy = wpos[i * 3 + 1], wz = wpos[i * 3 + 2];   // project: screenX = world z, screenY = -world y, depth = world x
+        sx[i] = ox + wz * sc; sy[i] = oy - wy * sc; sz[i] = wx; sxSum += sx[i];
         if (sx[i] < bxMin) bxMin = sx[i]; if (sx[i] > bxMax) bxMax = sx[i];
         if (sy[i] < byMin) byMin = sy[i]; if (sy[i] > byMax) byMax = sy[i];
       }
@@ -173,15 +174,62 @@
     const M = [127, 216, 225], Bc = [2, 171, 191], C = [2, 108, 122];   // mist -> body -> core
     const col = (t) => { let r, g, b; if (t < 0.5) { const u = t * 2; r = M[0] + (Bc[0] - M[0]) * u; g = M[1] + (Bc[1] - M[1]) * u; b = M[2] + (Bc[2] - M[2]) * u; } else { const u = (t - 0.5) * 2; r = Bc[0] + (C[0] - Bc[0]) * u; g = Bc[1] + (C[1] - Bc[1]) * u; b = Bc[2] + (C[2] - Bc[2]) * u; } return `${r | 0},${g | 0},${b | 0}`; };
 
+    // GLOW POINTS: the reference's crisp-core + soft-echo luminous point, translated to a WHITE bg.
+    // On black, additive light = glow; on white the dual is SUBTRACTIVE, so each point is ink: a wide
+    // faint MIST-teal echo (drawn under 'multiply', easing paper toward teal, never mud) beneath a tight
+    // CORE-teal crisp core (source-over). Two 64px sprites baked once; every point is two drawImage blits.
+    const makeSprite = (stops) => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const rg = g.createRadialGradient(32, 32, 0, 32, 32, 32); for (const [st, cl] of stops) rg.addColorStop(st, cl); g.fillStyle = rg; g.fillRect(0, 0, 64, 64); return c; };
+    const SPR_SOFT = makeSprite([[0.0, 'rgba(120,210,222,0.46)'], [0.35, 'rgba(127,216,225,0.22)'], [1.0, 'rgba(127,216,225,0.0)']]);   // wide defocused depth-bloom (multiply) — the soft teal halo
+    const SPR_CRISP = makeSprite([[0.0, 'rgba(2,108,122,0.92)'], [0.14, 'rgba(2,124,138,0.86)'], [0.32, 'rgba(2,171,191,0.30)'], [0.6, 'rgba(2,171,191,0.05)'], [1.0, 'rgba(2,171,191,0.0)']]);   // sharp luminous deep-teal core (source-over)
+    const gpX = new Float32Array(700), gpY = new Float32Array(700), gpD = new Float32Array(700), gpA = new Float32Array(700), gpS = new Float32Array(700);
+    const asmRev = new Float32Array(700);                   // fly-in: per-node placed-ness (drives fills + vertices building from the feet up)
+    const hsh = (i) => { const x = Math.sin(i * 78.233 + 1.3) * 43758.5453; return x - Math.floor(x); };   // stable per-index 0..1 (for size variation)
+    function drawGlowField(n, X, Y, D, A, S) {              // X,Y,D(depth 0..1),A(fade),S(size mult) accessors. Two batched passes = two composite switches, never per point.
+      for (let i = 0; i < n; i++) { gpX[i] = X(i); gpY[i] = Y(i); gpD[i] = D(i); gpA[i] = A(i); gpS[i] = S ? S(i) : 1; }
+      ctx.globalCompositeOperation = 'multiply';            // echo pass (soft teal halo / depth bloom)
+      for (let i = 0; i < n; i++) { const a = gpA[i]; if (a <= 0.004) continue; const d = gpD[i], rE = (1.5 + 1.4 * d) * gpS[i] * 2.8, aE = (0.62 + 0.38 * d) * 0.42 * a; if (aE <= 0.004) continue; ctx.globalAlpha = aE; ctx.drawImage(SPR_SOFT, gpX[i] - rE, gpY[i] - rE, rE * 2, rE * 2); }
+      ctx.globalCompositeOperation = 'source-over';         // crisp pass (the luminous core)
+      for (let i = 0; i < n; i++) { const a = gpA[i]; if (a <= 0.006) continue; const d = gpD[i], rC = (1.5 + 1.4 * d) * gpS[i], aC = (0.64 + 0.36 * d) * a; ctx.globalAlpha = aC; ctx.drawImage(SPR_CRISP, gpX[i] - rC, gpY[i] - rC, rC * 2, rC * 2); }
+      ctx.globalAlpha = 1;
+    }
+
+    function seedLattice() {                               // sparse persistent field in the negative space around the runner (right of the text on desktop; off on mobile for now)
+      const rnd = (i, s) => { const x = Math.sin((i + 1) * 12.9898 + s * 78.233) * 43758.5453; return x - Math.floor(x); };
+      latN = W < 760 ? 0 : 92;
+      latX = new Float32Array(latN); latY = new Float32Array(latN); latT = new Float32Array(latN);
+      for (let i = 0; i < latN; i++) { latX[i] = (0.44 + 0.54 * rnd(i, 11)) * W; latY[i] = (0.08 + 0.86 * rnd(i, 12)) * H; latT[i] = rnd(i, 13); }   // right of the .gh__id column; depth 0..1 (mist..core)
+      const le = [], maxD2 = (Math.min(W, H) * 0.18) ** 2;   // k=2 nearest links, built once
+      for (let i = 0; i < latN; i++) { let n1 = -1, n2 = -1, d1 = 1e18, d2 = 1e18; for (let j = 0; j < latN; j++) { if (j === i) continue; const dx = latX[i] - latX[j], dy = latY[i] - latY[j], d = dx * dx + dy * dy; if (d < d1) { d2 = d1; n2 = n1; d1 = d; n1 = j; } else if (d < d2) { d2 = d; n2 = j; } } if (n1 > i && d1 < maxD2) le.push(i, n1); if (n2 > i && d2 < maxD2) le.push(i, n2); }
+      latEdges = new Int32Array(le);
+    }
+    function drawLattice(gFade) {                          // one shared slow breath, depth-toned with the figure's own ramp, faded out over the left text column
+      if (!latN || gFade <= 0.001) return;
+      const sway = Math.sin(tflow * 0.22) * 1.6, sway2 = Math.cos(tflow * 0.17) * 1.0, lift = 1 + wakeEnergy * 0.5;
+      const fx0 = W * 0.30, fx1 = W * 0.45, maxL2 = (Math.min(W, H) * 0.21) ** 2;
+      ctx.strokeStyle = `rgba(${BODY},${(0.075 * gFade).toFixed(3)})`; ctx.beginPath();   // links (single batched stroke)
+      for (let e = 0; e < latEdges.length; e += 2) { const a = latEdges[e], b = latEdges[e + 1], ax = latX[a] + sway * latT[a], ay = latY[a] + sway2 * latT[a], bx = latX[b] + sway * latT[b], by = latY[b] + sway2 * latT[b], dx = ax - bx, dy = ay - by; if (dx * dx + dy * dy > maxL2 || (ax < fx0 && bx < fx0)) continue; ctx.moveTo(ax, ay); ctx.lineTo(bx, by); }
+      ctx.stroke();
+      ctx.save();                                          // glow points: shared breath + a small per-point drift (alive but restrained)
+      drawGlowField(latN,
+        i => latX[i] + sway * latT[i] + Math.sin(tflow * 0.48 + latT[i] * 6.2832 + i * 0.7) * 0.7,
+        i => latY[i] + sway2 * latT[i] + Math.cos(tflow * 0.416 + (latT[i] * 6.2832 + i * 0.7) * 1.3) * 0.7,
+        i => latT[i],
+        i => gFade * lift * smooth(fx0, fx1, latX[i] + sway * latT[i]),
+        i => 0.7 + 0.95 * hsh(i + 131));                     // varied ambient point sizes
+      ctx.restore();
+    }
+
     function draw() {
+      if (posterUp && poster) { posterUp = false; poster.classList.add('is-hidden'); }   // first live frame -> crossfade the static poster out
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
       if (haveGround) {                                  // ground line: anchors the runner, binds figure to the name
-        const gy = groundY + 3, grad = ctx.createLinearGradient(0, 0, W, 0);
-        grad.addColorStop(0, `rgba(${BODY},0)`); grad.addColorStop(0.32, `rgba(${BODY},0.08)`); grad.addColorStop(0.6, `rgba(${BODY},0.34)`); grad.addColorStop(1, `rgba(${BODY},0.62)`);
-        ctx.strokeStyle = grad; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+        const gy = groundY + 3, grad = ctx.createLinearGradient(0, 0, W, 0);   // full-width baseline: the shared ground the wordmark AND runner stand on (present under the name, not just the figure)
+        grad.addColorStop(0, `rgba(${BODY},0.16)`); grad.addColorStop(0.4, `rgba(${BODY},0.20)`); grad.addColorStop(1, `rgba(${BODY},0.40)`);
+        ctx.strokeStyle = grad; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
       }
       if (haveGround && plantAge < 0.5) { const a = 0.15 * (1 - plantAge / 0.5); ctx.fillStyle = `rgba(${CORE},${a.toFixed(3)})`; ctx.beginPath(); ctx.ellipse(plantX, plantY + 2, 26, 5, 0, 0, 6.2832); ctx.fill(); }
       drawShed();
+      drawFills(null);                                       // translucent region plates (form/shading + shorts) under the wireframe
       const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1;     // depth axis = X
       ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
       // edges: far -> near, each tier toned + faded by depth (far = pale/faint, near = deep/bold)
@@ -190,6 +238,7 @@
         ctx.strokeStyle = `rgba(${col(t)},${(0.28 + 0.5 * t).toFixed(3)})`;
         ctx.beginPath();
         for (let e = 0; e < edges.length; e++) {
+          if ((e * 0.618034) % 1 >= wireKeep) continue;   // stable, evenly-spread edge thinning
           const a = edges[e][0], b = edges[e][1], za = (sz[a] + sz[b]) * 0.5;
           if (za < za0 || za >= za1) continue;
           const cl = Math.hypot((sx[a] - sx[b]) / sc, (sy[a] - sy[b]) / sc);
@@ -198,13 +247,12 @@
         }
         ctx.stroke();
       }
-      // nodes: same depth toning
-      for (let tier = 0; tier < TIERS; tier++) {
-        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS;
-        ctx.fillStyle = `rgba(${col(t)},${(0.35 + 0.55 * t).toFixed(3)})`;
-        const r = t > 0.8 ? 2.0 : 1.4;
-        for (let i = 0; i < sIdx.length; i++) { if (sz[i] < za0 || sz[i] >= za1) continue; ctx.fillRect(sx[i] - r * 0.5, sy[i] - r * 0.5, r, r); }
-      }
+      // nodes: luminous glow points (still — the runner is measured data, not jitter), depth-toned
+      ctx.save();
+      drawGlowField(sIdx.length, i => sx[i], i => sy[i],
+        i => { const d = (sz[i] - z0) / zr; return d < 0 ? 0 : d > 1 ? 1 : d; },
+        i => 1, i => 0.7 + 0.95 * hsh(i));                   // varied vertex sizes (same hash as the entry, so sizes carry through)
+      ctx.restore();
     }
 
     function footPlant(dt) {                            // ground level + foot-strike (drives the ground shadow)
@@ -219,6 +267,7 @@
     }
     function updateShed(dt) {
       shedPulse *= Math.exp(-dt / 0.18);                                          // the toe-off burst decays over ~0.4s
+      wakeEnergy = Math.max(wakeEnergy * Math.exp(-dt / 1.2), shedPulse * 0.7);   // slow stride-tied envelope: lifts the ambient field a touch on each toe-off, settles over ~1.2s
       const kick = 1 + shedPulse * 0.8;                                           // burst particles get a propulsion kick
       const wf = Math.max(0.85, Math.min(1.75, W / 1200));                       // scale wake density to viewport width
       shEmitRefresh += dt * 8; while (shEmitRefresh >= 1) { shEmitRefresh -= 1; shEmit[shEmitRot] = pickPosterior(); shEmitRot = (shEmitRot + 1) % SH_NEMIT; }   // slowly migrate the limited spawn points
@@ -247,6 +296,7 @@
         const sw = Math.cos(a1) * 0.9 - Math.cos(a2) * 0.5, cfy = -Math.max(0, sw) * SH_CURL;   // UP-only swells: curl up now and again, never down
         let fx = -SH_DRIFT + cfx, fy = -SH_LIFT + cfy;
         if (mOn) { const dx = x - mX, dy = y - mY, d = Math.hypot(dx, dy); if (d < 140) { const f = (1 - d / 140) * 280, ii = 1 / (d + 1); fx += dx * ii * f; fy += dy * ii * f; } }
+        const wmY = H * 0.80; if (x < W * 0.52) { const g = (1 - x / (W * 0.52)); fy = fy * (1 - g) + (wmY - y) * 0.05 * g; }   // spent wake settles toward the wordmark (lower-left)
         shVX[i] += (fx - shVX[i]) * SH_RELAX; shVY[i] += (fy - shVY[i]) * SH_RELAX;
         const sp2 = shVX[i] * shVX[i] + shVY[i] * shVY[i]; if (sp2 > SH_VMAX * SH_VMAX) { const cl = SH_VMAX / Math.sqrt(sp2); shVX[i] *= cl; shVY[i] *= cl; }   // cap speed -> no long stray streaks from the fast toe-off ejecta
         shX[i] = x + shVX[i] * dt; shY[i] = y + shVY[i] * dt;
@@ -286,74 +336,160 @@
       }
       ctx.globalAlpha = 1;
     }
-    function setupAssembly() {                           // build order (core-out) + run-in offset; he RUNS while building
-      const n = sIdx.length;
-      if (!rv || rv.length !== n) rv = new Float32Array(n);
-      mixer.setTime(0); root.updateMatrixWorld(true); mesh.skeleton.update(); sample();   // frame-0 layout for the build order
-      const bh = (byMax - byMin) || 1;
-      const adj = [];                                                                      // adjacency from the mesh edge graph
-      for (let i = 0; i < n; i++) adj.push([]);
-      for (let e = 0; e < edges.length; e++) { const a = edges[e][0], b = edges[e][1]; adj[a].push(b); adj[b].push(a); }
-      const depth = new Int32Array(n).fill(-1), queue = [];
-      for (let i = 0; i < n; i++) { if ((sy[i] - byMin) / bh > 0.92) { depth[i] = 0; queue.push(i); } }   // seed = the feet
-      if (!queue.length) { let lo = 0; for (let i = 1; i < n; i++) if (sy[i] > sy[lo]) lo = i; depth[lo] = 0; queue.push(lo); }
-      let qi = 0, maxD = 0;                                                                 // BFS: grow outward hop-by-hop through the struts
-      while (qi < queue.length) { const u = queue[qi++], d = depth[u]; if (d > maxD) maxD = d; const nb = adj[u]; for (let j = 0; j < nb.length; j++) { const w = nb[j]; if (depth[w] < 0) { depth[w] = d + 1; queue.push(w); } } }
-      for (let i = 0; i < n; i++) if (depth[i] < 0) depth[i] = maxD;                        // any disconnected -> build last
-      const md = maxD || 1;
-      for (let i = 0; i < n; i++) {
-        const jit = ((i * 9301 + 49297) % 233280) / 233280;
-        rv[i] = Math.min(1 - RV_WIN, (depth[i] / md) * (1 - RV_WIN) + jit * 0.02);          // build order = graph distance from the feet (wires outward, not a wipe)
+    function drawFills(na) {                               // fill mesh faces (follow the wireframe), depth-shaded; shorts more solid. na = per-node arrival 0..1 during the entry (null = full)
+      if (!tris) return;
+      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1, nt = tris.length;
+      for (let ti = 0, q = 0; ti < nt; ti += 3, q++) {
+        const a = tris[ti], b = tris[ti + 1], c = tris[ti + 2];
+        const mx = Math.max(Math.hypot((sx[a] - sx[b]) / sc, (sy[a] - sy[b]) / sc), Math.hypot((sx[a] - sx[c]) / sc, (sy[a] - sy[c]) / sc), Math.hypot((sx[b] - sx[c]) / sc, (sy[b] - sy[c]) / sc));
+        const inBand = triWy[q] > shLo && triWy[q] < shHi;
+        const armX = triGd[q] >= shGArm;
+        const inSh = inBand && !armX;                       // SHORTS: world-height band on the lower body (complete ring)
+        if (mx > triRest[q] * (inSh ? 3.6 : 2)) continue;   // per-frame stretch cull: shorts cover the groin -> tolerate more; body culls hard to keep lower-leg gaps open
+        let ent = 1;
+        if (na) { ent = Math.min(na[a], na[b], na[c]); if (ent < 0.85) continue; }   // entry: a face fills only once all 3 points have landed (no blob while they stream)
+        const t = Math.max(0, Math.min(1, ((sz[a] + sz[b] + sz[c]) / 3 - z0) / zr));
+        const al = (inSh ? 0.32 : 0.05) * (0.5 + 0.6 * t) * ent;   // shorts band reads more solid; body faint
+        if (al < 0.004) continue;
+        ctx.fillStyle = `rgba(${col(t)},${al.toFixed(3)})`;
+        ctx.beginPath(); ctx.moveTo(sx[a], sy[a]); ctx.lineTo(sx[b], sy[b]); ctx.lineTo(sx[c], sy[c]); ctx.closePath(); ctx.fill();
       }
-      introDX0 = -W * ASM_DX;                             // start shifted left toward the name; eases to 0
-      mixer.setTime(0); asmT = 0; phase = 'assembling'; haveGround = false; planted = false;
+    }
+    function setupEntry() {                               // BUILT FROM THE NAME: light emits beside the wordmark, streams right, and the runner constructs bottom-up
+      const n = sIdx.length; if (!tris || !sx) return;
+      clipT = 0; sample();                                 // baked vertices at frame 0 -> build order + depth
+      if (!bord || bord.length !== n) { bord = new Float32Array(n); sox = new Float32Array(n); soy = new Float32Array(n); szNorm = new Float32Array(n); cArr = new Float32Array(n); cStag = new Float32Array(n); }
+      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1, bh = (byMax - byMin) || 1;
+      emitX = W * 0.36; emitY = byMin + bh * 0.46;          // emitter: just right of the wordmark, near mid-figure height
+      for (let i = 0; i < n; i++) {
+        const d = (sz[i] - z0) / zr; szNorm[i] = d < 0 ? 0 : d > 1 ? 1 : d;
+        const jit = ((i * 9301 + 49297) % 233280) / 233280;
+        bord[i] = Math.min(0.72, ((byMax - sy[i]) / bh) * 0.62 + jit * 0.10);   // build order: bottom-up (feet -> head), feathered by jitter
+        sox[i] = emitX + (hsh(i) - 0.5) * W * 0.05;          // source: a tight luminous seed beside the name
+        soy[i] = emitY + (hsh(i + 5) - 0.5) * H * 0.10;
+        cArr[i] = 0;
+      }
+      enHX = new Float32Array(n * EN_HIST); enHY = new Float32Array(n * EN_HIST); enHead = new Uint8Array(n);
+      for (let i = 0; i < n; i++) { sx[i] = sox[i]; sy[i] = soy[i]; for (let h = 0; h < EN_HIST; h++) { enHX[i * EN_HIST + h] = sox[i]; enHY[i * EN_HIST + h] = soy[i]; } }
+      introDX0 = 0; clipT = 0; cT = 0; phase = 'entry'; haveGround = false; planted = false;
+    }
+    function stepEntry(dt) {
+      cT += dt; const p = Math.min(1, cT / ENTRY_DUR), n = sIdx.length;
+      tflow += dt; clipT += dt * TS; sample();                            // live run pose vertices (targets) at the final spot
+      for (let i = 0; i < n; i++) {
+        const vX = sx[i], vY = sy[i];                                      // baked vertex captured before overwrite
+        const r0 = (p - bord[i]) / BUILD_WIN, r = r0 < 0 ? 0 : r0 > 1 ? 1 : r0, ea = r * r * (3 - 2 * r);
+        cArr[i] = ea;
+        if (ea <= 0) { sx[i] = sox[i]; sy[i] = soy[i]; }                   // waiting at the emitter (still invisible)
+        else if (ea >= 1) { sx[i] = vX; sy[i] = vY; }                      // placed on the figure
+        else {                                                            // streaming emitter -> vertex with a gentle per-node bow
+          const bow = Math.sin(ea * Math.PI) * (hsh(i + 9) - 0.5) * 120;
+          sx[i] = sox[i] + (vX - sox[i]) * ea; sy[i] = soy[i] + (vY - soy[i]) * ea + bow;
+          const hh = enHead[i] = (enHead[i] + 1) % EN_HIST; enHX[i * EN_HIST + hh] = sx[i]; enHY[i * EN_HIST + hh] = sy[i];
+        }
+      }
+      drawEntry(p);
+      if (p >= 1) handoff();
+    }
+    function drawEnStreaks() {                              // the connecting current of light: streaming points leave teal trails as they fly from the name to the figure
+      if (W < 760 || !enHX) return;                         // desktop only
+      const n = sIdx.length, fx0 = W * 0.22, fx1 = W * 0.32, half = EN_HIST >> 1;
+      for (let i = 0; i < n; i++) {
+        if (cArr[i] <= 0.001 || cArr[i] >= 0.92) continue;
+        const hh = enHead[i], px = enHX[i * EN_HIST + hh], py = enHY[i * EN_HIST + hh];
+        const pv = (hh - 1 + EN_HIST) % EN_HIST, vx = px - enHX[i * EN_HIST + pv], vy = py - enHY[i * EN_HIST + pv], sp = Math.sqrt(vx * vx + vy * vy);
+        if (sp < 3) continue;
+        const a = Math.min(0.5, sp * 0.026) * (1 - cArr[i]) * smooth(fx0, fx1, px);
+        if (a < 0.02) continue;
+        const tone = col(0.3 + 0.45 * szNorm[i]);
+        ctx.strokeStyle = `rgba(${tone},${(a * 0.45).toFixed(3)})`; ctx.lineWidth = 1; ctx.beginPath();
+        for (let s = 0; s < EN_HIST; s++) { const id = (hh - (EN_HIST - 1) + s + EN_HIST) % EN_HIST, X = enHX[i * EN_HIST + id], Y = enHY[i * EN_HIST + id]; s === 0 ? ctx.moveTo(X, Y) : ctx.lineTo(X, Y); }
+        ctx.stroke();
+        ctx.strokeStyle = `rgba(${tone},${a.toFixed(3)})`; ctx.lineWidth = 1.5; ctx.beginPath();
+        for (let s = 0; s < half; s++) { const id = (hh - (half - 1) + s + EN_HIST) % EN_HIST, X = enHX[i * EN_HIST + id], Y = enHY[i * EN_HIST + id]; s === 0 ? ctx.moveTo(X, Y) : ctx.lineTo(X, Y); }
+        ctx.stroke();
+      }
+    }
+    function drawEntry(p) {
+      if (posterUp && poster) { posterUp = false; poster.classList.add('is-hidden'); }
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
+      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1;
+      drawEnStreaks();                                                    // the connecting current from the name to the figure
+      drawFills(cArr);                                                    // translucent plates construct in (bottom-up, as faces land)
+      for (let tier = 0; tier < TIERS; tier++) {                          // wireframe wires on, strut by strut, as both ends land
+        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS;
+        ctx.strokeStyle = `rgba(${col(t)},${(0.28 + 0.5 * t).toFixed(3)})`; ctx.beginPath(); let any = false;
+        for (let e = 0; e < edges.length; e++) {
+          if ((e * 0.618034) % 1 >= wireKeep) continue;
+          const a = edges[e][0], b = edges[e][1]; if ((cArr[a] < cArr[b] ? cArr[a] : cArr[b]) < 0.9) continue;
+          const za = (sz[a] + sz[b]) * 0.5; if (za < za0 || za >= za1) continue;
+          if (Math.hypot((sx[a] - sx[b]) / sc, (sy[a] - sy[b]) / sc) > edges[e][2] * 2.0) continue;
+          ctx.moveTo(sx[a], sy[a]); ctx.lineTo(sx[b], sy[b]); any = true;
+        }
+        if (any) ctx.stroke();
+      }
+      ctx.save();                                                         // luminous points: bright as they stream, settling onto the mesh
+      drawGlowField(sIdx.length, i => sx[i], i => sy[i],
+        i => { const d = (sz[i] - z0) / zr; return d < 0 ? 0 : d > 1 ? 1 : d; },
+        i => { const ef = Math.min(1, Math.max(0, (p - bord[i]) / 0.05)); return ef * (0.62 + 0.38 * cArr[i]); },
+        i => (0.85 + 0.5 * hsh(i)) * (1 + 1.1 * (1 - cArr[i])));
+      ctx.restore();
+    }
+    // ---- ALTERNATE ENTRY: mesh self-construction ("fly-in") — the runner wires itself into existence from the feet up while running in ----
+    function setupAssembly() {
+      const n = sIdx.length; if (!sx) return;
+      if (!rv || rv.length !== n) rv = new Float32Array(n);
+      clipT = 0; sample();                                 // frame-0 layout, for the build order
+      const bh = (byMax - byMin) || 1;
+      for (let i = 0; i < n; i++) {                          // build order: bottom-up (feet -> head) by screen height, feathered by jitter
+        const jit = ((i * 9301 + 49297) % 233280) / 233280;
+        rv[i] = Math.min(1 - RV_WIN, ((byMax - sy[i]) / bh) * (1 - RV_WIN - 0.10) + jit * 0.10);
+      }
+      introDX0 = -W * ASM_DX; clipT = 0; asmT = 0; phase = 'entry'; haveGround = false; planted = false;
     }
     function stepAssemble(dt) {
       asmT += dt;
-      const p = Math.min(1, asmT / ASM_DUR), dx = introDX0 * (1 - smooth(0, 1, p));
-      tflow += dt; mixer.update(dt); sample();            // he RUNS during the build
-      for (let i = 0; i < sIdx.length; i++) sx[i] += dx;  // translate from near-name to his final spot
+      const p = Math.min(1, asmT / ASM_DUR), dx = introDX0 * (1 - smooth(0, 0.82, p));   // ease-out: the run-in settles into place a beat before the build completes
+      tflow += dt; clipT += dt * TS; sample();              // he RUNS during the build
+      for (let i = 0; i < sIdx.length; i++) sx[i] += dx;    // translate from near-name to his final spot
       drawAssemble(p);
       if (p >= 1) handoff();
     }
-    function drawAssemble(p) {                            // MESH CONSTRUCTION: vertices snap in, struts draw on between them (bottom-up)
+    function drawAssemble(p) {
+      if (posterUp && poster) { posterUp = false; poster.classList.add('is-hidden'); }
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
       ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
-      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1, NW = 0.05, EW = 0.05;
-      for (let tier = 0; tier < TIERS; tier++) {           // EDGES draw-on: strut extends from the earlier vertex to the later one
+      const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1, EW = 0.05;
+      for (let i = 0; i < sIdx.length; i++) asmRev[i] = p < rv[i] ? 0 : smooth(rv[i], rv[i] + 0.05, p);   // per-node placed-ness
+      drawFills(asmRev);                                    // translucent plates fill in as the mesh constructs
+      for (let tier = 0; tier < TIERS; tier++) {            // EDGES draw on: each strut extends from its earlier vertex to its later one
         const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS, baseEdge = 0.28 + 0.5 * t, cstr = col(t);
         for (let e = 0; e < edges.length; e++) {
+          if ((e * 0.618034) % 1 >= wireKeep) continue;
           const a = edges[e][0], b = edges[e][1], za = (sz[a] + sz[b]) * 0.5;
           if (za < za0 || za >= za1) continue;
-          const eStart = rv[a] > rv[b] ? rv[a] : rv[b];    // both vertices placed before the strut connects them
-          if (p < eStart) continue;
-          const eu = smooth(eStart, eStart + EW, p);        // 0..1 draw fraction
-          let ax, ay, ex, ey;
-          if (rv[a] <= rv[b]) { ax = sx[a]; ay = sy[a]; ex = sx[b]; ey = sy[b]; } else { ax = sx[b]; ay = sy[b]; ex = sx[a]; ey = sy[a]; }
-          const cl = Math.hypot((ex - ax) / sc, (ey - ay) / sc);
-          if (cl > edges[e][2] * 2.0) continue;             // stretch cull (running pose is fine)
+          const eStart = rv[a] > rv[b] ? rv[a] : rv[b]; if (p < eStart) continue;   // both ends placed before the strut connects them
+          const eu = smooth(eStart, eStart + EW, p);
+          let ax, ay, ex, ey; if (rv[a] <= rv[b]) { ax = sx[a]; ay = sy[a]; ex = sx[b]; ey = sy[b]; } else { ax = sx[b]; ay = sy[b]; ex = sx[a]; ey = sy[a]; }
+          if (Math.hypot((ex - ax) / sc, (ey - ay) / sc) > edges[e][2] * 2.0) continue;
           ctx.strokeStyle = `rgba(${cstr},${(baseEdge * Math.min(1, eu * 2)).toFixed(3)})`;
           ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + (ex - ax) * eu, ay + (ey - ay) * eu); ctx.stroke();
         }
       }
-      for (let tier = 0; tier < TIERS; tier++) {           // VERTICES snap in crisply with a brief size-pop (a placed point)
-        const t = (tier + 0.5) / TIERS, za0 = z0 + zr * tier / TIERS, za1 = z0 + zr * (tier + 1) / TIERS, baseA = 0.35 + 0.55 * t, rr = t > 0.8 ? 2.0 : 1.4, cf = col(t);
-        for (let i = 0; i < sIdx.length; i++) {
-          if (sz[i] < za0 || sz[i] >= za1) continue;
-          if (p < rv[i]) continue;
-          const a = baseA * smooth(rv[i], rv[i] + NW, p);
-          if (a < 0.02) continue;
-          const r = rr * (1 + 0.7 * Math.max(0, 1 - (p - rv[i]) / 0.09));   // pop bigger on placement, settle
-          ctx.fillStyle = `rgba(${cf},${a.toFixed(3)})`; ctx.fillRect(sx[i] - r * 0.5, sy[i] - r * 0.5, r, r);
-        }
-      }
+      ctx.save();                                           // VERTICES: luminous glow points, placed in build order with a brief size-pop
+      drawGlowField(sIdx.length, i => sx[i], i => sy[i],
+        i => { const d = (sz[i] - z0) / zr; return d < 0 ? 0 : d > 1 ? 1 : d; },
+        i => asmRev[i],
+        i => (0.85 + 0.5 * hsh(i)) * (1 + 0.8 * Math.max(0, 1 - (p - rv[i]) / 0.09)));
+      ctx.restore();
     }
-    function handoff() {                                  // mixer ran continuously + dx=0 at the end -> seamless; just start the wake
+    function handoff() {                                  // start the wake; seamless (clipT advances continuously through the cycle)
       phase = 'running'; seedShed(); haveGround = false; planted = false; last = 0;
     }
     function step(dt) {
-      if (phase === 'assembling') { stepAssemble(dt); return; }
-      tflow += dt; mixer.update(dt); sample(); footPlant(dt); updateShed(dt); draw();
+      if (phase === 'entry') { flyin ? stepAssemble(dt) : stepEntry(dt); return; }
+      tflow += dt; clipT += dt * TS; sample(); footPlant(dt); updateShed(dt); draw();
     }
     function frame(now) {
       const T = now / 1000; if (!last) last = T; let dt = T - last; last = T; if (dt > 1 / 30) dt = 1 / 30; if (dt < 0) dt = 0;
@@ -367,20 +503,21 @@
       canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
       if (ready) {
         fit();
-        if (phase === 'assembling') { setupAssembly(); }   // (re)capture frame-0 targets at this size, re-scatter
-        else { sample(); for (let i = 0; i < sIdx.length; i++) { psx[i] = sx[i]; psy[i] = sy[i]; } haveGround = false; planted = false; seedShed(); }
+        if (phase === 'entry') { flyin ? setupAssembly() : setupEntry(); }   // re-seed the entry at this size (only fires during the brief entry)
+        else { sample(); for (let i = 0; i < sIdx.length; i++) { psx[i] = sx[i]; psy[i] = sy[i]; } if (reduce) draw(); }   // running: re-fit only; keep the wake/ground (no intro replay)
       }
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
     }
 
-    const init = () => {
-      if (reduce) phase = 'running';                       // reduced motion: skip the reveal, show him assembled + static
-      cancelAnimationFrame(raf); size(); last = 0;
-      if (!reduce) raf = requestAnimationFrame(frame);
-      else { mixer.setTime(0); sample(); draw(); }
+    const init = () => {                                   // CONSTELLATION ENTRY plays, then hands off to the run loop + wake
+      phase = 'entry';
+      cancelAnimationFrame(raf); size(); last = 0;         // size() -> setupEntry() (phase === 'entry')
+      raf = requestAnimationFrame(frame);
     };
-    let to; window.addEventListener('resize', () => { clearTimeout(to); to = setTimeout(() => { if (ready) init(); }, 160); });
+    let to; window.addEventListener('resize', () => { clearTimeout(to); to = setTimeout(() => { if (ready) size(); }, 160); });   // re-fit only; never re-enter the intro
     stage.addEventListener('pointermove', (e) => { const r = stage.getBoundingClientRect(); mX = e.clientX - r.left; mY = e.clientY - r.top; mOn = true; });
     stage.addEventListener('pointerleave', () => { mOn = false; });
+    window.__sim = (m) => { cancelAnimationFrame(raf); let ms = 0; last = 0; for (let q = 0; q < m; q++) { ms += 16.7; const T = ms / 1000; let dt = T - last; last = T; step(dt); } return 'stepped ' + m + ' phase=' + phase; }; // TEMP verify (removed in final cleanup)
+    window.__asm = () => { cancelAnimationFrame(raf); flyin ? setupAssembly() : setupEntry(); return 'reset to entry'; }; // TEMP verify
   }
 </script>
