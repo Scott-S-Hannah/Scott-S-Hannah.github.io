@@ -5,40 +5,46 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-body);
+  font-family: var(--font);
   font-size: var(--step-0);
-  line-height: 1.65;
+  line-height: 1.6;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3 { font-family: var(--font-display); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; color: var(--ink); }
+h1, h2, h3 { font-family: var(--font); font-weight: 700; line-height: 1.02; letter-spacing: -0.03em; color: var(--ink); }
 
-a { color: var(--teal); text-decoration: none; }
-a:hover { color: var(--teal-deep); }
+a { color: var(--teal-deep); text-decoration: none; }
+a:hover { color: var(--ink); }
 img { max-width: 100%; height: auto; display: block; }
 
-:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--teal-deep); outline-offset: 3px; }
 
 .container { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
-.section { padding-block: clamp(3rem, 2rem + 5vw, 6rem); }
+.section { padding-block: clamp(4rem, 3rem + 6vw, 8rem); }
 
-.kicker {
-  font-size: var(--step--1); font-weight: 500; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--teal); font-family: var(--font-body);
-}
+/* Numerals and metadata stay in the type family, with tabular figures. No monospace. */
+.mono { font-family: var(--font); font-variant-numeric: tabular-nums; }
+.num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+/* Small tracked labels exist for the publications archive only; the homepage avoids eyebrows. */
 .label {
-  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--faint); font-family: var(--font-body);
+  font-size: var(--step--1); font-weight: 500; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--faint);
 }
-.mono { font-family: var(--font-mono); }
+.kicker { font-size: var(--step--1); font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mut); }
+
+/* Teal registration mark that rhymes with the period in the wordmark. */
+.mark { display: inline-block; width: 9px; height: 9px; background: var(--teal); }
+
 .skip-link {
-  position: absolute; left: -9999px; top: 0; background: var(--ink); color: var(--paper);
+  position: absolute; left: -9999px; top: 0; background: var(--ink); color: #fff;
   padding: 0.6rem 1rem; border-radius: var(--radius); z-index: 50;
 }
 .skip-link:focus { left: 1rem; top: 1rem; }
 
-.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
 .js .reveal.is-visible { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {

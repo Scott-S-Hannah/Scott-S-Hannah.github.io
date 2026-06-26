@@ -1,28 +1,41 @@
 :root {
-  --paper: #f7f4ee;
-  --surface: #fffdf9;
-  --ink: #1a2422;
-  --ink-soft: #494e4b;
-  --mut: #5f6360;
-  --faint: #6b6660;
-  --line: #e6e1d7;
-  --teal: #0a7488;
-  --teal-deep: #0c6b72;
-  --feature: #16242e;
-  --on-feature: #eef1ee;
+  /* Surfaces: cool slate off-white paper, slate near-black ink, single teal accent. */
+  --paper: #f6f8f9;
+  --surface: #fbfcfd;
+  --surface-2: #eaeef1;
+  --ink: #10161a;
+  --ink-soft: #2b3238;
+  --mut: #697178;
+  --faint: #98a1a8;
+  --line: #e1e6e9;
+  --line-strong: #d2d8dc;
 
-  --font-display: 'Sora', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Teal as data ink. Deep for text links on light; bright for marks on dark slate. */
+  --teal: #02abbf;
+  --teal-deep: #0a7d8b;
+  --teal-bright: #06c2d6;
+  --teal-wash: #e3f3f4;
+  --feature: #10161a;
+  --on-feature: #eef1f3;
+  --on-feature-mut: #8c949b;
+  --on-feature-faint: #6c747b;
 
-  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
-  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --step-1: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-  --step-2: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
-  --step-3: clamp(2.1rem, 1.6rem + 2.2vw, 3rem);
-  --step-4: clamp(2.6rem, 1.9rem + 3.4vw, 4.2rem);
+  /* One family, four weights. Tabular figures via .mono / font-variant-numeric. */
+  --font: 'Switzer', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: var(--font);
+  --font-body: var(--font);
+  --font-mono: var(--font);
 
-  --maxw: 72rem;
-  --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.75rem);
-  --radius: 10px;
+  /* Confident, tight type scale. */
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.86rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.075rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --step-2: clamp(1.7rem, 1.35rem + 1.5vw, 2.5rem);
+  --step-3: clamp(2.3rem, 1.7rem + 2.6vw, 3.5rem);
+  --step-4: clamp(3rem, 2rem + 4.5vw, 5.2rem);
+
+  --maxw: 76rem;
+  --gutter: clamp(1.25rem, 0.8rem + 2.4vw, 3rem);
+  --radius: 8px;
+  --nav-h: 64px;
 }

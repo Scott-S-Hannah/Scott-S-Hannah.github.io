@@ -10,30 +10,26 @@
    White base, single teal #02ABBF, Helvetica/Swiss. Re-bake instructions: baking/README.md. */
 ---
 <section class="gh">
-  <header class="gh__nav">
-    <span class="gh__brand">Dr. Scott Hannah</span>
-    <span class="gh__status"><span class="gh__dot" aria-hidden="true"></span>Open to collaboration</span>
-  </header>
   <div class="gh__stage" id="gh-stage">
     <canvas id="gh-canvas" aria-hidden="true"></canvas>
     <img id="gh-poster" class="gh__poster" src="/hero-poster.webp" width="1500" height="651" decoding="async" alt="Dr. Scott Hannah rendered as a teal low-poly running figure" />
     <div class="gh__ovl">
       <div class="gh__id">
+        <p class="gh__status"><span class="gh__dot" aria-hidden="true"></span>Open to collaboration</p>
         <h1 class="gh__name">Dr. Scott<br>Hannah<span>.</span></h1>
-        <p class="gh__role">Exercise Physiologist</p>
-        <p class="gh__org">University of Winchester</p>
-        <p class="gh__lede">I measure how the body responds to exercise, effort, and recovery, for elite sport and clinical care.</p>
+        <p class="gh__role">Exercise Physiologist<span class="gh__org"> · University of Winchester</span></p>
+        <p class="gh__lede">I measure how the body responds to exercise, effort, and recovery, and translate it into assessment for elite sport and clinical care.</p>
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .gh { min-height: 100vh; display: flex; flex-direction: column; background: #fff; color: #0a0a0b; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-  .gh__nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid #ededed; }
-  .gh__brand { font-weight: 700; letter-spacing: -0.02em; font-size: 15px; }
-  .gh__status { display: flex; gap: 9px; align-items: center; font-size: 11px; letter-spacing: 0.1em; color: #71717a; text-transform: uppercase; }
-  .gh__dot { width: 7px; height: 7px; border-radius: 50%; background: #02abbf; }
+  .gh { min-height: calc(100svh - var(--nav-h)); display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font); }
+  .gh__status { display: flex; gap: 9px; align-items: center; font-size: 11px; letter-spacing: 0.14em; color: var(--mut); text-transform: uppercase; font-weight: 500; margin: 0 0 22px; }
+  .gh__dot { width: 7px; height: 7px; border-radius: 50%; background: #02abbf; box-shadow: 0 0 0 0 rgba(2,171,191,0.5); animation: ghPulse 2.6s ease-out infinite; }
+  @keyframes ghPulse { 0% { box-shadow: 0 0 0 0 rgba(2,171,191,0.45); } 70% { box-shadow: 0 0 0 7px rgba(2,171,191,0); } 100% { box-shadow: 0 0 0 0 rgba(2,171,191,0); } }
+  @media (prefers-reduced-motion: reduce) { .gh__dot { animation: none; } }
   .gh__stage { position: relative; flex: 1; overflow: hidden; }
   #gh-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .gh__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: right center; pointer-events: none; opacity: 1; transition: opacity 0.6s ease; }
@@ -43,10 +39,10 @@
   .gh__id { width: 44%; }
   .gh__name { font-weight: 700; font-size: clamp(44px, 7.8vw, 108px); line-height: 0.82; letter-spacing: -0.046em; margin: 0; }   /* name leads: prominent wordmark */
   .gh__name span { color: #02abbf; }
-  .gh__role { font-size: clamp(14px, 1.4vw, 18px); font-weight: 500; margin: 18px 0 0; }
-  .gh__org { font-size: 13px; color: #71717a; margin: 2px 0 0; }
-  .gh__lede { font-size: clamp(12px, 1.1vw, 14px); line-height: 1.55; color: #26262a; max-width: 24em; margin: 18px 0 0; }
-  @media (max-width: 760px) { .gh__id { width: 84%; } .gh__ovl { align-items: flex-start; padding-top: 36px; } .gh__poster { object-position: center bottom; } }
+  .gh__role { font-size: clamp(15px, 1.5vw, 19px); font-weight: 600; margin: 20px 0 0; letter-spacing: -0.01em; color: var(--ink); }
+  .gh__org { color: var(--mut); font-weight: 400; }
+  .gh__lede { font-size: clamp(14px, 1.25vw, 17px); line-height: 1.5; color: var(--ink-soft); max-width: 30em; margin: 16px 0 0; }
+  @media (max-width: 760px) { .gh__id { width: 88%; } .gh__ovl { align-items: flex-start; padding-top: 28px; } .gh__poster { object-position: center bottom; } .gh__lede { max-width: 36em; } }
 </style>
 
 <script>
@@ -58,6 +54,7 @@
     let posterUp = true;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const BODY = '2,171,191', CORE = '2,108,122';
+    const PAPER = (getComputedStyle(document.documentElement).getPropertyValue('--paper').trim()) || '#faf8f3';   // hero canvas matches the page paper
 
     let W = 0, H = 0, DPR = 1, raf = 0, last = 0, ready = false;
     let frames = null, wpos = null, nFrames = 0, cycleDur = 1, TS = 0.5, clipT = 0;   // baked run cycle: per-frame node world positions, played back (TS = original mixer.timeScale)
@@ -221,7 +218,7 @@
 
     function draw() {
       if (posterUp && poster) { posterUp = false; poster.classList.add('is-hidden'); }   // first live frame -> crossfade the static poster out
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
       if (haveGround) {                                  // ground line: anchors the runner, binds figure to the name
         const gy = groundY + 3, grad = ctx.createLinearGradient(0, 0, W, 0);   // full-width baseline: the shared ground the wordmark AND runner stand on (present under the name, not just the figure)
         grad.addColorStop(0, `rgba(${BODY},0.16)`); grad.addColorStop(0.4, `rgba(${BODY},0.20)`); grad.addColorStop(1, `rgba(${BODY},0.40)`);
@@ -412,7 +409,7 @@
     }
     function drawEntry(p) {
       if (posterUp && poster) { posterUp = false; poster.classList.add('is-hidden'); }
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
       ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
       const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1;
       drawEnStreaks();                                                    // the connecting current from the name to the figure
@@ -458,7 +455,7 @@
     }
     function drawAssemble(p) {
       if (posterUp && poster) { posterUp = false; poster.classList.add('is-hidden'); }
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
       ctx.lineWidth = DPR <= 1 ? 1.25 : 1.0;
       const z0 = bb.minx, zr = (bb.maxx - bb.minx) || 1, EW = 0.05;
       for (let i = 0; i < sIdx.length; i++) asmRev[i] = p < rv[i] ? 0 : smooth(rv[i], rv[i] + 0.05, p);   // per-node placed-ness
@@ -506,7 +503,7 @@
         if (phase === 'entry') { flyin ? setupAssembly() : setupEntry(); }   // re-seed the entry at this size (only fires during the brief entry)
         else { sample(); for (let i = 0; i < sIdx.length; i++) { psx[i] = sx[i]; psy[i] = sy[i]; } if (reduce) draw(); }   // running: re-fit only; keep the wake/ground (no intro replay)
       }
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
     }
 
     const init = () => {                                   // CONSTELLATION ENTRY plays, then hands off to the run loop + wake

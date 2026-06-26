@@ -1,39 +1,50 @@
 ---
-import Reveal from './Reveal.astro';
-import { featured } from '../lib/publications';
-const [lead, ...rest] = featured;
+import { featured, THEME_LABELS } from '../lib/publications';
+const FINDINGS: Record<string, string> = {
+  'arterial-rt': 'How a resistance session is built changes arterial stiffness, not just how heavy it is.',
+  'clinical-rehab': 'A therapy people can use at home improved function and vascular health after stroke.',
+  'bone-calcium': 'Low oxygen, from altitude or hard training, shapes bone health in overlooked ways.',
+};
+const items = featured.slice(0, 3);
 ---
-<section class="section container">
-  <div class="sw__head">
-    <p class="label">Selected work</p>
-    <a class="btn-text" href="/publications">All publications</a>
-  </div>
-  {lead && (
-    <Reveal class="sw__lead">
-      <span class="sw__meta mono">{lead.year}</span>
-      <h2 class="sw__lead-title">{lead.title}</h2>
-      <p class="sw__journal">{lead.journal}</p>
-    </Reveal>
-  )}
-  <div class="sw__grid">
-    {rest.map((p) => (
-      <Reveal class="sw__item">
-        <span class="sw__meta mono">{p.year}</span>
-        <h3 class="sw__item-title">{p.title}</h3>
-        <p class="sw__journal">{p.journal}</p>
-      </Reveal>
-    ))}
+<section id="work" class="sw section">
+  <div class="container">
+    <div class="sw__head reveal">
+      <h2 class="sw__title">Selected work</h2>
+      <a class="sw__all" href="/publications">All publications<span aria-hidden="true"> &rarr;</span></a>
+    </div>
+    <div class="sw__list">
+      {items.map((p) => (
+        <div class="sw__row reveal">
+          <span class="sw__year num" aria-hidden="true">{p.year}</span>
+          <div class="sw__main">
+            <span class="sw__tag"><span class="mark" aria-hidden="true"></span>{THEME_LABELS[p.theme]}</span>
+            <h3 class="sw__find">{FINDINGS[p.theme] ?? p.title}</h3>
+            <p class="sw__src">{p.title}</p>
+            <p class="sw__journal">{p.journal}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
-  .sw__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.4rem; }
-  .sw__lead { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 1.6rem 1.8rem; margin-bottom: 1rem; }
-  .sw__lead-title { font-size: var(--step-2); margin: 0.4rem 0; max-width: 24ch; }
-  .sw__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
-  .sw__item { border-top: 2px solid var(--ink); padding-top: 0.9rem; }
-  .sw__item-title { font-size: var(--step-1); margin-top: 0.3rem; line-height: 1.25; }
-  .sw__meta { color: var(--faint); font-size: var(--step--1); }
-  .sw__journal { font-style: italic; color: var(--mut); font-size: var(--step--1); margin-top: 0.4rem; }
-  @media (max-width: 38rem) { .sw__grid { grid-template-columns: 1fr; } }
+  .sw__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .sw__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
+  .sw__all { font-size: var(--step--1); font-weight: 500; color: var(--teal-deep); white-space: nowrap; }
+  .sw__all:hover { color: var(--ink); }
+
+  .sw__list { border-bottom: 1px solid var(--line); }
+  .sw__row { display: grid; grid-template-columns: 5.5rem 1fr; gap: clamp(1.25rem, 4vw, 3rem); padding: clamp(1.8rem, 3vw, 2.6rem) 0; border-top: 1px solid var(--line); align-items: start; }
+  .sw__year { font-size: var(--step-2); font-weight: 700; color: var(--ink); line-height: 1; }
+  .sw__tag { display: inline-flex; align-items: center; gap: 0.55rem; font-size: var(--step--1); font-weight: 500; color: var(--teal-deep); }
+  .sw__tag .mark { width: 7px; height: 7px; }
+  .sw__find { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.25; margin: 0.6rem 0 0; max-width: 40ch; }
+  .sw__src { color: var(--mut); font-size: var(--step--1); margin-top: 0.7rem; max-width: 60ch; line-height: 1.45; }
+  .sw__journal { color: var(--faint); font-size: var(--step--1); font-style: italic; margin-top: 0.2rem; }
+  @media (max-width: 40rem) {
+    .sw__row { grid-template-columns: 1fr; gap: 0.5rem; }
+    .sw__year { font-size: var(--step-1); }
+  }
 </style>

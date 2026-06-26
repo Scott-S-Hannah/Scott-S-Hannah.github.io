@@ -1,0 +1,56 @@
+---
+const services = [
+  { t: 'Research consultancy', d: 'Study design, ethics, measurement, and analysis, taking a project from question through review to publication.' },
+  { t: 'Performance support', d: 'Helping athletes, teams, and organisations build or sharpen their performance support services and infrastructure.' },
+  { t: 'Guest lectures & talks', d: 'Lectures, teaching, and talks on exercise physiology for universities, teams, and events.' },
+];
+const partners = ['English National Ballet', 'Saracens', 'Queens Park Rangers', 'Marathon des Sables', 'NHS Stroke Services'];
+---
+<section id="consultancy" class="consult section">
+  <div class="container">
+    <div class="consult__head">
+      <h2 class="consult__title reveal">Consultancy</h2>
+      <p class="consult__lede reveal">Research, performance, and teaching support for teams, clinicians, and organisations, delivered through WinWell.</p>
+    </div>
+
+    <div class="consult__svcs">
+      {services.map((s, i) => (
+        <div class="consult__svc reveal">
+          <span class="consult__n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="consult__svc-t">{s.t}</h3>
+          <p class="consult__svc-d">{s.d}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="consult__proof reveal">
+      <p class="consult__proof-lead">Trusted by elite sport and clinical partners</p>
+      <ul class="consult__partners">
+        {partners.map((p) => <li>{p}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .consult { background: var(--surface-2); border-block: 1px solid var(--line); }
+  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+  .consult__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
+  .consult__lede { color: var(--mut); max-width: 44ch; line-height: 1.5; }
+
+  .consult__svcs { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+  .consult__svc { padding-top: 1.3rem; border-top: 1px solid var(--line-strong); }
+  .consult__n { display: block; font-size: var(--step--1); color: var(--faint); margin-bottom: 0.8rem; }
+  .consult__svc-t { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
+  .consult__svc-d { color: var(--mut); font-size: var(--step--1); margin-top: 0.7rem; line-height: 1.5; max-width: 34ch; }
+
+  .consult__proof { margin-top: clamp(2.5rem, 5vw, 4rem); padding-top: 1.6rem; border-top: 1px solid var(--line); }
+  .consult__proof-lead { font-size: var(--step--1); color: var(--faint); margin-bottom: 1rem; }
+  .consult__partners { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.8rem 2rem; }
+  .consult__partners li { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+  @media (max-width: 52rem) {
+    .consult__head { grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+    .consult__svcs { grid-template-columns: 1fr; gap: 1.6rem; }
+    .consult__lede { max-width: none; }
+  }
+</style>

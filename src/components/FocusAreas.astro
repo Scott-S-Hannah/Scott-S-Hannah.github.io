@@ -1,31 +1,57 @@
 ---
-import Reveal from './Reveal.astro';
 const areas = [
-  { n: '01', title: 'Cardiovascular & vascular physiology', body: 'How arteries respond to resistance training, effort, and prolonged sitting, measured beat by beat.' },
-  { n: '02', title: 'Clinical exercise rehabilitation', body: 'Translating physiology into recovery after stroke and spinal-cord injury, alongside NHS partners.' },
-  { n: '03', title: 'Applied performance physiology', body: 'Assessment and testing for elite sport, from the laboratory to the field.' },
+  {
+    n: '01',
+    title: 'Mechanistic exercise physiology',
+    body: 'How the body responds and adapts to different exercise stimuli, across the cardiovascular system and bone.',
+  },
+  {
+    n: '02',
+    title: 'Clinical exercise rehabilitation',
+    body: 'Using exercise to rebuild function and health after injury, illness, and long-term conditions, with clinical and NHS partners.',
+  },
+  {
+    n: '03',
+    title: 'Applied performance physiology',
+    body: 'Turning physiology into assessment and training for elite sport, carried from the laboratory to the field.',
+  },
 ];
 ---
-<section id="focus" class="section container">
-  <p class="label">Areas of focus</p>
-  <div class="focus">
-    {areas.map((a) => (
-      <Reveal class="focus__row">
-        <span class="focus__n mono">{a.n}</span>
-        <div>
-          <h2 class="focus__title">{a.title}</h2>
-          <p class="focus__body">{a.body}</p>
+<section id="focus" class="focus section">
+  <div class="container">
+    <div class="focus__head reveal">
+      <h2 class="focus__h">Areas of focus</h2>
+      <p class="focus__intro">Three threads run through the research, the clinic, and the field.</p>
+    </div>
+    <div class="focus__cols">
+      {areas.map((a) => (
+        <div class="focus__col reveal">
+          <span class="focus__mark" aria-hidden="true"></span>
+          <span class="focus__n num" aria-hidden="true">{a.n}</span>
+          <h3 class="focus__col-t">{a.title}</h3>
+          <p class="focus__col-d">{a.body}</p>
         </div>
-      </Reveal>
-    ))}
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
-  .focus { margin-top: 1.6rem; }
-  .focus__row { display: grid; grid-template-columns: 4rem 1fr; gap: 1.4rem; padding: 1.6rem 0; border-bottom: 1px solid var(--line); align-items: baseline; }
-  .focus__n { color: var(--teal); font-size: var(--step-2); font-weight: 400; }
-  .focus__title { font-size: var(--step-2); }
-  .focus__body { color: var(--mut); margin-top: 0.5rem; max-width: 48ch; }
-  @media (max-width: 38rem) { .focus__row { grid-template-columns: 1fr; gap: 0.5rem; } }
+  .focus { background: var(--feature); color: var(--on-feature); }
+  .focus__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.6rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .focus__h { color: var(--on-feature); font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
+  .focus__intro { color: var(--on-feature-mut); font-size: var(--step-0); }
+  .focus__cols { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(238,241,243,0.14); }
+  .focus__col { padding: clamp(1.8rem, 2.6vw, 2.6rem) clamp(1.4rem, 2.4vw, 2.4rem); border-left: 1px solid rgba(238,241,243,0.14); }
+  .focus__col:first-child { border-left: 0; padding-left: 0; }
+  .focus__col:last-child { padding-right: 0; }
+  .focus__mark { display: block; width: 9px; height: 9px; background: var(--teal-bright); margin-bottom: 1.4rem; }
+  .focus__n { display: block; font-size: var(--step-0); color: var(--on-feature-faint); margin-bottom: 0.7rem; }
+  .focus__col-t { color: var(--on-feature); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; }
+  .focus__col-d { color: var(--on-feature-mut); margin-top: 0.9rem; line-height: 1.55; font-size: var(--step--1); }
+  @media (max-width: 46rem) {
+    .focus__cols { grid-template-columns: 1fr; border-top: 0; }
+    .focus__col { border-left: 0; border-top: 1px solid rgba(238,241,243,0.14); padding: 1.6rem 0; }
+    .focus__col:first-child { padding-top: 1.6rem; }
+  }
 </style>

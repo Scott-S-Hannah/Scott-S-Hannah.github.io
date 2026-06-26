@@ -1,10 +1,5 @@
 ---
-import '@fontsource/sora/600.css';
-import '@fontsource/sora/800.css';
-import '@fontsource/inter/300.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/jetbrains-mono/400.css';
+import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import SEO from '../components/SEO.astro';
@@ -21,6 +16,8 @@ const { title, description } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/switzer-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/switzer-400.woff2" as="font" type="font/woff2" crossorigin />
     <SEO title={title} description={description} />
   </head>
   <body>
@@ -28,5 +25,16 @@ const { title, description } = Astro.props;
     <Nav />
     <main id="main"><slot /></main>
     <Footer />
+    <script>
+      const els = document.querySelectorAll('.reveal');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
   </body>
 </html>
