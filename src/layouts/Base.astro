@@ -26,14 +26,29 @@ const { title, description } = Astro.props;
     <main id="main"><slot /></main>
     <Footer />
     <script>
-      const els = document.querySelectorAll('.reveal');
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
-        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-        els.forEach((el) => io.observe(el));
-      } else {
-        els.forEach((el) => el.classList.add('is-visible'));
+      import gsap from 'gsap';
+
+      const reveals = Array.from(document.querySelectorAll('.reveal'));
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const showAll = () => reveals.forEach((el) => { el.style.opacity = '1'; el.style.transform = 'none'; });
+
+      try {
+        if (reduce || !reveals.length || !('IntersectionObserver' in window)) {
+          showAll();
+        } else {
+          gsap.set(reveals, { opacity: 0, y: 18 });
+          // IntersectionObserver triggers; GSAP animates. Items entering together stagger as a group.
+          const io = new IntersectionObserver((entries) => {
+            const hits = entries.filter((e) => e.isIntersecting).map((e) => e.target);
+            if (!hits.length) return;
+            gsap.to(hits, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08, overwrite: true });
+            hits.forEach((t) => io.unobserve(t));
+          }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+          reveals.forEach((el) => io.observe(el));
+        }
+      } catch (e) {
+        console.error('motion init failed', e);
+        showAll();
       }
     </script>
   </body>

@@ -44,10 +44,8 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .skip-link:focus { left: 1rem; top: 1rem; }
 
-.js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
-.js .reveal.is-visible { opacity: 1; transform: none; }
-
+/* Reveal entrance is JS-driven (see Base.astro): the script hides .reveal, then animates each in on
+   scroll. Hiding lives in JS, not CSS, so that if the script fails or is blocked, content stays visible. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .reveal { opacity: 1; transform: none; transition: none; }
 }
