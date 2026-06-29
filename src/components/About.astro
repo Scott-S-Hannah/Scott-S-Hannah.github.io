@@ -1,50 +1,68 @@
 ---
 import { Image } from 'astro:assets';
 import portrait from '../assets/portrait.jpg';
+const facets = [
+  { t: 'Researcher', d: 'How the cardiovascular system and bone respond and adapt to exercise.' },
+  { t: 'Educator', d: 'Programme Leader of the BSc in Sport and Exercise Science at Winchester.' },
+  { t: 'Practitioner', d: 'Testing and rehabilitation with athletes, clinical teams, and the NHS.' },
+  { t: 'Analyst', d: 'Data science and statistics, finding the signal in the measurement.' },
+];
 ---
 <section id="about" class="about section">
   <div class="container">
-    <p class="about__lead reveal">What is the body actually doing when we ask it to work?</p>
-    <div class="about__grid">
+    <div class="about__top">
+      <div class="about__statement">
+        <h2 class="about__declare reveal">I measure<span aria-hidden="true">.</span> I teach<span aria-hidden="true">.</span> I translate<span aria-hidden="true">.</span></h2>
+        <p class="about__lede reveal">Exercise physiologist at the University of Winchester. Ten years spent measuring how the body answers to effort, and translating it into practice.</p>
+      </div>
       <figure class="about__photo reveal">
         <span class="about__mark" aria-hidden="true"></span>
         <div class="about__frame">
-          <Image src={portrait} alt="Dr Scott Hannah" widths={[300, 480, 640]} sizes="(max-width: 46rem) 60vw, 300px" />
+          <Image src={portrait} alt="Dr Scott Hannah" widths={[300, 480, 640]} sizes="(max-width: 46rem) 60vw, 280px" />
         </div>
-      </figure>
-      <div class="about__body reveal">
-        <p>I am an exercise physiologist at the University of Winchester, where I lead the BSc in Sport and Exercise Science. Across more than ten years of research and teaching, I have studied how the body responds and adapts to exercise, from the cardiovascular system to bone, and worked to pass that understanding on to the students and practitioners who come after me.</p>
-        <p>I lean on data science and statistics to make measurement mean something, in the laboratory to the millisecond and in the field with athletes, clinical teams, and the NHS. <em class="about__em">A measurement that never changes anything was not worth taking.</em></p>
-        <div class="about__sign">
+        <figcaption class="about__cap">
           <span class="about__name">Scott Hannah</span>
-          <span class="about__role">Exercise Physiologist, University of Winchester</span>
+          <span class="about__role">Exercise Physiologist</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="about__facets">
+      {facets.map((f) => (
+        <div class="about__facet reveal">
+          <h3 class="about__facet-t">{f.t}</h3>
+          <p class="about__facet-d">{f.d}</p>
         </div>
-      </div>
+      ))}
     </div>
   </div>
 </section>
 
 <style>
-  .about__lead { font-size: var(--step-3); font-weight: 700; line-height: 1.06; letter-spacing: -0.03em; max-width: 18ch; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
-  .about__grid { display: grid; grid-template-columns: minmax(180px, 300px) 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+  .about__top { display: grid; grid-template-columns: 1.55fr 0.85fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: start; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .about__declare { font-size: var(--step-4); font-weight: 700; line-height: 1.0; letter-spacing: -0.035em; max-width: 12ch; }
+  .about__declare span { color: var(--teal); }
+  .about__lede { font-size: var(--step-1); color: var(--ink-soft); line-height: 1.4; margin-top: clamp(1.5rem, 3vw, 2.2rem); max-width: 34ch; }
 
   .about__photo { position: relative; margin: 0; }
   .about__mark { position: absolute; left: -5px; top: -5px; width: 11px; height: 11px; background: var(--teal); z-index: 2; }
   .about__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--surface-2); border: 0.5px solid var(--line-strong); }
   .about__frame :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; transform: scale(1.08); filter: grayscale(1) contrast(1.05) brightness(1.02); }
   .about__frame::after { content: ''; position: absolute; inset: 0; background: var(--teal); mix-blend-mode: color; opacity: 0.16; pointer-events: none; }
+  .about__cap { display: flex; flex-direction: column; margin-top: 0.85rem; }
+  .about__name { font-size: var(--step-0); font-weight: 600; letter-spacing: -0.01em; }
+  .about__role { font-size: var(--step--1); color: var(--mut); }
 
-  .about__body p { color: var(--ink-soft); max-width: 52ch; line-height: 1.6; }
-  .about__body p + p { margin-top: 1.1rem; }
-  .about__em { font-style: normal; font-weight: 500; color: var(--teal-deep); }
+  .about__facets { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(1.2rem, 2.5vw, 2.4rem); }
+  .about__facet { padding-top: 1.3rem; border-top: 1px solid var(--line-strong); }
+  .about__facet-t { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; }
+  .about__facet-d { color: var(--mut); font-size: var(--step--1); margin-top: 0.6rem; line-height: 1.5; }
 
-  .about__sign { margin-top: clamp(1.6rem, 3vw, 2.4rem); padding-top: 1.2rem; border-top: 1px solid var(--line); }
-  .about__name { display: block; font-size: var(--step-1); font-weight: 600; letter-spacing: -0.02em; }
-  .about__role { display: block; font-size: var(--step--1); color: var(--mut); margin-top: 0.2rem; }
-
+  @media (max-width: 60rem) { .about__facets { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 46rem) {
-    .about__grid { grid-template-columns: 1fr; gap: 1.8rem; }
-    .about__photo { max-width: 240px; }
-    .about__lead { font-size: var(--step-2); }
+    .about__top { grid-template-columns: 1fr; gap: 1.8rem; }
+    .about__declare { font-size: var(--step-3); }
+    .about__photo { max-width: 240px; order: 2; }
+    .about__facets { grid-template-columns: 1fr; }
   }
 </style>
