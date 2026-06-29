@@ -7,19 +7,29 @@ const facets = [
   { t: 'Practitioner', d: 'Testing and rehabilitation with athletes, clinical teams, and the NHS.' },
   { t: 'Analyst', d: 'Data science and statistics, finding the signal in the measurement.' },
 ];
+const ticks = Array.from({ length: 25 }, (_, i) => i); // measurement scale under the portrait
 ---
 <section id="about" class="about section">
   <div class="container">
     <div class="about__top">
       <div class="about__statement">
-        <h2 class="about__declare reveal">I measure<span aria-hidden="true">.</span> I teach<span aria-hidden="true">.</span> I translate<span aria-hidden="true">.</span></h2>
-        <p class="about__lede reveal">Exercise physiologist at the University of Winchester. Ten years spent measuring how the body answers to effort, and translating it into practice.</p>
+        <h2 class="about__declare">
+          <span class="about__cl">I measure<i class="about__dot">.</i></span>
+          <span class="about__cl">I teach<i class="about__dot">.</i></span>
+          <span class="about__cl">I translate<i class="about__dot">.</i></span>
+        </h2>
+        <p class="about__lede">Exercise physiologist at the University of Winchester. Ten years spent measuring how the body answers to effort, and translating it into practice.</p>
       </div>
-      <figure class="about__photo reveal">
+      <figure class="about__photo">
         <span class="about__mark" aria-hidden="true"></span>
         <div class="about__frame">
           <Image src={portrait} alt="Dr Scott Hannah" widths={[300, 480, 640]} sizes="(max-width: 46rem) 60vw, 280px" />
         </div>
+        <svg class="about__scale" viewBox="0 0 192 14" preserveAspectRatio="none" aria-hidden="true">
+          {ticks.map((i) => (
+            <line x1={i * 8} y1="14" x2={i * 8} y2={i % 5 === 0 ? 3 : 9} vector-effect="non-scaling-stroke" />
+          ))}
+        </svg>
         <figcaption class="about__cap">
           <span class="about__name">Scott Hannah</span>
           <span class="about__role">Exercise Physiologist</span>
@@ -29,7 +39,7 @@ const facets = [
 
     <div class="about__facets">
       {facets.map((f) => (
-        <div class="about__facet reveal">
+        <div class="about__facet">
           <h3 class="about__facet-t">{f.t}</h3>
           <p class="about__facet-d">{f.d}</p>
         </div>
@@ -41,7 +51,8 @@ const facets = [
 <style>
   .about__top { display: grid; grid-template-columns: 1.55fr 0.85fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: start; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
   .about__declare { font-size: var(--step-4); font-weight: 700; line-height: 1.0; letter-spacing: -0.035em; max-width: 12ch; }
-  .about__declare span { color: var(--teal); }
+  .about__cl { display: inline-block; }
+  .about__dot { display: inline-block; font-style: normal; color: var(--teal); }
   .about__lede { font-size: var(--step-1); color: var(--ink-soft); line-height: 1.4; margin-top: clamp(1.5rem, 3vw, 2.2rem); max-width: 34ch; }
 
   .about__photo { position: relative; margin: 0; }
@@ -49,7 +60,9 @@ const facets = [
   .about__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--surface-2); border: 0.5px solid var(--line-strong); }
   .about__frame :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; transform: scale(1.08); filter: grayscale(1) contrast(1.05) brightness(1.02); }
   .about__frame::after { content: ''; position: absolute; inset: 0; background: var(--teal); mix-blend-mode: color; opacity: 0.16; pointer-events: none; }
-  .about__cap { display: flex; flex-direction: column; margin-top: 0.85rem; }
+  .about__scale { display: block; width: 100%; height: 14px; margin-top: 10px; }
+  .about__scale line { stroke: var(--line-strong); stroke-width: 1; }
+  .about__cap { display: flex; flex-direction: column; margin-top: 0.7rem; }
   .about__name { font-size: var(--step-0); font-weight: 600; letter-spacing: -0.01em; }
   .about__role { font-size: var(--step--1); color: var(--mut); }
 
@@ -66,3 +79,49 @@ const facets = [
     .about__facets { grid-template-columns: 1fr; }
   }
 </style>
+
+<script>
+  import gsap from 'gsap';
+  const root = document.getElementById('about');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (root && !reduce && 'IntersectionObserver' in window) {
+    const q = (s) => root.querySelector(s);
+    const declare = q('.about__declare'), lede = q('.about__lede'), mark = q('.about__mark');
+    const frame = q('.about__frame'), img = frame && frame.querySelector('img');
+    const cap = q('.about__cap'), scale = q('.about__scale');
+    const dots = root.querySelectorAll('.about__dot');
+    const facets = root.querySelectorAll('.about__facet');
+    const showRest = () => gsap.set([declare, lede, mark, frame, cap, scale, ...dots, ...facets].filter(Boolean), { opacity: 1, y: 0, scale: 1, clipPath: 'none' });
+    try {
+      // Initial hidden state lives in JS, so if this never runs the section stays visible.
+      gsap.set([declare, lede, cap], { opacity: 0, y: 14 });
+      gsap.set(dots, { opacity: 0, y: -8, scale: 0.8, transformOrigin: 'bottom center' });
+      gsap.set(mark, { opacity: 0, scale: 0, transformOrigin: 'center' });
+      gsap.set(facets, { opacity: 0, y: 16 });
+      gsap.set(scale, { opacity: 0 });
+      gsap.set(frame, { opacity: 0, clipPath: 'inset(0 0 100% 0)' });
+      if (img) gsap.set(img, { scale: 1.14 });
+
+      let played = false;
+      const io = new IntersectionObserver((entries) => {
+        if (played || !entries.some((e) => e.isIntersecting)) return;
+        played = true; io.disconnect();
+        gsap.timeline({ defaults: { ease: 'power3.out' } })
+          .to(declare, { opacity: 1, y: 0, duration: 0.6 }, 0)
+          .to(dots, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: 'back.out(2.2)', stagger: 0.12 }, 0.30) // signature: periods land like plotted points
+          .to(lede, { opacity: 1, y: 0, duration: 0.65 }, 0.34)
+          .to(mark, { opacity: 1, scale: 1, duration: 0.34, ease: 'back.out(2.2)' }, 0.46)
+          .to(frame, { opacity: 1, clipPath: 'inset(0 0 0% 0)', duration: 0.8, ease: 'power3.inOut' }, 0.50) // portrait calibrates
+          .to(img, { scale: 1.08, duration: 0.95, ease: 'power2.out' }, 0.50)
+          .to(scale, { opacity: 1, duration: 0.6 }, 0.85)
+          .to(cap, { opacity: 1, y: 0, duration: 0.55 }, 1.05)
+          .to(facets, { opacity: 1, y: 0, duration: 0.65, stagger: 0.10 }, 0.90);
+      }, { threshold: 0.15 });
+      io.observe(root);
+    } catch (e) {
+      console.error('about motion failed', e);
+      showRest();
+      if (img) gsap.set(img, { scale: 1.08 });
+    }
+  }
+</script>
