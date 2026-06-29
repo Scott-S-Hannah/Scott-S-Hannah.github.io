@@ -3,32 +3,48 @@ import { Image } from 'astro:assets';
 import portrait from '../assets/portrait.jpg';
 ---
 <section id="about" class="about section">
-  <div class="container about__grid">
-    <figure class="about__photo reveal">
-      <Image src={portrait} alt="Dr Scott Hannah" widths={[320, 480, 640]} sizes="(max-width: 46rem) 70vw, 360px" />
-    </figure>
-    <div class="about__text">
-      <p class="about__lead reveal">I have spent my career on one question: what is the body actually doing when we ask it to work?</p>
+  <div class="container">
+    <p class="about__lead reveal">What is the body actually doing when we ask it to work?</p>
+    <div class="about__grid">
+      <figure class="about__photo reveal">
+        <span class="about__mark" aria-hidden="true"></span>
+        <div class="about__frame">
+          <Image src={portrait} alt="Dr Scott Hannah" widths={[300, 480, 640]} sizes="(max-width: 46rem) 60vw, 300px" />
+        </div>
+      </figure>
       <div class="about__body reveal">
         <p>I am an exercise physiologist at the University of Winchester, where I lead the BSc in Sport and Exercise Science. Across more than ten years of research and teaching, I have studied how the body responds and adapts to exercise, from the cardiovascular system to bone, and worked to pass that understanding on to the students and practitioners who come after me.</p>
-        <p>The work depends on measurement, and on making measurement mean something. I lean heavily on data science and statistics to find the signal in the noise, in the laboratory to the millisecond and in the field with athletes, clinical teams, and the NHS. What I care about most is the bridge between the two, because a measurement that never changes anything was not worth taking.</p>
+        <p>I lean on data science and statistics to make measurement mean something, in the laboratory to the millisecond and in the field with athletes, clinical teams, and the NHS. <em class="about__em">A measurement that never changes anything was not worth taking.</em></p>
+        <div class="about__sign">
+          <span class="about__name">Scott Hannah</span>
+          <span class="about__role">Exercise Physiologist, University of Winchester</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .about__grid { display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: clamp(2rem, 6vw, 5rem); align-items: start; }
-  .about__photo { margin: 0; position: relative; overflow: hidden; background: var(--surface-2); }
-  .about__photo img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; filter: grayscale(1) contrast(1.04) brightness(1.02); }
-  .about__photo::after { content: ''; position: absolute; inset: 0; background: var(--teal); mix-blend-mode: color; opacity: 0.16; pointer-events: none; }
-  .about__lead { font-size: var(--step-3); font-weight: 700; line-height: 1.06; letter-spacing: -0.03em; max-width: 18ch; }
-  .about__body { margin-top: clamp(1.5rem, 3vw, 2.2rem); }
-  .about__body p { color: var(--ink-soft); max-width: 56ch; line-height: 1.6; }
+  .about__lead { font-size: var(--step-3); font-weight: 700; line-height: 1.06; letter-spacing: -0.03em; max-width: 18ch; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+  .about__grid { display: grid; grid-template-columns: minmax(180px, 300px) 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+
+  .about__photo { position: relative; margin: 0; }
+  .about__mark { position: absolute; left: -5px; top: -5px; width: 11px; height: 11px; background: var(--teal); z-index: 2; }
+  .about__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--surface-2); border: 0.5px solid var(--line-strong); }
+  .about__frame :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; transform: scale(1.08); filter: grayscale(1) contrast(1.05) brightness(1.02); }
+  .about__frame::after { content: ''; position: absolute; inset: 0; background: var(--teal); mix-blend-mode: color; opacity: 0.16; pointer-events: none; }
+
+  .about__body p { color: var(--ink-soft); max-width: 52ch; line-height: 1.6; }
   .about__body p + p { margin-top: 1.1rem; }
+  .about__em { font-style: normal; font-weight: 500; color: var(--teal-deep); }
+
+  .about__sign { margin-top: clamp(1.6rem, 3vw, 2.4rem); padding-top: 1.2rem; border-top: 1px solid var(--line); }
+  .about__name { display: block; font-size: var(--step-1); font-weight: 600; letter-spacing: -0.02em; }
+  .about__role { display: block; font-size: var(--step--1); color: var(--mut); margin-top: 0.2rem; }
+
   @media (max-width: 46rem) {
     .about__grid { grid-template-columns: 1fr; gap: 1.8rem; }
-    .about__photo { max-width: 260px; }
+    .about__photo { max-width: 240px; }
     .about__lead { font-size: var(--step-2); }
   }
 </style>
