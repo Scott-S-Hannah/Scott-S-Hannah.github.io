@@ -1,9 +1,9 @@
 ---
-import type { Publication } from '../lib/publications';
+import { areaOf, type Publication } from '../lib/publications';
 interface Props { pub: Publication; }
 const { pub } = Astro.props;
 ---
-<article class="pub" data-theme={pub.theme}>
+<article class="pub" data-theme={pub.theme} data-area={areaOf(pub.theme)}>
   <h3 class="pub__title">
     {pub.doi
       ? <a class="pub__tl" href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener">{pub.title}</a>

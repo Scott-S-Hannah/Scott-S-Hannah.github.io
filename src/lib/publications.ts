@@ -28,3 +28,14 @@ export const THEME_LABELS: Record<string, string> = {
   'clinical-rehab': 'Clinical exercise rehabilitation',
   'athlete-health': 'Athlete health & RED-S',
 };
+
+/* The site-wide taxonomy: the three Areas of focus. Themes are the
+   fine-grained labels shown on items; areas group them for filtering. */
+export const AREAS: Record<string, { label: string; themes: string[] }> = {
+  mechanisms: { label: 'Mechanisms', themes: ['arterial-rt', 'sedentary-vascular', 'bone-calcium'] },
+  rehabilitation: { label: 'Rehabilitation', themes: ['clinical-rehab'] },
+  performance: { label: 'Performance', themes: ['athlete-health'] },
+};
+
+export const areaOf = (theme: string): string =>
+  Object.keys(AREAS).find((a) => AREAS[a].themes.includes(theme)) ?? 'mechanisms';

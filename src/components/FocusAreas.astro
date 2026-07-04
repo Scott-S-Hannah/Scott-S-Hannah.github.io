@@ -5,9 +5,9 @@
    abstracted, travels the line continuously, brightening each area's period
    as it passes beneath. CSS-only motion; static under reduced motion. */
 const areas = [
-  { n: '01', short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.' },
-  { n: '02', short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.' },
-  { n: '03', short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.' },
+  { n: '01', short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.', href: '/publications?area=mechanisms' },
+  { n: '02', short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.', href: '/publications?area=rehabilitation' },
+  { n: '03', short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.', href: '/publications?area=performance' },
 ];
 ---
 <section id="focus" class="focus section">
@@ -20,13 +20,13 @@ const areas = [
       <span class="focus__rule" aria-hidden="true"><span class="focus__runner"></span></span>
       <div class="focus__cells">
         {areas.map((a, i) => (
-          <div class="focus__cell" style={`--i:${i}`}>
+          <a class="focus__cell" href={a.href} style={`--i:${i}`}>
             <h3 class="focus__t">{a.short}<span class={`focus__dot focus__dot--${i}`} aria-hidden="true">.</span></h3>
             <div class="focus__meta">
-              <p class="focus__ft"><span class="num">{a.n}</span> &middot; {a.t}</p>
+              <p class="focus__ft"><span class="num">{a.n}</span> &middot; {a.t}<span class="focus__go" aria-hidden="true"> &rarr;</span></p>
               <p class="focus__d">{a.d}</p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>
@@ -61,10 +61,22 @@ const areas = [
     background: var(--teal-bright); box-shadow: 0 0 14px 3px rgba(6, 194, 214, 0.5); opacity: 0;
   }
 
+  .focus__cell { display: block; color: inherit; }
+  .focus__cell:hover { color: inherit; }
   .focus__meta { margin-top: 1.15rem; }
-  .focus__ft { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; }
+  .focus__ft { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; transition: color 0.25s ease; }
   .focus__ft .num { color: var(--on-feature-faint); }
   .focus__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.6rem; max-width: 32ch; }
+
+  /* Hover speaks the light's language: the arrow arrives and the period flares, same as when the runner passes. */
+  .focus__go { display: inline-block; opacity: 0; translate: -5px 0; transition: opacity 0.3s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+  .focus__cell:hover .focus__ft, .focus__cell:focus-visible .focus__ft { color: var(--on-feature); }
+  .focus__cell:hover .focus__go, .focus__cell:focus-visible .focus__go { opacity: 1; translate: 0 0; }
+  .focus__cell:hover .focus__dot, .focus__cell:focus-visible .focus__dot,
+  .focus.js-anim.in .focus__cell:hover .focus__dot, .focus.js-anim.in .focus__cell:focus-visible .focus__dot {
+    animation: none; color: rgba(178, 240, 248, 1); text-shadow: 0 0 16px rgba(6, 194, 214, 0.9);
+    transition: color 0.25s ease;
+  }
 
   /* Entry choreography, active only once the script marks the section (.js-anim). */
   .focus.js-anim .focus__rule { transform: scaleX(0); transform-origin: left; }

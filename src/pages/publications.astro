@@ -1,10 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import PublicationItem from '../components/PublicationItem.astro';
-import { byYearDesc, THEME_LABELS } from '../lib/publications';
+import { byYearDesc, AREAS, areaOf } from '../lib/publications';
 
-const themes = Object.keys(THEME_LABELS).filter((t) => byYearDesc.some((p) => p.theme === t));
-const countOf = (t: string) => byYearDesc.filter((p) => p.theme === t).length;
+const areaKeys = Object.keys(AREAS).filter((a) => byYearDesc.some((p) => areaOf(p.theme) === a));
+const countOf = (a: string) => byYearDesc.filter((p) => areaOf(p.theme) === a).length;
 const years = [...new Set(byYearDesc.map((p) => p.year))];
 const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.year === y) }));
 ---
@@ -13,10 +13,10 @@ const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.yea
     <p class="kicker">Publications</p>
     <h1 class="pubs__head">Peer-reviewed research</h1>
 
-    <div class="filters" role="group" aria-label="Filter publications by theme">
+    <div class="filters" role="group" aria-label="Filter publications by area of focus">
       <button class="filter is-active" data-filter="all" aria-pressed="true">All<span class="filter__n num">{byYearDesc.length}</span></button>
-      {themes.map((t) => (
-        <button class="filter" data-filter={t} aria-pressed="false">{THEME_LABELS[t]}<span class="filter__n num">{countOf(t)}</span></button>
+      {areaKeys.map((a) => (
+        <button class="filter" data-filter={a} aria-pressed="false">{AREAS[a].label}<span class="filter__n num">{countOf(a)}</span></button>
       ))}
     </div>
 
@@ -69,22 +69,26 @@ const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.yea
   const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
   const items = document.querySelectorAll<HTMLElement>('#pub-list .pub');
   const groups = document.querySelectorAll<HTMLElement>('#pub-list .pubyear');
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-      buttons.forEach((b) => {
-        const active = b === btn;
-        b.classList.toggle('is-active', active);
-        b.setAttribute('aria-pressed', String(active));
-      });
-      items.forEach((item) => {
-        const show = filter === 'all' || item.dataset.theme === filter;
-        item.style.display = show ? '' : 'none';
-      });
-      groups.forEach((g) => {   // a year with nothing left in it disappears with its numeral
-        const any = Array.from(g.querySelectorAll<HTMLElement>('.pub')).some((i) => i.style.display !== 'none');
-        g.style.display = any ? '' : 'none';
-      });
+
+  const apply = (filter: string) => {
+    buttons.forEach((b) => {
+      const active = b.dataset.filter === filter;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-pressed', String(active));
     });
-  });
+    items.forEach((item) => {
+      const show = filter === 'all' || item.dataset.area === filter;
+      item.style.display = show ? '' : 'none';
+    });
+    groups.forEach((g) => {   // a year with nothing left in it disappears with its numeral
+      const any = Array.from(g.querySelectorAll<HTMLElement>('.pub')).some((i) => i.style.display !== 'none');
+      g.style.display = any ? '' : 'none';
+    });
+  };
+
+  buttons.forEach((btn) => btn.addEventListener('click', () => apply(btn.dataset.filter ?? 'all')));
+
+  // Deep link from the Areas of focus section: /publications?area=mechanisms
+  const wanted = new URLSearchParams(location.search).get('area');
+  if (wanted && Array.from(buttons).some((b) => b.dataset.filter === wanted)) apply(wanted);
 </script>

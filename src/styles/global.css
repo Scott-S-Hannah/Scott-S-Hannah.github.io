@@ -49,3 +49,11 @@ img { max-width: 100%; height: auto; display: block; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Cross-document view transitions: page navigations cross-fade instead of hard-cutting.
+   Pure CSS progressive enhancement; unsupported browsers keep the instant swap, and
+   every script still runs on a real page load (no client-side router). */
+@view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
