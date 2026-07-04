@@ -1,0 +1,32 @@
+[
+  {
+    "type": "Project",
+    "year": 2026,
+    "headline": "Robot-assisted gait training, carried from trial evidence into a working NHS stroke service",
+    "detail": "The implementation of robot-assisted gait training in a UK NHS stroke service",
+    "source": "Clinical Rehabilitation",
+    "href": "/publications?area=rehabilitation",
+    "cta": "See the work",
+    "external": false
+  },
+  {
+    "type": "Paper",
+    "year": 2025,
+    "headline": "How a resistance session is built changes arterial stiffness, not just how heavy it is",
+    "detail": "Arterial stiffness and wave reflection responses following heavy and moderate load resistance training protocols",
+    "source": "Journal of Clinical Hypertension",
+    "href": "https://doi.org/10.1111/jch.70020",
+    "cta": "Read the paper",
+    "external": true
+  },
+  {
+    "type": "Paper",
+    "year": 2025,
+    "headline": "A therapy people can use at home improved function and vascular health after stroke",
+    "detail": "Effect of using home-based dynamic intermittent pneumatic compression therapy during periods of physical activity on functional and vascular health outcomes in chronic stroke: A randomized controlled clinical trial",
+    "source": "PLoS ONE",
+    "href": "https://doi.org/10.1371/journal.pone.0318942",
+    "cta": "Read the paper",
+    "external": true
+  }
+]
