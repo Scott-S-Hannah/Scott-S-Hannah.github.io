@@ -1,33 +1,53 @@
 ---
-/* Featured: the homepage's "look at this first" slot. Type-agnostic by design:
-   rows are curated in src/data/featured.json and can be a paper, a project, or
-   (eventually) a post; the tag names the type, the headline speaks plainly, the
-   small lines carry provenance. Publications keep their own page; this section
-   never tries to mirror the archive. */
+/* Latest: the homepage's "look at this first" slot. Type-agnostic and curated
+   in src/data/featured.json (Project / Paper / Post). The first entry is the
+   lead story at display scale; up to three more run as compact secondaries.
+   Render is capped so the section cannot bloat as entries accumulate.
+   No thumbnails, ever: the headlines are the images. */
 import featured from '../data/featured.json';
-const items = featured as {
+type Item = {
   type: string; year: number; headline: string; detail: string;
   source: string; href: string; cta: string; external: boolean;
-}[];
+};
+const items = featured as Item[];
+const lead = items[0];
+const rest = items.slice(1, 4);
 const clean = (s: string) => s.replace(/\.\s*$/, '');
+const linkAttrs = (it: Item) => (it.external ? { target: '_blank', rel: 'noopener' } : {});
 ---
 <section id="featured" class="ft section">
   <div class="container">
     <div class="ft__head reveal">
-      <h2 class="ft__title">Featured</h2>
+      <h2 class="ft__title">Latest<span class="ft__hdot" aria-hidden="true">.</span></h2>
     </div>
+
     <div class="ft__list">
-      {items.map((it) => (
-        <a class="ft__row reveal" href={it.href} target={it.external ? '_blank' : undefined} rel={it.external ? 'noopener' : undefined}>
-          <p class="ft__tag"><span class="mark" aria-hidden="true"></span>{it.type}<span class="ft__yr num">&nbsp;&middot; {it.year}</span></p>
-          <h3 class="ft__h">{clean(it.headline)}<span class="ft__dot" aria-hidden="true">.</span></h3>
-          <p class="ft__detail">{it.detail}</p>
+      {lead && (
+        <a class="ft__lead reveal" href={lead.href} {...linkAttrs(lead)}>
+          <p class="ft__tag"><span class="mark" aria-hidden="true"></span>{lead.type}<span class="ft__yr num">&nbsp;&middot; {lead.year}</span></p>
+          <h3 class="ft__lead-h">{clean(lead.headline)}<span class="ft__dot" aria-hidden="true">.</span></h3>
+          <p class="ft__detail">{lead.detail}</p>
           <p class="ft__meta">
-            <span class="ft__source">{it.source}</span>
-            <span class="ft__go">{it.cta}<span aria-hidden="true"> &nearr;</span></span>
+            <span class="ft__source">{lead.source}</span>
+            <span class="ft__go">{lead.cta}<span aria-hidden="true"> &nearr;</span></span>
           </p>
         </a>
-      ))}
+      )}
+
+      {rest.length > 0 && (
+        <div class="ft__rest" style={`--cols:${rest.length}`}>
+          {rest.map((it) => (
+            <a class="ft__cell reveal" href={it.href} {...linkAttrs(it)}>
+              <p class="ft__tag"><span class="mark" aria-hidden="true"></span>{it.type}<span class="ft__yr num">&nbsp;&middot; {it.year}</span></p>
+              <h3 class="ft__cell-h">{clean(it.headline)}<span class="ft__dot" aria-hidden="true">.</span></h3>
+              <p class="ft__meta">
+                <span class="ft__source">{it.source}</span>
+                <span class="ft__go">{it.cta}<span aria-hidden="true"> &nearr;</span></span>
+              </p>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   </div>
 </section>
@@ -35,39 +55,54 @@ const clean = (s: string) => s.replace(/\.\s*$/, '');
 <style>
   .ft__head { margin-bottom: clamp(1rem, 2vw, 1.8rem); }
   .ft__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
+  .ft__hdot { color: var(--teal); }
 
   .ft__list { border-bottom: 1px solid var(--line); }
-  .ft__row {
-    display: block;
-    padding-block: clamp(2rem, 3.4vw, 3.2rem);
-    border-top: 1px solid var(--line);
-    color: var(--ink);
+
+  .ft__lead { display: block; padding-block: clamp(2rem, 3.4vw, 3.2rem); border-top: 1px solid var(--line); color: var(--ink); }
+  .ft__lead:hover { color: var(--ink); }
+  .ft__lead-h {
+    font-size: clamp(1.7rem, 1.1rem + 2.7vw, 3.1rem);
+    font-weight: 700; letter-spacing: -0.03em; line-height: 1.06;
+    margin: 0.9rem 0 0; max-width: 30ch;
   }
-  .ft__row:hover { color: var(--ink); }
+  .ft__detail { color: var(--mut); font-size: var(--step--1); margin-top: 1rem; max-width: 66ch; line-height: 1.45; }
+
+  .ft__rest {
+    display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--line);
+    padding-block: clamp(1.6rem, 2.6vw, 2.4rem) clamp(1.8rem, 3vw, 2.6rem);
+  }
+  .ft__cell { display: block; color: var(--ink); }
+  .ft__cell:hover { color: var(--ink); }
+  .ft__cell-h {
+    font-size: clamp(1.2rem, 1rem + 0.9vw, 1.55rem);
+    font-weight: 600; letter-spacing: -0.02em; line-height: 1.2;
+    margin: 0.7rem 0 0; max-width: 28ch;
+  }
 
   .ft__tag { display: flex; align-items: center; gap: 0.55rem; font-size: var(--step--1); font-weight: 500; color: var(--teal-deep); }
   .ft__tag .mark { width: 7px; height: 7px; flex: none; }
   .ft__yr { color: var(--faint); font-weight: 400; }
 
-  .ft__h {
-    font-size: clamp(1.6rem, 1.1rem + 2.4vw, 2.9rem);
-    font-weight: 700; letter-spacing: -0.03em; line-height: 1.06;
-    margin: 0.9rem 0 0; max-width: 30ch;
-  }
   .ft__dot { color: var(--ink); transition: color 0.25s ease; }
-  .ft__row:hover .ft__dot, .ft__row:focus-visible .ft__dot { color: var(--teal); }
+  .ft__lead:hover .ft__dot, .ft__lead:focus-visible .ft__dot,
+  .ft__cell:hover .ft__dot, .ft__cell:focus-visible .ft__dot { color: var(--teal); }
 
-  .ft__detail { color: var(--mut); font-size: var(--step--1); margin-top: 1rem; max-width: 66ch; line-height: 1.45; }
-  .ft__meta { display: flex; align-items: baseline; gap: 1.1rem; font-size: var(--step--1); margin-top: 0.35rem; }
+  .ft__meta { display: flex; align-items: baseline; gap: 1.1rem; font-size: var(--step--1); margin-top: 0.5rem; flex-wrap: wrap; }
   .ft__source { color: var(--faint); font-style: italic; }
   .ft__go {
     color: var(--teal-deep); font-weight: 500; white-space: nowrap;
     opacity: 0; transform: translateX(-6px); transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .ft__row:hover .ft__go, .ft__row:focus-visible .ft__go { opacity: 1; transform: translateX(0); }
+  .ft__lead:hover .ft__go, .ft__lead:focus-visible .ft__go,
+  .ft__cell:hover .ft__go, .ft__cell:focus-visible .ft__go { opacity: 1; transform: translateX(0); }
   @media (prefers-reduced-motion: reduce) { .ft__go, .ft__dot { transition: none; } }
 
   @media (max-width: 46rem) {
     .ft__go { opacity: 1; transform: none; }
+    .ft__rest { grid-template-columns: 1fr; gap: 0; padding-block: 0 0.4rem; border-top: 0; }
+    .ft__cell { border-top: 1px solid var(--line); padding-block: 1.5rem; }
   }
 </style>
