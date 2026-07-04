@@ -1,56 +1,69 @@
 ---
-const services = [
-  { t: 'Research consultancy', d: 'Study design, ethics, measurement, and analysis, taking a project from question through review to publication.' },
-  { t: 'Performance support', d: 'Helping athletes, teams, and organisations build or sharpen their performance support services and infrastructure.' },
-  { t: 'Guest lectures & talks', d: 'Lectures, teaching, and talks on exercise physiology for universities, teams, and events.' },
+/* Engagement-led: outcome-first offers and a single low-friction CTA.
+   No logos, no partner walls; the ask itself does the selling. */
+const email = 'Scott.Hannah@Winchester.ac.uk';
+const offers = [
+  { t: 'Research consultancy', d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.' },
+  { t: 'Performance support', d: 'Physiological testing and support infrastructure that gives athletes and staff numbers they can train by.' },
+  { t: 'Lectures & talks', d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.' },
 ];
-const partners = ['English National Ballet', 'Saracens', 'Queens Park Rangers', 'Marathon des Sables', 'NHS Stroke Services'];
 ---
 <section id="consultancy" class="consult section">
   <div class="container">
     <div class="consult__head">
-      <h2 class="consult__title reveal">Consultancy</h2>
-      <p class="consult__lede reveal">Research, performance, and teaching support for teams, clinicians, and organisations, delivered through WinWell.</p>
+      <h2 class="consult__title reveal">Work with me</h2>
+      <p class="consult__lede reveal">Consultancy through WinWell, for teams, clinicians, and organisations that need physiology they can act on.</p>
     </div>
 
     <div class="consult__svcs">
-      {services.map((s, i) => (
+      {offers.map((s) => (
         <div class="consult__svc reveal">
-          <span class="consult__n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <h3 class="consult__svc-t">{s.t}</h3>
           <p class="consult__svc-d">{s.d}</p>
         </div>
       ))}
     </div>
 
-    <div class="consult__proof reveal">
-      <p class="consult__proof-lead">Trusted by elite sport and clinical partners</p>
-      <ul class="consult__partners">
-        {partners.map((p) => <li>{p}</li>)}
-      </ul>
+    <div class="consult__cta reveal">
+      <a class="consult__btn" href={`mailto:${email}?subject=Working%20together`}>Start a conversation<span aria-hidden="true"> &nearr;</span></a>
+      <p class="consult__note">One email is enough to find out whether I can help.</p>
     </div>
   </div>
 </section>
 
 <style>
   .consult { background: var(--surface-2); border-block: 1px solid var(--line); }
-  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
   .consult__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
   .consult__lede { color: var(--mut); max-width: 44ch; line-height: 1.5; }
 
-  .consult__svcs { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
-  .consult__svc { padding-top: 1.3rem; border-top: 1px solid var(--line-strong); }
-  .consult__n { display: block; font-size: var(--step--1); color: var(--faint); margin-bottom: 0.8rem; }
+  .consult__svc {
+    display: grid; grid-template-columns: minmax(13rem, 0.8fr) 1.6fr;
+    gap: clamp(1rem, 3vw, 3rem); align-items: baseline;
+    padding-block: clamp(1.1rem, 2vw, 1.6rem);
+    border-top: 1px solid var(--line-strong);
+  }
   .consult__svc-t { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
-  .consult__svc-d { color: var(--mut); font-size: var(--step--1); margin-top: 0.7rem; line-height: 1.5; max-width: 34ch; }
+  .consult__svc-d { color: var(--mut); font-size: var(--step-0); line-height: 1.5; max-width: 58ch; }
 
-  .consult__proof { margin-top: clamp(2.5rem, 5vw, 4rem); padding-top: 1.6rem; border-top: 1px solid var(--line); }
-  .consult__proof-lead { font-size: var(--step--1); color: var(--faint); margin-bottom: 1rem; }
-  .consult__partners { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.8rem 2rem; }
-  .consult__partners li { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+  .consult__cta {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem 1.8rem;
+    margin-top: clamp(2rem, 4vw, 3rem); padding-top: clamp(1.6rem, 3vw, 2.4rem);
+    border-top: 1px solid var(--line-strong);
+  }
+  .consult__btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--ink); color: var(--paper);
+    font-size: var(--step-0); font-weight: 600; letter-spacing: -0.01em;
+    padding: 0.95rem 1.6rem; border-radius: 2px;
+    transition: background 0.25s ease;
+  }
+  .consult__btn:hover { background: var(--teal-deep); color: var(--paper); }
+  .consult__note { color: var(--mut); font-size: var(--step--1); }
+
   @media (max-width: 52rem) {
     .consult__head { grid-template-columns: 1fr; gap: 1rem; align-items: start; }
-    .consult__svcs { grid-template-columns: 1fr; gap: 1.6rem; }
+    .consult__svc { grid-template-columns: 1fr; gap: 0.4rem; }
     .consult__lede { max-width: none; }
   }
 </style>

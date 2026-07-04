@@ -1,5 +1,15 @@
 ---
-import GenerativeHero from '../components/GenerativeHero.astro';
+/* Concept preview: four executions of the "one line, three areas" idea for
+   Areas of focus. Real tokens, fonts, and copy. Not linked from the site; noindex. */
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+const areas = [
+  { n: '01', short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.' },
+  { n: '02', short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.' },
+  { n: '03', short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.' },
+];
 ---
 <!doctype html>
 <html lang="en">
@@ -7,13 +17,211 @@ import GenerativeHero from '../components/GenerativeHero.astro';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Dr. Scott Hannah — concept preview</title>
-    <style>
-      * { margin: 0; box-sizing: border-box; }
-      html, body { background: #fff; }
-    </style>
+    <title>Areas of focus — the line, four ways</title>
   </head>
   <body>
-    <GenerativeHero />
+
+    <div class="opt"><div class="container"><span class="opt__chip">D1</span> The original: horizontal line above three stations.</div></div>
+
+    <section class="line dark">
+      <div class="container">
+        <div class="head">
+          <h2>Areas of focus</h2>
+          <p class="intro">Three threads run through the research, the clinic, and the field.</p>
+        </div>
+        <div class="line__wrap">
+          <span class="line__rule" aria-hidden="true"></span>
+          <div class="line__stations">
+            {areas.map((a) => (
+              <div class="line__st">
+                <span class="line__mark" aria-hidden="true"></span>
+                <p class="line__n num">{a.n}</p>
+                <h3 class="line__t">{a.t}</h3>
+                <p class="line__d">{a.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="opt"><div class="container"><span class="opt__chip">D2</span> Vertical route: the line becomes a spine the page travels down.</div></div>
+
+    <section class="route dark">
+      <div class="container">
+        <div class="head">
+          <h2>Areas of focus</h2>
+          <p class="intro">One body, three settings.</p>
+        </div>
+        <div class="route__wrap">
+          <span class="route__spine" aria-hidden="true"></span>
+          {areas.map((a) => (
+            <div class="route__st">
+              <span class="route__mark" aria-hidden="true"></span>
+              <p class="route__n num">{a.n}</p>
+              <div class="route__body">
+                <h3 class="route__t">{a.t}</h3>
+                <p class="route__d">{a.d}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <div class="opt"><div class="container"><span class="opt__chip">D3</span> Shared baseline: the areas stand on the line, like the name and the runner in the hero.</div></div>
+
+    <section class="base dark">
+      <div class="container">
+        <div class="head">
+          <h2>Areas of focus</h2>
+          <p class="intro">Three threads run through the research, the clinic, and the field.</p>
+        </div>
+        <div class="base__wrap">
+          <div class="base__row">
+            {areas.map((a) => (
+              <h3 class="base__t">{a.short}<span class="base__dot" aria-hidden="true">.</span></h3>
+            ))}
+          </div>
+          <span class="base__rule" aria-hidden="true"></span>
+          <div class="base__row base__row--desc">
+            {areas.map((a) => (
+              <div class="base__cell">
+                <p class="base__ft"><span class="num">{a.n}</span> &middot; {a.t}</p>
+                <p class="base__d">{a.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="opt"><div class="container"><span class="opt__chip">D4</span> Living line: the line draws itself in and a point of light, the runner, keeps passing through all three.</div></div>
+
+    <section class="live dark" id="live">
+      <div class="container">
+        <div class="head">
+          <h2>Areas of focus</h2>
+          <p class="intro">Three threads run through the research, the clinic, and the field.</p>
+        </div>
+        <div class="live__wrap">
+          <span class="live__rule" aria-hidden="true"></span>
+          <span class="live__runner" aria-hidden="true"></span>
+          <div class="live__stations">
+            {areas.map((a, i) => (
+              <div class="live__st" style={`--i:${i}`}>
+                <span class="live__mark" aria-hidden="true"></span>
+                <p class="live__n num">{a.n}</p>
+                <h3 class="live__t">{a.t}</h3>
+                <p class="live__d">{a.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="opt"><div class="container">End of concepts.</div></div>
+
+  <style>
+    body { background: var(--paper); }
+    .opt { padding-block: 1.4rem; font-size: var(--step--1); color: var(--mut); }
+    .opt__chip { display: inline-block; background: var(--ink); color: var(--paper); border-radius: 2px; padding: 0.2rem 0.6rem; font-weight: 600; margin-right: 0.6rem; }
+    .dark { background: var(--feature); color: var(--on-feature); padding-block: clamp(4rem, 6vw, 6rem); }
+    .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.6rem; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+    .head h2 { color: var(--on-feature); font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
+    .intro { color: var(--on-feature-mut); font-size: var(--step-0); }
+
+    /* ---- D1: horizontal line + stations (as before) ---- */
+    .line__wrap { position: relative; margin-top: 1rem; }
+    .line__rule { position: absolute; top: 4px; left: 50%; translate: -50% 0; width: 100vw; height: 1px;
+      background: linear-gradient(90deg, rgba(2,171,191,0.16), rgba(2,171,191,0.25) 40%, rgba(2,171,191,0.45)); }
+    .line__stations { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+    .line__st { position: relative; padding-top: 2.2rem; }
+    .line__mark { position: absolute; top: 0; left: 0; width: 9px; height: 9px; background: var(--teal-bright); }
+    .line__n { color: var(--on-feature-faint); font-size: var(--step--1); font-weight: 500; }
+    .line__t { color: var(--on-feature); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-top: 0.5rem; }
+    .line__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.8rem; max-width: 34ch; }
+
+    /* ---- D2: vertical route ---- */
+    .route__wrap { position: relative; padding-left: clamp(1.8rem, 4vw, 3rem); }
+    .route__spine { position: absolute; left: 4px; top: -1rem; bottom: -1rem; width: 1px;
+      background: linear-gradient(180deg, rgba(2,171,191,0.14), rgba(2,171,191,0.3) 45%, rgba(2,171,191,0.5)); }
+    .route__st { position: relative; display: grid; grid-template-columns: clamp(3rem, 6vw, 5rem) minmax(0, 1fr); gap: clamp(1rem, 3vw, 2.5rem); align-items: start; padding-block: clamp(1.8rem, 3.2vw, 2.8rem); }
+    .route__st + .route__st { border-top: 1px solid rgba(238,241,243,0.10); }
+    .route__mark { position: absolute; left: calc(4px - clamp(1.8rem, 4vw, 3rem) - 4px); top: calc(clamp(1.8rem, 3.2vw, 2.8rem) + 0.55em); width: 9px; height: 9px; background: var(--teal-bright); }
+    .route__n { color: var(--on-feature-faint); font-size: var(--step-2); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+    .route__t { color: var(--on-feature); font-size: clamp(1.4rem, 1.15rem + 1.2vw, 2rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.12; }
+    .route__d { color: var(--on-feature-mut); font-size: var(--step-0); line-height: 1.55; margin-top: 0.7rem; max-width: 52ch; }
+
+    /* ---- D3: shared baseline ---- */
+    .base__wrap { position: relative; }
+    .base__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: end; }
+    .base__t { color: var(--on-feature); font-size: clamp(1.7rem, 1rem + 3vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; padding-bottom: 0.35rem; }
+    .base__dot { color: var(--teal-bright); }
+    .base__rule { display: block; position: relative; height: 1px; }
+    .base__rule::after { content: ''; position: absolute; left: 50%; translate: -50% 0; width: 100vw; height: 1px;
+      background: linear-gradient(90deg, rgba(2,171,191,0.16), rgba(2,171,191,0.25) 40%, rgba(2,171,191,0.45)); }
+    .base__row--desc { align-items: start; margin-top: 1.1rem; }
+    .base__ft { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; }
+    .base__ft .num { color: var(--on-feature-faint); }
+    .base__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.6rem; max-width: 32ch; }
+
+    /* ---- D4: living line ---- */
+    .live__wrap { position: relative; margin-top: 1rem; }
+    .live__rule { position: absolute; top: 4px; left: 50%; translate: -50% 0; width: 100vw; height: 1px;
+      background: linear-gradient(90deg, rgba(2,171,191,0.16), rgba(2,171,191,0.25) 40%, rgba(2,171,191,0.45));
+      transform: scaleX(0); transform-origin: left; transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .live.in .live__rule { transform: scaleX(1); }
+    .live__runner { position: absolute; top: 4.5px; translate: 0 -50%; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal-bright); box-shadow: 0 0 14px 3px rgba(6,194,214,0.5); opacity: 0; }
+    .live.in .live__runner { animation: liveTravel 11s linear infinite 1.5s; }
+    @keyframes liveTravel {
+      0% { left: -2%; opacity: 0; }
+      5% { opacity: 1; }
+      92% { opacity: 1; }
+      100% { left: 101%; opacity: 0; }
+    }
+    .live__stations { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+    .live__st { position: relative; padding-top: 2.2rem; }
+    .live__mark { position: absolute; top: 0; left: 0; width: 9px; height: 9px; background: var(--teal-bright);
+      transform: scale(0); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transition-delay: calc(0.35s + var(--i) * 0.42s); }
+    .live.in .live__mark { transform: scale(1); }
+    .live__st > p, .live__st > h3 { opacity: 0; translate: 0 10px; transition: opacity 0.6s ease, translate 0.6s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(0.45s + var(--i) * 0.42s); }
+    .live.in .live__st > p, .live.in .live__st > h3 { opacity: 1; translate: 0 0; }
+    .live__n { color: var(--on-feature-faint); font-size: var(--step--1); font-weight: 500; }
+    .live__t { color: var(--on-feature); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-top: 0.5rem; }
+    .live__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.8rem; max-width: 34ch; }
+    @media (prefers-reduced-motion: reduce) {
+      .live__rule { transform: none; transition: none; }
+      .live__runner { display: none; }
+      .live__mark { transform: none; transition: none; }
+      .live__st > p, .live__st > h3 { opacity: 1; translate: none; transition: none; }
+    }
+
+    @media (max-width: 46rem) {
+      .line__stations, .live__stations { grid-template-columns: 1fr; }
+      .line__rule, .live__rule, .live__runner { display: none; }
+      .line__st, .live__st { border-left: 1px solid rgba(2,171,191,0.35); padding: 0 0 1.6rem 1.4rem; }
+      .line__mark, .live__mark { top: 0.35rem; left: -5px; }
+      .base__row { grid-template-columns: 1fr; gap: 0.4rem; align-items: start; }
+      .base__row--desc .base__cell + .base__cell { margin-top: 1.2rem; }
+      .base__rule { display: none; }
+      .base__t { padding-bottom: 0; }
+    }
+  </style>
+
+  <script>
+    // Mockup-only: trigger D4's draw when it enters view (static under reduced motion via CSS).
+    const live = document.getElementById('live');
+    if (live && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { live.classList.add('in'); io.disconnect(); }
+      }, { threshold: 0.3 });
+      io.observe(live);
+    } else if (live) {
+      live.classList.add('in');
+    }
+  </script>
   </body>
 </html>

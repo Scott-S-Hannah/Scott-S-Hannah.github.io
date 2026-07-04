@@ -1,11 +1,15 @@
 ---
+/* The second hero. No graphics: the findings ARE the display. Each row is a
+   link to the paper; the plain-language finding leads at display scale, the
+   formal title and journal sit under it as provenance. */
 import { featured, THEME_LABELS } from '../lib/publications';
 const FINDINGS: Record<string, string> = {
-  'arterial-rt': 'How a resistance session is built changes arterial stiffness, not just how heavy it is.',
-  'clinical-rehab': 'A therapy people can use at home improved function and vascular health after stroke.',
-  'bone-calcium': 'Low oxygen, from altitude or hard training, shapes bone health in overlooked ways.',
+  'arterial-rt': 'How a resistance session is built changes arterial stiffness, not just how heavy it is',
+  'clinical-rehab': 'A therapy people can use at home improved function and vascular health after stroke',
+  'bone-calcium': 'Low oxygen, from altitude or hard training, shapes bone health in overlooked ways',
 };
 const items = featured.slice(0, 3);
+const findingOf = (p: (typeof items)[0]) => (FINDINGS[p.theme] ?? p.title).replace(/\.\s*$/, '');
 ---
 <section id="work" class="sw section">
   <div class="container">
@@ -15,36 +19,58 @@ const items = featured.slice(0, 3);
     </div>
     <div class="sw__list">
       {items.map((p) => (
-        <div class="sw__row reveal">
-          <span class="sw__year num" aria-hidden="true">{p.year}</span>
-          <div class="sw__main">
-            <span class="sw__tag"><span class="mark" aria-hidden="true"></span>{THEME_LABELS[p.theme]}</span>
-            <h3 class="sw__find">{FINDINGS[p.theme] ?? p.title}</h3>
-            <p class="sw__src">{p.title}</p>
-            <p class="sw__journal">{p.journal}</p>
-          </div>
-        </div>
+        <a class="sw__row reveal" href={p.doi ? `https://doi.org/${p.doi}` : '/publications'} target={p.doi ? '_blank' : undefined} rel={p.doi ? 'noopener' : undefined}>
+          <p class="sw__tag"><span class="mark" aria-hidden="true"></span>{THEME_LABELS[p.theme]}<span class="sw__yr num">&nbsp;&middot; {p.year}</span></p>
+          <h3 class="sw__find">{findingOf(p)}<span class="sw__dot" aria-hidden="true">.</span></h3>
+          <p class="sw__src">{p.title}</p>
+          <p class="sw__meta">
+            <span class="sw__journal">{p.journal}</span>
+            <span class="sw__go">Read the paper<span aria-hidden="true"> &nearr;</span></span>
+          </p>
+        </a>
       ))}
     </div>
   </div>
 </section>
 
 <style>
-  .sw__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .sw__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: clamp(1rem, 2vw, 1.8rem); }
   .sw__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
   .sw__all { font-size: var(--step--1); font-weight: 500; color: var(--teal-deep); white-space: nowrap; }
   .sw__all:hover { color: var(--ink); }
 
   .sw__list { border-bottom: 1px solid var(--line); }
-  .sw__row { display: grid; grid-template-columns: 5.5rem 1fr; gap: clamp(1.25rem, 4vw, 3rem); padding: clamp(1.8rem, 3vw, 2.6rem) 0; border-top: 1px solid var(--line); align-items: start; }
-  .sw__year { font-size: var(--step-2); font-weight: 700; color: var(--ink); line-height: 1; }
-  .sw__tag { display: inline-flex; align-items: center; gap: 0.55rem; font-size: var(--step--1); font-weight: 500; color: var(--teal-deep); }
-  .sw__tag .mark { width: 7px; height: 7px; }
-  .sw__find { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.25; margin: 0.6rem 0 0; max-width: 40ch; }
-  .sw__src { color: var(--mut); font-size: var(--step--1); margin-top: 0.7rem; max-width: 60ch; line-height: 1.45; }
-  .sw__journal { color: var(--faint); font-size: var(--step--1); font-style: italic; margin-top: 0.2rem; }
-  @media (max-width: 40rem) {
-    .sw__row { grid-template-columns: 1fr; gap: 0.5rem; }
-    .sw__year { font-size: var(--step-1); }
+  .sw__row {
+    display: block;
+    padding-block: clamp(2rem, 3.4vw, 3.2rem);
+    border-top: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .sw__row:hover { color: var(--ink); }
+
+  .sw__tag { display: flex; align-items: center; gap: 0.55rem; font-size: var(--step--1); font-weight: 500; color: var(--teal-deep); }
+  .sw__tag .mark { width: 7px; height: 7px; flex: none; }
+  .sw__yr { color: var(--faint); font-weight: 400; }
+
+  .sw__find {
+    font-size: clamp(1.6rem, 1.1rem + 2.4vw, 2.9rem);
+    font-weight: 700; letter-spacing: -0.03em; line-height: 1.06;
+    margin: 0.9rem 0 0; max-width: 30ch;
+  }
+  .sw__dot { color: var(--ink); transition: color 0.25s ease; }
+  .sw__row:hover .sw__dot, .sw__row:focus-visible .sw__dot { color: var(--teal); }
+
+  .sw__src { color: var(--mut); font-size: var(--step--1); margin-top: 1rem; max-width: 66ch; line-height: 1.45; }
+  .sw__meta { display: flex; align-items: baseline; gap: 1.1rem; font-size: var(--step--1); margin-top: 0.35rem; }
+  .sw__journal { color: var(--faint); font-style: italic; }
+  .sw__go {
+    color: var(--teal-deep); font-weight: 500; white-space: nowrap;
+    opacity: 0; transform: translateX(-6px); transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sw__row:hover .sw__go, .sw__row:focus-visible .sw__go { opacity: 1; transform: translateX(0); }
+  @media (prefers-reduced-motion: reduce) { .sw__go, .sw__dot { transition: none; } }
+
+  @media (max-width: 46rem) {
+    .sw__go { opacity: 1; transform: none; }
   }
 </style>

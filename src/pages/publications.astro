@@ -4,6 +4,9 @@ import PublicationItem from '../components/PublicationItem.astro';
 import { byYearDesc, THEME_LABELS } from '../lib/publications';
 
 const themes = Object.keys(THEME_LABELS).filter((t) => byYearDesc.some((p) => p.theme === t));
+const countOf = (t: string) => byYearDesc.filter((p) => p.theme === t).length;
+const years = [...new Set(byYearDesc.map((p) => p.year))];
+const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.year === y) }));
 ---
 <Base title="Publications | Dr Scott Hannah" description="Peer-reviewed research by Dr Scott Hannah on cardiovascular physiology, clinical exercise rehabilitation, and athlete health.">
   <section class="section container">
@@ -11,33 +14,61 @@ const themes = Object.keys(THEME_LABELS).filter((t) => byYearDesc.some((p) => p.
     <h1 class="pubs__head">Peer-reviewed research</h1>
 
     <div class="filters" role="group" aria-label="Filter publications by theme">
-      <button class="filter is-active" data-filter="all" aria-pressed="true">All</button>
+      <button class="filter is-active" data-filter="all" aria-pressed="true">All<span class="filter__n num">{byYearDesc.length}</span></button>
       {themes.map((t) => (
-        <button class="filter" data-filter={t} aria-pressed="false">{THEME_LABELS[t]}</button>
+        <button class="filter" data-filter={t} aria-pressed="false">{THEME_LABELS[t]}<span class="filter__n num">{countOf(t)}</span></button>
       ))}
     </div>
 
     <div id="pub-list">
-      {byYearDesc.map((pub) => <PublicationItem pub={pub} />)}
+      {groups.map((g) => (
+        <section class="pubyear">
+          <h2 class="pubyear__y num">{g.year ?? 'In press'}</h2>
+          <div class="pubyear__items">
+            {g.pubs.map((pub) => <PublicationItem pub={pub} />)}
+          </div>
+        </section>
+      ))}
     </div>
   </section>
 </Base>
 
 <style>
   .pubs__head { font-size: var(--step-3); margin-top: 0.4rem; margin-bottom: 2rem; }
-  .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
   .filter {
+    display: inline-flex; align-items: baseline; gap: 0.55rem;
     font-family: var(--font-body); font-size: var(--step--1); color: var(--mut);
-    background: transparent; border: 1px solid var(--line); border-radius: 999px;
-    padding: 0.45rem 0.95rem; cursor: pointer; transition: all 0.2s ease;
+    background: transparent; border: 1px solid var(--line-strong); border-radius: 2px;
+    padding: 0.45rem 0.85rem; cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
   }
+  .filter__n { font-size: 0.85em; color: var(--faint); transition: color 0.2s ease; }
   .filter:hover { border-color: var(--teal); color: var(--teal-deep); }
   .filter.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .filter.is-active .filter__n { color: var(--on-feature-mut); }
+
+  .pubyear {
+    display: grid; grid-template-columns: clamp(5rem, 10vw, 8rem) minmax(0, 1fr);
+    gap: clamp(1rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--line-strong);
+    padding-block: clamp(1.2rem, 2.5vw, 2rem) 0.6rem;
+  }
+  .pubyear__y {
+    font-size: var(--step-3); font-weight: 700; line-height: 0.9; letter-spacing: -0.03em;
+    color: var(--ink); position: sticky; top: calc(var(--nav-h) + 1.2rem); align-self: start;
+  }
+  @media (max-width: 40rem) {
+    .pubyear { grid-template-columns: 1fr; gap: 0.4rem; }
+    .pubyear__y { position: static; font-size: var(--step-2); }
+  }
 </style>
 
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
   const items = document.querySelectorAll<HTMLElement>('#pub-list .pub');
+  const groups = document.querySelectorAll<HTMLElement>('#pub-list .pubyear');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const filter = btn.dataset.filter;
@@ -49,6 +80,10 @@ const themes = Object.keys(THEME_LABELS).filter((t) => byYearDesc.some((p) => p.
       items.forEach((item) => {
         const show = filter === 'all' || item.dataset.theme === filter;
         item.style.display = show ? '' : 'none';
+      });
+      groups.forEach((g) => {   // a year with nothing left in it disappears with its numeral
+        const any = Array.from(g.querySelectorAll<HTMLElement>('.pub')).some((i) => i.style.display !== 'none');
+        g.style.display = any ? '' : 'none';
       });
     });
   });

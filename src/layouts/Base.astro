@@ -36,15 +36,33 @@ const { title, description } = Astro.props;
         if (reduce || !reveals.length || !('IntersectionObserver' in window)) {
           showAll();
         } else {
-          gsap.set(reveals, { opacity: 0, y: 18 });
-          // IntersectionObserver triggers; GSAP animates. Items entering together stagger as a group.
+          // Anything already in view (first paint, or a direct #hash load that jumped the page)
+          // is never hidden: the fade-up is for content the user scrolls to, not content they arrive on.
+          const vh = window.innerHeight;
+          const inView = (el) => { const r = el.getBoundingClientRect(); return r.top < vh * 0.96 && r.bottom > 0; };
+          const pending = new Set(reveals.filter((el) => !inView(el)));
+          gsap.set([...pending], { opacity: 0, y: 18 });
+
           const io = new IntersectionObserver((entries) => {
-            const hits = entries.filter((e) => e.isIntersecting).map((e) => e.target);
+            const hits = entries.filter((e) => e.isIntersecting).map((e) => e.target).filter((t) => pending.has(t));
             if (!hits.length) return;
             gsap.to(hits, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08, overwrite: true });
-            hits.forEach((t) => io.unobserve(t));
+            hits.forEach((t) => { pending.delete(t); io.unobserve(t); });
           }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-          reveals.forEach((el) => io.observe(el));
+          pending.forEach((el) => io.observe(el));
+
+          // Anchor arrivals never wait on the observer: reveal the target section at once.
+          const revealHash = () => {
+            const id = location.hash && location.hash.slice(1);
+            const target = id && document.getElementById(id);
+            if (!target) return;
+            const hits = [...pending].filter((el) => target.contains(el) || el === target);
+            if (!hits.length) return;
+            gsap.to(hits, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', overwrite: true, stagger: 0.04 });
+            hits.forEach((t) => { pending.delete(t); io.unobserve(t); });
+          };
+          window.addEventListener('hashchange', revealHash);
+          revealHash();
         }
       } catch (e) {
         console.error('motion init failed', e);

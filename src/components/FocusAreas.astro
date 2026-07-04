@@ -1,20 +1,13 @@
 ---
+/* One line, three areas. The short names stand on a continuous full-bleed
+   baseline, the way the wordmark and the runner share a baseline in the hero.
+   On entry the line draws itself in; then a single point of light, the runner
+   abstracted, travels the line continuously, brightening each area's period
+   as it passes beneath. CSS-only motion; static under reduced motion. */
 const areas = [
-  {
-    n: '01',
-    title: 'Mechanistic exercise physiology',
-    body: 'How the body responds and adapts to different exercise stimuli, across the cardiovascular system and bone.',
-  },
-  {
-    n: '02',
-    title: 'Clinical exercise rehabilitation',
-    body: 'Using exercise to rebuild function and health after injury, illness, and long-term conditions, with clinical and NHS partners.',
-  },
-  {
-    n: '03',
-    title: 'Applied performance physiology',
-    body: 'Turning physiology into assessment and training for elite sport, carried from the laboratory to the field.',
-  },
+  { n: '01', short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.' },
+  { n: '02', short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.' },
+  { n: '03', short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.' },
 ];
 ---
 <section id="focus" class="focus section">
@@ -23,35 +16,125 @@ const areas = [
       <h2 class="focus__h">Areas of focus</h2>
       <p class="focus__intro">Three threads run through the research, the clinic, and the field.</p>
     </div>
-    <div class="focus__cols">
-      {areas.map((a) => (
-        <div class="focus__col reveal">
-          <span class="focus__mark" aria-hidden="true"></span>
-          <span class="focus__n num" aria-hidden="true">{a.n}</span>
-          <h3 class="focus__col-t">{a.title}</h3>
-          <p class="focus__col-d">{a.body}</p>
-        </div>
-      ))}
+    <div class="focus__wrap">
+      <span class="focus__rule" aria-hidden="true"><span class="focus__runner"></span></span>
+      <div class="focus__cells">
+        {areas.map((a, i) => (
+          <div class="focus__cell" style={`--i:${i}`}>
+            <h3 class="focus__t">{a.short}<span class={`focus__dot focus__dot--${i}`} aria-hidden="true">.</span></h3>
+            <div class="focus__meta">
+              <p class="focus__ft"><span class="num">{a.n}</span> &middot; {a.t}</p>
+              <p class="focus__d">{a.d}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
 <style>
   .focus { background: var(--feature); color: var(--on-feature); }
-  .focus__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.6rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .focus__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.6rem; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
   .focus__h { color: var(--on-feature); font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
   .focus__intro { color: var(--on-feature-mut); font-size: var(--step-0); }
-  .focus__cols { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(238,241,243,0.14); }
-  .focus__col { padding: clamp(1.8rem, 2.6vw, 2.6rem) clamp(1.4rem, 2.4vw, 2.4rem); border-left: 1px solid rgba(238,241,243,0.14); }
-  .focus__col:first-child { border-left: 0; padding-left: 0; }
-  .focus__col:last-child { padding-right: 0; }
-  .focus__mark { display: block; width: 9px; height: 9px; background: var(--teal-bright); margin-bottom: 1.4rem; }
-  .focus__n { display: block; font-size: var(--step-0); color: var(--on-feature-faint); margin-bottom: 0.7rem; }
-  .focus__col-t { color: var(--on-feature); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; }
-  .focus__col-d { color: var(--on-feature-mut); margin-top: 0.9rem; line-height: 1.55; font-size: var(--step--1); }
-  @media (max-width: 46rem) {
-    .focus__cols { grid-template-columns: 1fr; border-top: 0; }
-    .focus__col { border-left: 0; border-top: 1px solid rgba(238,241,243,0.14); padding: 1.6rem 0; }
-    .focus__col:first-child { padding-top: 1.6rem; }
+
+  .focus__wrap { position: relative; --wordfs: clamp(1.5rem, 0.4rem + 2.6vw, 2.7rem); }
+  .focus__cells { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 3rem); }
+
+  .focus__t {
+    color: var(--on-feature); font-size: var(--wordfs); font-weight: 700;
+    letter-spacing: -0.03em; line-height: 1; white-space: nowrap;
+    padding-bottom: 0.45rem;   /* the words stand on the line, not float above it */
+  }
+  .focus__dot { color: var(--teal-bright); }
+
+  /* The baseline: full-bleed, sitting directly under the words. */
+  .focus__rule {
+    position: absolute; top: calc(var(--wordfs) + 0.45rem); left: 50%; translate: -50% 0;
+    width: 100vw; height: 1px;
+    background: linear-gradient(90deg, rgba(2,171,191,0.16), rgba(2,171,191,0.25) 40%, rgba(2,171,191,0.45));
+  }
+  /* The runner: a single glow point travelling the line, forever. */
+  .focus__runner {
+    position: absolute; top: 50%; translate: 0 -50%; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--teal-bright); box-shadow: 0 0 14px 3px rgba(6, 194, 214, 0.5); opacity: 0;
+  }
+
+  .focus__meta { margin-top: 1.15rem; }
+  .focus__ft { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; }
+  .focus__ft .num { color: var(--on-feature-faint); }
+  .focus__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.6rem; max-width: 32ch; }
+
+  /* Entry choreography, active only once the script marks the section (.js-anim). */
+  .focus.js-anim .focus__rule { transform: scaleX(0); transform-origin: left; }
+  .focus.js-anim.in .focus__rule { transform: scaleX(1); transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+  .focus.js-anim .focus__cell { opacity: 0; translate: 0 12px; }
+  .focus.js-anim.in .focus__cell {
+    opacity: 1; translate: 0 0;
+    transition: opacity 0.65s ease, translate 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(0.4s + var(--i) * 0.35s);
+  }
+  .focus.js-anim.in .focus__runner { animation: focusTravel 11s linear infinite 1.6s; }
+  @keyframes focusTravel {
+    0% { left: -2%; opacity: 0; }
+    5% { opacity: 1; }
+    93% { opacity: 1; }
+    100% { left: 102%; opacity: 0; }
+  }
+  /* Each period brightens as the light passes beneath its word (same 11s timeline). */
+  .focus.js-anim.in .focus__dot { color: rgba(6, 194, 214, 0.5); animation: none 11s linear infinite 1.6s; }
+  .focus.js-anim.in .focus__dot--0 { animation-name: focusDot0; }
+  .focus.js-anim.in .focus__dot--1 { animation-name: focusDot1; }
+  .focus.js-anim.in .focus__dot--2 { animation-name: focusDot2; }
+  @keyframes focusDot0 {
+    0%, 11% { color: rgba(6,194,214,0.5); text-shadow: none; }
+    18% { color: rgba(178,240,248,1); text-shadow: 0 0 16px rgba(6,194,214,0.9); }
+    25%, 100% { color: rgba(6,194,214,0.5); text-shadow: none; }
+  }
+  @keyframes focusDot1 {
+    0%, 43% { color: rgba(6,194,214,0.5); text-shadow: none; }
+    50% { color: rgba(178,240,248,1); text-shadow: 0 0 16px rgba(6,194,214,0.9); }
+    57%, 100% { color: rgba(6,194,214,0.5); text-shadow: none; }
+  }
+  @keyframes focusDot2 {
+    0%, 75% { color: rgba(6,194,214,0.5); text-shadow: none; }
+    82% { color: rgba(178,240,248,1); text-shadow: 0 0 16px rgba(6,194,214,0.9); }
+    89%, 100% { color: rgba(6,194,214,0.5); text-shadow: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .focus.js-anim .focus__rule { transform: none; transition: none; }
+    .focus.js-anim .focus__cell { opacity: 1; translate: none; transition: none; }
+    .focus__runner { display: none; }
+    .focus.js-anim.in .focus__dot { color: var(--teal-bright); animation: none; text-shadow: none; }
+  }
+
+  @media (max-width: 56rem) {
+    .focus__rule, .focus__runner { display: none; }
+    .focus__cells { grid-template-columns: 1fr; gap: 0; }
+    .focus__cell { position: relative; border-left: 1px solid rgba(2, 171, 191, 0.35); padding: 0 0 1.9rem 1.35rem; }
+    .focus__cell:last-child { padding-bottom: 0.4rem; }
+    .focus__cell::before { content: ''; position: absolute; left: -5px; top: 0.45em; width: 9px; height: 9px; background: var(--teal-bright); }
+    .focus__t { white-space: normal; padding-bottom: 0; }
+    .focus__meta { margin-top: 0.8rem; }
+    .focus.js-anim.in .focus__dot { color: var(--teal-bright); animation: none; }
   }
 </style>
+
+<script>
+  // Hiding lives behind .js-anim (added here), so a failed script leaves the section visible.
+  const sec = document.getElementById('focus');
+  if (sec) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    sec.classList.add('js-anim');
+    if (reduce || !('IntersectionObserver' in window)) {
+      sec.classList.add('in');
+    } else {
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { sec.classList.add('in'); io.disconnect(); }
+      }, { threshold: 0.25 });
+      io.observe(sec);
+    }
+  }
+</script>

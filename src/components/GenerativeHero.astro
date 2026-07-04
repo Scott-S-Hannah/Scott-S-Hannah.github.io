@@ -15,7 +15,6 @@
     <img id="gh-poster" class="gh__poster" src="/hero-poster.webp" width="1500" height="651" decoding="async" alt="Dr Scott Hannah rendered as a teal low-poly running figure" />
     <div class="gh__ovl">
       <div class="gh__id">
-        <p class="gh__status"><span class="gh__dot" aria-hidden="true"></span>Open to collaboration</p>
         <h1 class="gh__name">Dr Scott<br>Hannah<span>.</span></h1>
         <p class="gh__role">Exercise Physiologist</p>
         <p class="gh__lede">I measure how the body works and adapts, and translate it into assessment for elite sport and clinical care.</p>
@@ -26,10 +25,6 @@
 
 <style>
   .gh { min-height: calc(100svh - var(--nav-h)); display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font); }
-  .gh__status { display: flex; gap: 9px; align-items: center; font-size: 11px; letter-spacing: 0.14em; color: var(--mut); text-transform: uppercase; font-weight: 500; margin: 0 0 22px; }
-  .gh__dot { width: 7px; height: 7px; border-radius: 50%; background: #02abbf; box-shadow: 0 0 0 0 rgba(2,171,191,0.5); animation: ghPulse 2.6s ease-out infinite; }
-  @keyframes ghPulse { 0% { box-shadow: 0 0 0 0 rgba(2,171,191,0.45); } 70% { box-shadow: 0 0 0 7px rgba(2,171,191,0); } 100% { box-shadow: 0 0 0 0 rgba(2,171,191,0); } }
-  @media (prefers-reduced-motion: reduce) { .gh__dot { animation: none; } }
   .gh__stage { position: relative; flex: 1; overflow: hidden; }
   #gh-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .gh__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: right center; pointer-events: none; opacity: 1; transition: opacity 0.6s ease; }
@@ -55,7 +50,7 @@
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const BODY = '2,171,191', CORE = '2,108,122';
     const PAPER = (getComputedStyle(document.documentElement).getPropertyValue('--paper').trim()) || '#faf8f3';   // hero canvas matches the page paper
-    let runT = 0, settle = 0, paused = false; const RUN_HOLD = 5, SETTLE_DUR = 2.6;   // SETTLE: run for RUN_HOLD, then ease the stride + wake to rest over SETTLE_DUR (no perpetual loop)
+    let paused = false;   // the runner runs for as long as the hero is on screen (paused offscreen; reduced-motion gets the static poster)
 
     let W = 0, H = 0, DPR = 1, raf = 0, last = 0, ready = false;
     let frames = null, wpos = null, nFrames = 0, cycleDur = 1, TS = 0.5, clipT = 0;   // baked run cycle: per-frame node world positions, played back (TS = original mixer.timeScale)
@@ -269,7 +264,7 @@
       const kick = 1 + shedPulse * 0.8;                                           // burst particles get a propulsion kick
       const wf = Math.max(0.85, Math.min(1.75, W / 1200));                       // scale wake density to viewport width
       shEmitRefresh += dt * 8; while (shEmitRefresh >= 1) { shEmitRefresh -= 1; shEmit[shEmitRot] = pickPosterior(); shEmitRot = (shEmitRot + 1) % SH_NEMIT; }   // slowly migrate the limited spawn points
-      shEmitAcc += SH_EMIT * wf * (1 + shedPulse * 1.7) * dt * runScale; let toEmit = shEmitAcc | 0; shEmitAcc -= toEmit; if (toEmit > 42) toEmit = 42;   // wake emission fades to nothing as the runner settles
+      shEmitAcc += SH_EMIT * wf * (1 + shedPulse * 1.7) * dt * runScale; let toEmit = shEmitAcc | 0; shEmitAcc -= toEmit; if (toEmit > 42) toEmit = 42;
       for (let e = 0; e < toEmit; e++) {
         let slot = -1; for (let t = 0; t < 6; t++) { const c = (Math.random() * shN) | 0; if (shL[c] <= 0) { slot = c; break; } } if (slot < 0) continue;
         const k = shEmit[(Math.random() * SH_NEMIT) | 0], bx = sx[k], by = sy[k], nvx = (sx[k] - psx[k]) || 0, nvy = (sy[k] - psy[k]) || 0;
@@ -483,14 +478,11 @@
       ctx.restore();
     }
     function handoff() {                                  // start the wake; seamless (clipT advances continuously through the cycle)
-      phase = 'running'; seedShed(); haveGround = false; planted = false; last = 0; runT = 0; settle = 0;
+      phase = 'running'; seedShed(); haveGround = false; planted = false; last = 0;
     }
     function step(dt) {
       if (phase === 'entry') { flyin ? stepAssemble(dt) : stepEntry(dt); return; }
-      runT += dt;
-      if (runT > RUN_HOLD) settle = Math.min(1, settle + dt / SETTLE_DUR);          // begin easing to rest after the hold
-      const runScale = 1 - smooth(0, 1, settle);                                     // stride speed 1 -> 0 (ease-out); 0 = held pose
-      tflow += dt; clipT += dt * TS * runScale; sample(); footPlant(dt); updateShed(dt, runScale); draw();
+      tflow += dt; clipT += dt * TS; sample(); footPlant(dt); updateShed(dt, 1); draw();
     }
     function frame(now) {
       if (paused) { raf = 0; return; }
@@ -525,7 +517,7 @@
     }
     stage.addEventListener('pointermove', (e) => { const r = stage.getBoundingClientRect(); mX = e.clientX - r.left; mY = e.clientY - r.top; mOn = true; });
     stage.addEventListener('pointerleave', () => { mOn = false; });
-    window.__sim = (m) => { cancelAnimationFrame(raf); let ms = 0; last = 0; for (let q = 0; q < m; q++) { ms += 16.7; const T = ms / 1000; let dt = T - last; last = T; step(dt); } return { phase, ready, settle: +settle.toFixed(3), clipT: +clipT.toFixed(3), runT: +runT.toFixed(2) }; }; // TEMP verify (removed in final cleanup)
+    window.__sim = (m) => { cancelAnimationFrame(raf); let ms = 0; last = 0; for (let q = 0; q < m; q++) { ms += 16.7; const T = ms / 1000; let dt = T - last; last = T; step(dt); } return { phase, ready, clipT: +clipT.toFixed(3) }; }; // TEMP verify (removed in final cleanup)
     window.__asm = () => { cancelAnimationFrame(raf); flyin ? setupAssembly() : setupEntry(); return 'reset to entry'; }; // TEMP verify
   }
 </script>
