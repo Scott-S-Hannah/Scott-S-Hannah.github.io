@@ -1,6 +1,10 @@
 ---
 /* Dark slate footer that bookends the contact section. The teal gradient
-   ground line on top is the hero runner's baseline, closing the page. */
+   ground line on top is the hero runner's baseline, closing the page, and
+   the figure himself stands on it: a build-time wireframe glyph rendered
+   from the same baked run cycle the hero plays. */
+import { runnerGlyph } from '../lib/runner-glyph';
+const glyph = runnerGlyph();
 const year = new Date().getFullYear();
 const email = 'Scott.Hannah@Winchester.ac.uk';
 const site = [
@@ -16,11 +20,19 @@ const social = [
 ];
 ---
 <footer class="footer">
+  <svg class="footer__runner" viewBox={glyph.viewBox} xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    {glyph.tiers.map((t) => (
+      <path d={t.d} fill="none" stroke="#02abbf" stroke-opacity={t.opacity} stroke-width="1" vector-effect="non-scaling-stroke" stroke-linecap="round" />
+    ))}
+    {glyph.dots.map((d) => (
+      <circle cx={d.x} cy={d.y} r={d.r} fill="#06c2d6" fill-opacity={d.o} />
+    ))}
+  </svg>
   <div class="container">
     <div class="footer__grid">
       <div class="footer__id">
         <p class="footer__brand">Dr Scott Hannah<span aria-hidden="true">.</span></p>
-        <p class="footer__line">Exercise physiologist. Measuring how the body works and adapts, for elite performance and clinical care.</p>
+        <p class="footer__reprise">I measure<span aria-hidden="true">.</span> I teach<span aria-hidden="true">.</span> I translate<span aria-hidden="true">.</span></p>
         <a class="footer__mail" href={`mailto:${email}`}>{email}</a>
       </div>
       <nav class="footer__col" aria-label="Site">
@@ -45,12 +57,19 @@ const social = [
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, rgba(2,171,191,0.16), rgba(2,171,191,0.2) 40%, rgba(2,171,191,0.4));
   }
+  /* The bookend: the hero's figure, further down the same line, running off the page. */
+  .footer__runner {
+    position: absolute; top: 1px; right: clamp(1.25rem, 6vw, 5rem);
+    height: clamp(44px, 6.5vw, 74px); width: auto;
+    transform: translateY(-100%); pointer-events: none;
+  }
 
   .footer__grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(8rem, 0.7fr) minmax(8rem, 0.7fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
 
   .footer__brand { font-size: var(--step-1); font-weight: 700; letter-spacing: -0.02em; color: var(--on-feature); }
   .footer__brand span { color: var(--teal-bright); }
-  .footer__line { font-size: var(--step--1); line-height: 1.6; max-width: 34ch; margin-top: 0.8rem; }
+  .footer__reprise { font-size: var(--step-0); font-weight: 600; letter-spacing: -0.01em; color: var(--on-feature); margin-top: 0.8rem; }
+  .footer__reprise span { color: var(--teal-bright); }
   .footer__mail { display: inline-block; margin-top: 1.2rem; color: var(--on-feature); font-weight: 500; font-size: var(--step-0); border-bottom: 1px solid rgba(238,241,243,0.28); padding-bottom: 2px; }
   .footer__mail:hover { color: var(--teal-bright); border-color: var(--teal-bright); }
 

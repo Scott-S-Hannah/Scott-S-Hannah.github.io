@@ -1,11 +1,12 @@
 ---
-/* Engagement-led: outcome-first offers and a single low-friction CTA.
+/* Engagement-led: each offer is the sentence the visitor arrives thinking,
+   in their voice, so the section works by recognition rather than labels.
    No logos, no partner walls; the ask itself does the selling. */
 const email = 'Scott.Hannah@Winchester.ac.uk';
 const offers = [
-  { t: 'Research consultancy', d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.' },
-  { t: 'Performance support', d: 'Physiological testing and support infrastructure that gives athletes and staff numbers they can train by.' },
-  { t: 'Lectures & talks', d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.' },
+  { need: 'You need a study that survives review', d: 'Question, ethics, measurement, analysis, and the paper at the end of it.' },
+  { need: 'You need athletes tested where they train', d: 'Physiological testing and support infrastructure that produces numbers staff can act on.' },
+  { need: 'You need physiology taught so it lands', d: 'Lectures, teaching, and talks for universities, teams, and boardrooms.' },
 ];
 ---
 <section id="consultancy" class="consult section">
@@ -18,7 +19,7 @@ const offers = [
     <div class="consult__svcs">
       {offers.map((s) => (
         <div class="consult__svc reveal">
-          <h3 class="consult__svc-t">{s.t}</h3>
+          <h3 class="consult__svc-t">{s.need}<span class="consult__dot" aria-hidden="true">.</span></h3>
           <p class="consult__svc-d">{s.d}</p>
         </div>
       ))}
@@ -26,6 +27,7 @@ const offers = [
 
     <div class="consult__cta reveal">
       <a class="consult__btn" href={`mailto:${email}?subject=Working%20together`}>Start a conversation<span aria-hidden="true"> &nearr;</span></a>
+      <a class="consult__email" href={`mailto:${email}?subject=Working%20together`}>{email}</a>
       <p class="consult__note">One email is enough to find out whether I can help.</p>
     </div>
   </div>
@@ -38,13 +40,12 @@ const offers = [
   .consult__lede { color: var(--mut); max-width: 44ch; line-height: 1.5; }
 
   .consult__svc {
-    display: grid; grid-template-columns: minmax(13rem, 0.8fr) 1.6fr;
-    gap: clamp(1rem, 3vw, 3rem); align-items: baseline;
-    padding-block: clamp(1.1rem, 2vw, 1.6rem);
+    padding-block: clamp(1.4rem, 2.4vw, 2rem);
     border-top: 1px solid var(--line-strong);
   }
-  .consult__svc-t { font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
-  .consult__svc-d { color: var(--mut); font-size: var(--step-0); line-height: 1.5; max-width: 58ch; }
+  .consult__svc-t { font-size: clamp(1.35rem, 1.05rem + 1.4vw, 2.1rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
+  .consult__dot { color: var(--teal); }
+  .consult__svc-d { color: var(--mut); font-size: var(--step-0); line-height: 1.5; max-width: 58ch; margin-top: 0.6rem; }
 
   .consult__cta {
     display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem 1.8rem;
@@ -59,11 +60,15 @@ const offers = [
     transition: background 0.25s ease;
   }
   .consult__btn:hover { background: var(--teal-deep); color: var(--paper); }
-  .consult__note { color: var(--mut); font-size: var(--step--1); }
+  .consult__email {
+    color: var(--ink); font-weight: 500; font-size: var(--step-0);
+    border-bottom: 1px solid var(--line-strong); padding-bottom: 2px;
+  }
+  .consult__email:hover { color: var(--teal-deep); border-color: var(--teal-deep); }
+  .consult__note { color: var(--mut); font-size: var(--step--1); flex-basis: 100%; }
 
   @media (max-width: 52rem) {
     .consult__head { grid-template-columns: 1fr; gap: 1rem; align-items: start; }
-    .consult__svc { grid-template-columns: 1fr; gap: 0.4rem; }
     .consult__lede { max-width: none; }
   }
 </style>
