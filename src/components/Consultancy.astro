@@ -1,12 +1,12 @@
 ---
-/* Engagement-led: each offer is the sentence the visitor arrives thinking,
-   in their voice, so the section works by recognition rather than labels.
+/* A numbered ledger of offers: index numeral, title with the teal full stop,
+   outcome-led description. One low-friction CTA closes the section.
    No logos, no partner walls; the ask itself does the selling. */
 const email = 'Scott.Hannah@Winchester.ac.uk';
 const offers = [
-  { need: 'You need a study that survives review', d: 'Question, ethics, measurement, analysis, and the paper at the end of it.' },
-  { need: 'You need athletes tested where they train', d: 'Physiological testing and support infrastructure that produces numbers staff can act on.' },
-  { need: 'You need physiology taught so it lands', d: 'Lectures, teaching, and talks for universities, teams, and boardrooms.' },
+  { n: '01', t: 'Research consultancy', d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.' },
+  { n: '02', t: 'Performance support', d: 'Physiological testing and support infrastructure that produces numbers athletes and staff can act on.' },
+  { n: '03', t: 'Guest lectures & talks', d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.' },
 ];
 ---
 <section id="consultancy" class="consult section">
@@ -19,7 +19,8 @@ const offers = [
     <div class="consult__svcs">
       {offers.map((s) => (
         <div class="consult__svc reveal">
-          <h3 class="consult__svc-t">{s.need}<span class="consult__dot" aria-hidden="true">.</span></h3>
+          <span class="consult__n num" aria-hidden="true">{s.n}</span>
+          <h3 class="consult__svc-t">{s.t}<span class="consult__dot" aria-hidden="true">.</span></h3>
           <p class="consult__svc-d">{s.d}</p>
         </div>
       ))}
@@ -40,12 +41,17 @@ const offers = [
   .consult__lede { color: var(--mut); max-width: 44ch; line-height: 1.5; }
 
   .consult__svc {
-    padding-block: clamp(1.4rem, 2.4vw, 2rem);
+    display: grid;
+    grid-template-columns: clamp(3rem, 6vw, 5.5rem) minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: clamp(1rem, 3vw, 3rem);
+    align-items: baseline;
+    padding-block: clamp(1.6rem, 2.8vw, 2.6rem);
     border-top: 1px solid var(--line-strong);
   }
-  .consult__svc-t { font-size: clamp(1.35rem, 1.05rem + 1.4vw, 2.1rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
+  .consult__n { font-size: var(--step-2); font-weight: 700; line-height: 1; color: var(--faint); letter-spacing: -0.02em; }
+  .consult__svc-t { font-size: clamp(1.35rem, 1.05rem + 1.4vw, 2rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
   .consult__dot { color: var(--teal); }
-  .consult__svc-d { color: var(--mut); font-size: var(--step-0); line-height: 1.5; max-width: 58ch; margin-top: 0.6rem; }
+  .consult__svc-d { color: var(--mut); font-size: var(--step-0); line-height: 1.5; max-width: 46ch; }
 
   .consult__cta {
     display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem 1.8rem;
@@ -70,5 +76,8 @@ const offers = [
   @media (max-width: 52rem) {
     .consult__head { grid-template-columns: 1fr; gap: 1rem; align-items: start; }
     .consult__lede { max-width: none; }
+    .consult__svc { grid-template-columns: clamp(2.4rem, 9vw, 3rem) minmax(0, 1fr); gap: 0.4rem 1rem; }
+    .consult__n { font-size: var(--step-1); }
+    .consult__svc-d { grid-column: 2; }
   }
 </style>
