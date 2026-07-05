@@ -1,12 +1,15 @@
 ---
-/* A numbered ledger of offers: index numeral, title with the teal full stop,
-   outcome-led description. One low-friction CTA closes the section.
-   No logos, no partner walls; the ask itself does the selling. */
+/* Spotlight index: the three offers as a large interactive list; the active
+   one is full ink with the teal full stop, and the panel beside it answers
+   with the description and deliverables. No index numerals: order carries no
+   information here. A wireframe figure per service (T-pose / sprint / talk,
+   baked like the hero) will join the panel once the Mixamo poses are baked.
+   On small screens the same DOM reads as an accordion. */
 const email = 'Scott.Hannah@Winchester.ac.uk';
 const offers = [
-  { n: '01', t: 'Research consultancy', d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.' },
-  { n: '02', t: 'Performance support', d: 'Physiological testing and support infrastructure that produces numbers athletes and staff can act on.' },
-  { n: '03', t: 'Guest lectures & talks', d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.' },
+  { key: 'research', t: 'Research consultancy', d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.', pts: ['Study design', 'Ethics & governance', 'Measurement & analysis', 'Through review to publication'] },
+  { key: 'performance', t: 'Performance support', d: 'Physiological testing and support infrastructure that produces numbers athletes and staff can act on.', pts: ['Physiological testing', 'Support infrastructure', 'From the lab to the field'] },
+  { key: 'lectures', t: 'Guest lectures & talks', d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.', pts: ['Guest lectures', 'Team-room sessions', 'Keynotes & talks'] },
 ];
 ---
 <section id="consultancy" class="consult section">
@@ -16,12 +19,21 @@ const offers = [
       <p class="consult__lede reveal">Consultancy through WinWell, for teams, clinicians, and organisations that need physiology they can act on.</p>
     </div>
 
-    <div class="consult__svcs">
-      {offers.map((s) => (
-        <div class="consult__svc reveal">
-          <span class="consult__n num" aria-hidden="true">{s.n}</span>
-          <h3 class="consult__svc-t">{s.t}<span class="consult__dot" aria-hidden="true">.</span></h3>
-          <p class="consult__svc-d">{s.d}</p>
+    <div class="consult__spot reveal">
+      {offers.map((o, i) => (
+        <div class="consult__unit">
+          <button
+            class={`consult__tab${i === 0 ? ' is-on' : ''}`}
+            data-key={o.key}
+            aria-expanded={i === 0 ? 'true' : 'false'}
+            aria-controls={`consult-${o.key}`}
+          >{o.t}<span class="consult__dot" aria-hidden="true">.</span></button>
+          <div class={`consult__detail${i === 0 ? ' is-on' : ''}`} id={`consult-${o.key}`} data-key={o.key}>
+            <p class="consult__d">{o.d}</p>
+            <ul class="consult__pts">
+              {o.pts.map((p) => <li><span class="consult__pt-mark" aria-hidden="true"></span>{p}</li>)}
+            </ul>
+          </div>
         </div>
       ))}
     </div>
@@ -36,22 +48,40 @@ const offers = [
 
 <style>
   .consult { background: var(--surface-2); border-block: 1px solid var(--line); }
-  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(2rem, 4vw, 3rem); }
   .consult__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
   .consult__lede { color: var(--mut); max-width: 44ch; line-height: 1.5; }
 
-  .consult__svc {
-    display: grid;
-    grid-template-columns: clamp(3rem, 6vw, 5.5rem) minmax(0, 1fr) minmax(0, 1.35fr);
-    gap: clamp(1rem, 3vw, 3rem);
-    align-items: baseline;
-    padding-block: clamp(1.6rem, 2.8vw, 2.6rem);
-    border-top: 1px solid var(--line-strong);
+  .consult__spot { display: grid; grid-template-columns: 1.15fr 1fr; gap: 0 clamp(2rem, 6vw, 6rem); align-items: start; }
+  .consult__unit { display: contents; }
+
+  .consult__tab {
+    display: block; width: 100%; text-align: left; background: none; border: 0;
+    border-top: 1px solid var(--line-strong); border-radius: 0;
+    grid-column: 1;
+    padding: clamp(1.2rem, 2vw, 1.7rem) 0; cursor: pointer;
+    font-family: var(--font); font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.7rem);
+    font-weight: 700; letter-spacing: -0.03em; line-height: 1.05;
+    color: var(--faint); transition: color 0.25s ease;
   }
-  .consult__n { font-size: var(--step-2); font-weight: 700; line-height: 1; color: var(--faint); letter-spacing: -0.02em; }
-  .consult__svc-t { font-size: clamp(1.35rem, 1.05rem + 1.4vw, 2rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
-  .consult__dot { color: var(--teal); }
-  .consult__svc-d { color: var(--mut); font-size: var(--step-0); line-height: 1.5; max-width: 46ch; }
+  .consult__tab:hover { color: var(--ink-soft); }
+  .consult__tab.is-on { color: var(--ink); }
+  .consult__tab .consult__dot { opacity: 0; color: var(--teal); transition: opacity 0.25s ease; }
+  .consult__tab.is-on .consult__dot { opacity: 1; }
+  .consult__tab:focus-visible { outline: 2px solid var(--teal-deep); outline-offset: 3px; }
+
+  .consult__detail {
+    grid-column: 2; grid-row: 1 / span 3;
+    display: none; min-height: 15rem; padding-top: clamp(1.2rem, 2vw, 1.8rem);
+  }
+  .consult__detail.is-on { display: block; animation: consultIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+  @keyframes consultIn { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { .consult__detail.is-on { animation: none; } }
+
+  .consult__d { color: var(--ink-soft); font-size: var(--step-1); line-height: 1.4; letter-spacing: -0.01em; max-width: 32ch; }
+  .consult__pts { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; gap: 0.55rem; }
+  .consult__pts li { display: flex; align-items: center; gap: 0.7rem; color: var(--mut); font-size: var(--step-0); }
+  .consult__pt-mark { width: 7px; height: 7px; background: var(--teal); flex: none; }
 
   .consult__cta {
     display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem 1.8rem;
@@ -76,8 +106,34 @@ const offers = [
   @media (max-width: 52rem) {
     .consult__head { grid-template-columns: 1fr; gap: 1rem; align-items: start; }
     .consult__lede { max-width: none; }
-    .consult__svc { grid-template-columns: clamp(2.4rem, 9vw, 3rem) minmax(0, 1fr); gap: 0.4rem 1rem; }
-    .consult__n { font-size: var(--step-1); }
-    .consult__svc-d { grid-column: 2; }
+    .consult__spot { display: block; }
+    .consult__unit { display: block; border-top: 1px solid var(--line-strong); }
+    .consult__tab { border-top: 0; font-size: clamp(1.4rem, 1.1rem + 1.6vw, 1.8rem); }
+    .consult__detail { min-height: 0; padding: 0 0 1.5rem; }
   }
 </style>
+
+<script>
+  // Spotlight swap: hover on pointer devices, click/tap and keyboard everywhere.
+  const root = document.getElementById('consultancy');
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('.consult__tab'));
+    const details = Array.from(root.querySelectorAll<HTMLElement>('.consult__detail'));
+    const activate = (key: string | undefined) => {
+      if (!key) return;
+      tabs.forEach((t) => {
+        const on = t.dataset.key === key;
+        t.classList.toggle('is-on', on);
+        t.setAttribute('aria-expanded', String(on));
+      });
+      details.forEach((d) => d.classList.toggle('is-on', d.dataset.key === key));
+    };
+    tabs.forEach((t) => {
+      t.addEventListener('click', () => activate(t.dataset.key));
+      t.addEventListener('focus', () => activate(t.dataset.key));
+    });
+    if (matchMedia('(hover: hover)').matches) {
+      tabs.forEach((t) => t.addEventListener('mouseenter', () => activate(t.dataset.key)));
+    }
+  }
+</script>

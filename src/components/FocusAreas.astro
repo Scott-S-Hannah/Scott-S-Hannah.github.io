@@ -5,9 +5,9 @@
    abstracted, travels the line continuously, brightening each area's period
    as it passes beneath. CSS-only motion; static under reduced motion. */
 const areas = [
-  { n: '01', short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.', href: '/publications?area=mechanisms' },
-  { n: '02', short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.', href: '/publications?area=rehabilitation' },
-  { n: '03', short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.', href: '/publications?area=performance' },
+  { short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.', href: '/publications?area=mechanisms' },
+  { short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.', href: '/publications?area=rehabilitation' },
+  { short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.', href: '/publications?area=performance' },
 ];
 ---
 <section id="focus" class="focus section">
@@ -23,7 +23,7 @@ const areas = [
           <a class="focus__cell" href={a.href} style={`--i:${i}`}>
             <h3 class="focus__t">{a.short}<span class={`focus__dot focus__dot--${i}`} aria-hidden="true">.</span></h3>
             <div class="focus__meta">
-              <p class="focus__ft"><span class="num">{a.n}</span> &middot; {a.t}<span class="focus__go" aria-hidden="true"> &rarr;</span></p>
+              <p class="focus__ft">{a.t}<span class="focus__go" aria-hidden="true"> &rarr;</span></p>
               <p class="focus__d">{a.d}</p>
             </div>
           </a>
@@ -65,7 +65,6 @@ const areas = [
   .focus__cell:hover { color: inherit; }
   .focus__meta { margin-top: 1.15rem; }
   .focus__ft { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; transition: color 0.25s ease; }
-  .focus__ft .num { color: var(--on-feature-faint); }
   .focus__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.6rem; max-width: 32ch; }
 
   /* Hover speaks the light's language: the arrow arrives and the period flares, same as when the runner passes. */
