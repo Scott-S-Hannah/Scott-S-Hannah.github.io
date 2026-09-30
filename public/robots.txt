@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.scott-hannah.com/sitemap-index.xml
+Sitemap: https://scott-hannah.com/sitemap-index.xml

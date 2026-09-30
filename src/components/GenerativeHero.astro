@@ -101,7 +101,7 @@
     const shKind = new Uint8Array(shN), shFdx = new Float32Array(shN), shFdy = new Float32Array(shN), shSpin = new Float32Array(shN);
     const SH_HIST = 13;                                  // per-particle trail length so the shed parts FLOW off
     const shHX = new Float32Array(shN * SH_HIST), shHY = new Float32Array(shN * SH_HIST), shHead = new Uint8Array(shN), shCnt = new Uint8Array(shN);
-    let shEmitAcc = 0, shedPulse = 0;                    // shedPulse spikes at toe-off so the wake breathes with the stride
+    let shEmitAcc = 0, shedPulse = 0, wakeEnergy = 0;                   // shedPulse spikes at toe-off so the wake breathes with the stride
     const SH_NEMIT = 40; const shEmit = new Int32Array(SH_NEMIT); let shEmitRot = 0, shEmitRefresh = 0;   // limited, slowly-migrating spawn positions -> distinct streams, less uniform clumping
     const SH_DRIFT = 128, SH_LIFT = 5, SH_CURL = 24, SH_RELAX = 0.075, SH_EMIT = 104, SH_FRAG_FRAC = 0.10, SH_LIFE_MIN = 5.8, SH_LIFE_VAR = 4.0, SH_VMAX = 290;
     function seedShed() { shEmitAcc = 0; for (let i = 0; i < shN; i++) { shL[i] = 0; shVX[i] = 0; shVY[i] = 0; shKind[i] = 0; shX[i] = -100; shY[i] = -100; shCnt[i] = 0; shHead[i] = 0; shSeed[i] = Math.random() * 6.2832; } for (let j = 0; j < SH_NEMIT; j++) shEmit[j] = pickPosterior(); }
@@ -132,9 +132,16 @@
     function fit() {                                 // model bbox -> figure box (right on desktop; lower-centre on mobile to clear the headline)
       const mw = bb.maxz - bb.minz, mh = bb.maxy - bb.miny;   // side profile: Z=horizontal, Y=vertical, X=depth
       const mobile = W < 760;
-      const targetH = H * (mobile ? 0.54 : 0.78); sc = targetH / mh;   // figure supports the name (not competing)
+      let targetH = H * (mobile ? 0.54 : 0.78);      // figure supports the name (not competing)
+      if (mobile) {                                   // fill the band under the stacked text: no dead gap on tall phones, no overlap on short ones
+        const lede = document.querySelector('.gh__lede');
+        const textBottom = lede ? lede.getBoundingClientRect().bottom - stage.getBoundingClientRect().top : H * 0.4;
+        const band = H * 0.97 - (textBottom + 20);
+        targetH = Math.max(Math.min(band, (W * 0.86) * mh / mw, H * 0.62), H * 0.3);
+      }
+      sc = targetH / mh;
       const figW = mw * sc;
-      if (mobile) {                                   // centred and sat at the bottom, below the stacked text
+      if (mobile) {                                   // centred under the text, feet on the ground line
         ox = (W - figW) / 2 - bb.minz * sc;
         oy = H - H * 0.03 + bb.miny * sc;             // y flips: screenY = oy - worldY*sc
       } else {

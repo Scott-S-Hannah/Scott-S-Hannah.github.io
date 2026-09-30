@@ -9,7 +9,7 @@ const isCurrent = (href: string) => href === path;
 ---
 <header class="nav">
   <div class="container nav__inner">
-    <a class="nav__brand" href="/">Dr Scott Hannah<span aria-hidden="true">.</span></a>
+    <a class="nav__brand" href="/"><span class="nav__dr">Dr </span>Scott Hannah<span aria-hidden="true">.</span></a>
     <nav class="nav__links" aria-label="Primary">
       {links.map((l) => (
         <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>
@@ -22,9 +22,9 @@ const isCurrent = (href: string) => href === path;
 
 <style>
   .nav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.82); backdrop-filter: saturate(1.1) blur(10px); border-bottom: 1px solid var(--line); view-transition-name: site-nav; }   /* own transition group: the nav holds still while the page fades */
-  .nav__inner { display: flex; align-items: center; justify-content: space-between; height: var(--nav-h); }
+  .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; height: var(--nav-h); }
   .nav__brand { font-weight: 700; font-size: 1.02rem; color: var(--ink); letter-spacing: -0.02em; white-space: nowrap; }
-  .nav__brand span { color: var(--teal); }
+  .nav__brand span[aria-hidden] { color: var(--teal); }
   .nav__links { display: flex; align-items: center; gap: 1.8rem; font-size: var(--step--1); }
   .nav__links a { color: var(--mut); font-weight: 500; letter-spacing: 0.01em; padding-block: 0.55rem; }   /* padded hit area without moving the baseline */
   .nav__links a:hover { color: var(--ink); }
@@ -33,5 +33,9 @@ const isCurrent = (href: string) => href === path;
   @media (max-width: 34rem) {
     .nav__brand { font-size: 0.95rem; }
     .nav__links { gap: 0.9rem; }
+  }
+  @media (max-width: 25rem) {                        /* ~400px phones: brand plus three links only fit with air once the title drops */
+    .nav__brand .nav__dr { display: none; }
+    .nav__links { gap: 0.75rem; }
   }
 </style>
