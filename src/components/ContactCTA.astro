@@ -1,23 +1,11 @@
 ---
-const email = 'Scott.Hannah@Winchester.ac.uk';
-const paths = [
-  { h: 'Collaborate', p: 'Research partnerships and grant work, across institutions.' },
-  { h: 'Consult', p: 'Physiological testing and assessment for sport and clinical teams.' },
-  { h: 'Study', p: 'PhD and postgraduate research supervision.' },
-];
+import { email } from '../data/site';
 ---
 <section id="contact" class="cta">
   <div class="container cta__inner">
     <p class="cta__status reveal"><span class="cta__dot" aria-hidden="true"></span>Open to collaboration</p>
     <h2 class="cta__title reveal">Let&rsquo;s work together<span aria-hidden="true">.</span></h2>
-    <div class="cta__paths reveal">
-      {paths.map((c) => (
-        <div class="cta__path">
-          <h3 class="cta__path-h">{c.h}</h3>
-          <p class="cta__path-p">{c.p}</p>
-        </div>
-      ))}
-    </div>
+    <p class="cta__line reveal">For research partnerships, applied physiology, and PhD supervision.</p>
     <div class="cta__contact reveal">
       <a class="cta__email" href={`mailto:${email}`}>{email}</a>
     </div>
@@ -31,13 +19,10 @@ const paths = [
   .cta__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal-bright); }
   .cta__title { color: var(--on-feature); font-size: var(--step-3); font-weight: 700; letter-spacing: -0.03em; margin: 1rem 0 0; }
   .cta__title span { color: var(--teal-bright); }
-  .cta__paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); margin-top: clamp(2.5rem, 5vw, 4rem); }
-  .cta__path { padding-top: 1.2rem; border-top: 1px solid rgba(238,241,243,0.16); }
-  .cta__path-h { color: var(--on-feature); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.015em; }
-  .cta__path-p { color: var(--on-feature-mut); font-size: var(--step--1); margin-top: 0.5rem; line-height: 1.5; max-width: 30ch; }
-  .cta__contact { margin-top: clamp(2.5rem, 5vw, 4rem); }
+  .cta__line { color: var(--on-feature-mut); font-size: var(--step-1); line-height: 1.45; margin-top: 1.2rem; max-width: 40ch; }
+  .cta__contact { margin-top: clamp(2rem, 4vw, 3.2rem); }
   .cta__email { font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em; color: var(--on-feature); border-bottom: 1px solid rgba(238,241,243,0.32); padding-bottom: 4px; }
   .cta__email:hover { color: var(--teal-bright); border-color: var(--teal-bright); }
   .cta__creds { color: var(--on-feature-faint); font-size: var(--step--1); margin-top: clamp(2rem, 4vw, 3rem); max-width: 60ch; line-height: 1.6; }
-  @media (max-width: 42rem) { .cta__paths { grid-template-columns: 1fr; gap: 0; } .cta__path { margin-top: 1.4rem; } .cta__email { font-size: var(--step-1); word-break: break-word; } }
+  @media (max-width: 42rem) { .cta__email { font-size: var(--step-1); word-break: break-word; } }
 </style>

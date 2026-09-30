@@ -1,0 +1,49 @@
+---
+/* Branded 404: the runner glyph on his baseline, past the edge of the map.
+   Netlify serves dist/404.html automatically for unknown routes. */
+import Base from '../layouts/Base.astro';
+import { runnerGlyph } from '../lib/runner-glyph';
+const glyph = runnerGlyph();
+---
+<Base title="Page not found | Dr Scott Hannah" description="This page does not exist.">
+  <section class="nf section container">
+    <p class="nf__code num">404</p>
+    <h1 class="nf__head">No data at this address<span aria-hidden="true">.</span></h1>
+    <p class="nf__lede">The page you were after has moved, or never existed. The rest of the site is still running.</p>
+    <div class="nf__actions">
+      <a class="nf__btn" href="/">Back to the start</a>
+      <a class="nf__alt" href="/publications">Browse the research</a>
+    </div>
+    <div class="nf__ground">
+      <svg class="nf__runner" viewBox={glyph.viewBox} xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        {glyph.tiers.map((t) => (
+          <path d={t.d} fill="none" stroke="#02abbf" stroke-opacity={t.opacity} stroke-width="1" vector-effect="non-scaling-stroke" stroke-linecap="round" />
+        ))}
+        {glyph.dots.map((d) => (
+          <circle cx={d.x} cy={d.y} r={d.r} fill="#06c2d6" fill-opacity={d.o} />
+        ))}
+      </svg>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { min-height: calc(72svh - var(--nav-h)); display: flex; flex-direction: column; justify-content: center; }
+  .nf__code { font-size: var(--step--1); font-weight: 500; letter-spacing: 0.16em; color: var(--mut); }
+  .nf__head { font-size: var(--step-3); margin-top: 0.5rem; }
+  .nf__head span { color: var(--teal); }
+  .nf__lede { color: var(--mut); margin-top: 1rem; max-width: 44ch; }
+  .nf__actions { display: flex; align-items: center; gap: 1.6rem; margin-top: 2rem; flex-wrap: wrap; }
+  .nf__btn {
+    background: var(--ink); color: var(--paper); font-weight: 600; font-size: var(--step-0);
+    padding: 0.85rem 1.4rem; border-radius: 2px; transition: background 0.25s ease;
+  }
+  .nf__btn:hover { background: var(--teal-deep); color: var(--paper); }
+  .nf__alt { color: var(--teal-deep); font-weight: 500; }
+  .nf__ground {
+    margin-top: clamp(3rem, 6vw, 5rem); position: relative;
+    border-bottom: 1px solid transparent;
+    background: linear-gradient(90deg, rgba(2,171,191,0.4), rgba(2,171,191,0.2) 60%, rgba(2,171,191,0)) bottom / 100% 1px no-repeat;
+  }
+  .nf__runner { height: clamp(48px, 7vw, 80px); width: auto; display: block; margin-left: clamp(0.5rem, 4vw, 3rem); }
+</style>

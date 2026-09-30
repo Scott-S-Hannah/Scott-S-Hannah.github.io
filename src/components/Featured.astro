@@ -35,18 +35,20 @@ const linkAttrs = (it: Item) => (it.external ? { target: '_blank', rel: 'noopene
       )}
 
       {rest.length > 0 && (
-        <div class="ft__rest" style={`--cols:${rest.length}`}>
+        <ul class="ft__rest" style={`--cols:${rest.length}`}>
           {rest.map((it) => (
-            <a class="ft__cell reveal" href={it.href} {...linkAttrs(it)}>
-              <p class="ft__tag"><span class="mark" aria-hidden="true"></span>{it.type}<span class="ft__yr num">&nbsp;&middot; {it.year}</span></p>
-              <h3 class="ft__cell-h">{clean(it.headline)}<span class="ft__dot" aria-hidden="true">.</span></h3>
-              <p class="ft__meta">
-                <span class="ft__source">{it.source}</span>
-                <span class="ft__go">{it.cta}<span aria-hidden="true"> &nearr;</span></span>
-              </p>
-            </a>
+            <li>
+              <a class="ft__cell reveal" href={it.href} {...linkAttrs(it)}>
+                <p class="ft__tag"><span class="mark" aria-hidden="true"></span>{it.type}<span class="ft__yr num">&nbsp;&middot; {it.year}</span></p>
+                <h3 class="ft__cell-h">{clean(it.headline)}<span class="ft__dot" aria-hidden="true">.</span></h3>
+                <p class="ft__meta">
+                  <span class="ft__source">{it.source}</span>
+                  <span class="ft__go">{it.cta}<span aria-hidden="true"> &nearr;</span></span>
+                </p>
+              </a>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   </div>
@@ -73,6 +75,7 @@ const linkAttrs = (it: Item) => (it.external ? { target: '_blank', rel: 'noopene
     gap: clamp(1.5rem, 4vw, 3.5rem);
     border-top: 1px solid var(--line);
     padding-block: clamp(1.6rem, 2.6vw, 2.4rem) clamp(1.8rem, 3vw, 2.6rem);
+    list-style: none; margin: 0; padding-inline: 0;
   }
   .ft__cell { display: block; color: var(--ink); }
   .ft__cell:hover { color: var(--ink); }

@@ -6,8 +6,20 @@ import FocusAreas from '../components/FocusAreas.astro';
 import Featured from '../components/Featured.astro';
 import Consultancy from '../components/Consultancy.astro';
 import ContactCTA from '../components/ContactCTA.astro';
+import { profiles } from '../data/site';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': new URL('/#person', Astro.site).href,
+  name: 'Dr Scott Hannah',
+  jobTitle: 'Exercise Physiologist',
+  url: Astro.site?.href,
+  sameAs: profiles.map((p) => p.href),
+};
 ---
 <Base title="Dr Scott Hannah | Exercise Physiologist" description="Dr Scott Hannah is an exercise physiologist measuring how the body works and adapts, for elite performance and clinical care.">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <GenerativeHero />
   <About />
   <FocusAreas />

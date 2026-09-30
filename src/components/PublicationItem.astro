@@ -2,6 +2,20 @@
 import { areaOf, type Publication } from '../lib/publications';
 interface Props { pub: Publication; }
 const { pub } = Astro.props;
+
+/* Vancouver-style citation, built at render time so "copy citation" is one click. */
+const initials = (name: string) => {
+  const parts = name.trim().split(/\s+/);
+  const surname = parts.pop();
+  return `${surname} ${parts.map((p) => p[0]).join('')}`;
+};
+const citation = [
+  `${pub.authors.map((a) => initials(a.name)).join(', ')}.`,
+  `${pub.title}.`,
+  `${pub.journal}.`,
+  pub.year ? `${pub.year}.` : 'In press.',
+  pub.doi ? `doi:${pub.doi}` : '',
+].filter(Boolean).join(' ').replace(/\.\./g, '.');
 ---
 <article class="pub" data-theme={pub.theme} data-area={areaOf(pub.theme)}>
   <h3 class="pub__title">
@@ -17,7 +31,15 @@ const { pub } = Astro.props;
   <p class="pub__meta">
     <span class="pub__journal">{pub.journal}</span>
     {pub.doi && (<><span aria-hidden="true"> · </span><a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener">DOI</a></>)}
+    <span aria-hidden="true"> · </span>
+    <button class="pub__cite" type="button" data-citation={citation}>Copy citation</button>
   </p>
+  {pub.abstract && (
+    <details class="pub__abs">
+      <summary>Abstract</summary>
+      <p>{pub.abstract}</p>
+    </details>
+  )}
 </article>
 
 <style>
@@ -30,4 +52,22 @@ const { pub } = Astro.props;
   .pub__authors .is-owner { color: var(--ink); font-weight: 500; }
   .pub__meta { font-size: var(--step--1); color: var(--mut); margin-top: 0.3rem; }
   .pub__journal { font-style: italic; }
+  .pub__cite {
+    background: none; border: 0; padding: 0; cursor: pointer;
+    font: inherit; color: var(--teal-deep); font-weight: 500;
+  }
+  .pub__cite:hover { color: var(--ink); }
+  .pub__abs { margin-top: 0.6rem; }
+  .pub__abs summary {
+    display: inline-block; cursor: pointer; list-style: none;
+    font-size: var(--step--1); font-weight: 500; color: var(--teal-deep);
+  }
+  .pub__abs summary::-webkit-details-marker { display: none; }
+  .pub__abs summary::after { content: ' +'; color: var(--faint); }
+  .pub__abs[open] summary::after { content: ' \2212'; }
+  .pub__abs summary:hover { color: var(--ink); }
+  .pub__abs p {
+    font-size: var(--step--1); color: var(--mut); line-height: 1.6;
+    max-width: 70ch; margin-top: 0.5rem;
+  }
 </style>

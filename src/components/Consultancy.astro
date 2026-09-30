@@ -1,87 +1,171 @@
 ---
-/* Spotlight index: the three offers as a large interactive list; the active
-   one is full ink with the teal full stop, and the panel beside it answers
-   with the description and deliverables. No index numerals: order carries no
-   information here. A wireframe figure per service (T-pose / sprint / talk,
-   baked like the hero) will join the panel once the Mixamo poses are baked.
-   On small screens the same DOM reads as an accordion. */
-const email = 'Scott.Hannah@Winchester.ac.uk';
+/* The examination stage. Everywhere else on the site the runner runs; here he
+   stops to work with you. One offer at a time stands large in the measurement
+   zone, its deliverables drawn off the body as calliper readouts; the other
+   two offers wait as small dim figures further along the same full-bleed
+   ground line (the hero's baseline, the footer's exit line). Choosing a
+   waiting figure brings it under measurement.
+   Every figure is real mocap (see src/lib/consult-figures.ts): the idle
+   subject under the scan, the sprint, the speaker facing the room. The SVG
+   is the static truth; the client script below replays the same bake on a
+   canvas over it, so the active figure breathes, runs, or addresses you.
+   On small screens and without JS the three panels stack, everything visible
+   and static. */
+import { consultFigures, consultWings } from '../lib/consult-figures';
+import { email } from '../data/site';
+const figs = consultFigures();
+const wings = consultWings();
+
+/* pts carry a y anchor (% from figure top) so each readout's calliper meets
+   the body where it belongs: head for the question, chest, hands, stride. */
 const offers = [
-  { key: 'research', t: 'Research consultancy', d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.', pts: ['Study design', 'Ethics & governance', 'Measurement & analysis', 'Through review to publication'] },
-  { key: 'performance', t: 'Performance support', d: 'Physiological testing and support infrastructure that produces numbers athletes and staff can act on.', pts: ['Physiological testing', 'Support infrastructure', 'From the lab to the field'] },
-  { key: 'lectures', t: 'Guest lectures & talks', d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.', pts: ['Guest lectures', 'Team-room sessions', 'Keynotes & talks'] },
+  {
+    key: 'research',
+    t: 'Research consultancy',
+    d: 'A study built to survive review: question, ethics, measurement, analysis, and the paper at the end of it.',
+    pts: [
+      { t: 'Study design', y: 6 },
+      { t: 'Ethics & governance', y: 30 },
+      { t: 'Measurement & analysis', y: 52 },
+      { t: 'Through review to publication', y: 78 },
+    ],
+  },
+  {
+    key: 'performance',
+    t: 'Performance support',
+    d: 'Physiological testing and support infrastructure that produces numbers athletes and staff can act on.',
+    pts: [
+      { t: 'Physiological testing', y: 12 },
+      { t: 'Support infrastructure', y: 44 },
+      { t: 'From the lab to the field', y: 74 },
+    ],
+  },
+  {
+    key: 'lectures',
+    t: 'Guest lectures & talks',
+    d: 'Teaching that makes physiology land, in lecture theatres, team rooms, and boardrooms.',
+    pts: [
+      { t: 'Guest lectures', y: 8 },
+      { t: 'Team-room sessions', y: 40 },
+      { t: 'Keynotes & talks', y: 70 },
+    ],
+  },
 ];
 ---
 <section id="consultancy" class="consult section">
-  <div class="container">
-    <div class="consult__head">
-      <h2 class="consult__title reveal">Work with me</h2>
-      <p class="consult__lede reveal">Consultancy through WinWell, for teams, clinicians, and organisations that need physiology they can act on.</p>
-    </div>
+  <div class="container consult__head">
+    <h2 class="consult__title reveal">Work with me</h2>
+    <p class="consult__lede reveal">Consultancy for teams, clinicians, and organisations that need physiology they can act on.</p>
+  </div>
 
-    <div class="consult__spot reveal">
-      {offers.map((o, i) => (
-        <div class="consult__unit">
-          <button
-            class={`consult__tab${i === 0 ? ' is-on' : ''}`}
-            data-key={o.key}
-            aria-expanded={i === 0 ? 'true' : 'false'}
-            aria-controls={`consult-${o.key}`}
-          >{o.t}<span class="consult__dot" aria-hidden="true">.</span></button>
-          <div class={`consult__detail${i === 0 ? ' is-on' : ''}`} id={`consult-${o.key}`} data-key={o.key}>
+  <div class="consult__stage reveal">
+    <span class="consult__line" aria-hidden="true"></span>
+    <div class="container consult__grid">
+      <div class="consult__panels">
+        {offers.map((o, i) => (
+          <div class={`consult__panel${i === 0 ? ' is-on' : ''}`} id={`consult-${o.key}`} data-key={o.key}>
+            <h3 class="consult__t" tabindex="-1">{o.t}<span class="consult__dot" aria-hidden="true">.</span></h3>
             <p class="consult__d">{o.d}</p>
-            <ul class="consult__pts">
-              {o.pts.map((p) => <li><span class="consult__pt-mark" aria-hidden="true"></span>{p}</li>)}
-            </ul>
+            <div class="consult__subject">
+              <div class="consult__figbox" {...figs[o.key].anim}>
+                {figs[o.key].props && <svg class="consult__propsvg" viewBox={figs[o.key].viewBox} xmlns="http://www.w3.org/2000/svg" aria-hidden="true" set:html={figs[o.key].props} />}
+                <svg class="consult__fig" viewBox={figs[o.key].viewBox} xmlns="http://www.w3.org/2000/svg" aria-hidden="true" set:html={figs[o.key].body} />
+                <canvas class="consult__cv" aria-hidden="true" hidden></canvas>
+              </div>
+              <ul class="consult__reads">
+                {o.pts.map((p, j) => (
+                  <li class="consult__read" style={`--ry:${p.y}%; --rd:${120 + j * 90}ms`}>
+                    <span class="consult__read-mark" aria-hidden="true"></span>{p.t}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
+      <div class="consult__wings">
+        {offers.map((o, i) => (
+          <button class={`consult__wait${i === 0 ? ' is-on' : ''}`} data-key={o.key} aria-controls={`consult-${o.key}`}>
+            <svg class="consult__wfig" viewBox={wings[o.key].viewBox} xmlns="http://www.w3.org/2000/svg" aria-hidden="true" set:html={wings[o.key].body} />
+            <span class="consult__wname">{o.t}</span>
+          </button>
+        ))}
+      </div>
     </div>
+  </div>
 
-    <div class="consult__cta reveal">
-      <a class="consult__btn" href={`mailto:${email}?subject=Working%20together`}>Start a conversation<span aria-hidden="true"> &nearr;</span></a>
-      <a class="consult__email" href={`mailto:${email}?subject=Working%20together`}>{email}</a>
-      <p class="consult__note">One email is enough to find out whether I can help.</p>
-    </div>
+  <div class="container consult__cta reveal">
+    <a class="consult__btn" href={`mailto:${email}?subject=Working%20together`}>Start a conversation<span aria-hidden="true"> &nearr;</span></a>
+    <a class="consult__email" href={`mailto:${email}?subject=Working%20together`}>{email}</a>
+    <p class="consult__note">One email is enough to find out whether I can help.</p>
   </div>
 </section>
 
 <style>
-  .consult { background: var(--surface-2); border-block: 1px solid var(--line); }
-  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .consult { background: var(--surface-2); border-block: 1px solid var(--line); --strip: 3rem; }
+  .consult__head { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: end; margin-bottom: clamp(2rem, 4vw, 3.2rem); }
   .consult__title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; }
   .consult__lede { color: var(--mut); max-width: 44ch; line-height: 1.5; }
 
-  .consult__spot { display: grid; grid-template-columns: 1.15fr 1fr; gap: 0 clamp(2rem, 6vw, 6rem); align-items: start; }
-  .consult__unit { display: contents; }
-
-  .consult__tab {
-    display: block; width: 100%; text-align: left; background: none; border: 0;
-    border-top: 1px solid var(--line-strong); border-radius: 0;
-    grid-column: 1;
-    padding: clamp(1.2rem, 2vw, 1.7rem) 0; cursor: pointer;
-    font-family: var(--font); font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.7rem);
-    font-weight: 700; letter-spacing: -0.03em; line-height: 1.05;
-    color: var(--faint); transition: color 0.25s ease;
+  /* The stage: a full-bleed ground line; every figure's feet meet it. */
+  .consult__stage { position: relative; }
+  .consult__line {
+    position: absolute; bottom: var(--strip); left: 50%; translate: -50% 0;
+    width: 100vw; height: 1px;
+    background: linear-gradient(90deg, rgba(2,171,191,0.4), rgba(2,171,191,0.18) 55%, rgba(2,171,191,0.4));
   }
-  .consult__tab:hover { color: var(--ink-soft); }
-  .consult__tab.is-on { color: var(--ink); }
-  .consult__tab .consult__dot { opacity: 0; color: var(--teal); transition: opacity 0.25s ease; }
-  .consult__tab.is-on .consult__dot { opacity: 1; }
-  .consult__tab:focus-visible { outline: 2px solid var(--teal-deep); outline-offset: 3px; }
+  .consult__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: end; }
 
-  .consult__detail {
-    grid-column: 2; grid-row: 1 / span 3;
-    display: none; min-height: 15rem; padding-top: clamp(1.2rem, 2vw, 1.8rem);
+  /* Measurement zone: the active offer, stacked panels crossfading in place. */
+  .consult__panels { display: grid; }
+  :global(html.js) .consult__panel { grid-area: 1 / 1; visibility: hidden; opacity: 0; transition: opacity 0.35s ease; }
+  :global(html.js) .consult__panel.is-on { visibility: visible; opacity: 1; }
+  .consult__panel { display: flex; flex-direction: column; padding-bottom: var(--strip); }
+  .consult__t { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; outline: none; }
+  .consult__dot { color: var(--teal); }
+  .consult__d { color: var(--ink-soft); font-size: var(--step-1); line-height: 1.4; letter-spacing: -0.01em; max-width: 36ch; margin-top: 0.7rem; }
+  .consult__subject { display: flex; align-items: flex-end; gap: clamp(1.2rem, 2.5vw, 2rem); margin-top: clamp(1.4rem, 2.5vw, 2.2rem); }
+  .consult__figbox { position: relative; flex: none; margin-bottom: -1px; }   /* the figure's baked baseline sits ON the stage line */
+  .consult__fig { height: clamp(15rem, 22vw, 20rem); width: auto; display: block; position: relative; }
+  .consult__propsvg { position: absolute; inset: 0; width: 100%; height: 100%; }  /* the lab bench: under the figure, never hidden */
+  .consult__cv { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .consult__figbox.is-live .consult__fig { visibility: hidden; }   /* canvas takes over once it draws */
+
+  /* Calliper readouts: deliverables measured off the body. */
+  .consult__reads { position: relative; flex: 1; min-width: 11rem; height: clamp(15rem, 22vw, 20rem); list-style: none; margin: 0; padding: 0; }
+  .consult__read {
+    position: absolute; top: var(--ry); left: 0;
+    display: flex; align-items: center; gap: 0.65rem;
+    font-size: var(--step--1); font-weight: 500; color: var(--ink); white-space: nowrap;
   }
-  .consult__detail.is-on { display: block; animation: consultIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
-  @keyframes consultIn { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
-  @media (prefers-reduced-motion: reduce) { .consult__detail.is-on { animation: none; } }
+  .consult__read::before { content: ''; width: clamp(1.2rem, 3vw, 3rem); height: 1px; background: rgba(2, 171, 191, 0.45); flex: none; }
+  .consult__read-mark { width: 7px; height: 7px; background: var(--teal); flex: none; }
 
-  .consult__d { color: var(--ink-soft); font-size: var(--step-1); line-height: 1.4; letter-spacing: -0.01em; max-width: 32ch; }
-  .consult__pts { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; gap: 0.55rem; }
-  .consult__pts li { display: flex; align-items: center; gap: 0.7rem; color: var(--mut); font-size: var(--step-0); }
-  .consult__pt-mark { width: 7px; height: 7px; background: var(--teal); flex: none; }
+  /* Readouts draw in staggered when their panel takes the stage (JS-gated so
+     no-JS and reduced-motion always see them). */
+  .consult.js-anim .consult__read { opacity: 0; translate: -8px 0; }
+  .consult.js-anim.in .consult__panel.is-on .consult__read {
+    opacity: 1; translate: 0 0;
+    transition: opacity 0.5s ease var(--rd), translate 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--rd);
+  }
+
+  /* The wings: the other offers wait further along the line. */
+  .consult__wings { display: flex; justify-content: flex-end; align-items: flex-end; gap: clamp(1.8rem, 4vw, 3.5rem); }
+  :global(html:not(.js)) .consult__wings { display: none; }
+  .consult__wait {
+    display: flex; flex-direction: column; align-items: center;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit;
+  }
+  .consult__wait.is-on { display: none; }
+  .consult__wait:focus-visible { outline: 2px solid var(--teal-deep); outline-offset: 4px; }
+  .consult__wfig { height: clamp(6.5rem, 9vw, 8.5rem); width: auto; opacity: 0.45; transition: opacity 0.25s ease, translate 0.25s ease; margin-bottom: -1px; }
+  .consult__wname { height: var(--strip); display: flex; align-items: center; font-size: var(--step--1); font-weight: 500; color: var(--mut); transition: color 0.25s ease; }
+  .consult__wait:hover .consult__wfig, .consult__wait:focus-visible .consult__wfig { opacity: 0.9; translate: 0 -2px; }
+  .consult__wait:hover .consult__wname, .consult__wait:focus-visible .consult__wname { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) {
+    .consult__wfig { transition: none; }
+    .consult__wait:hover .consult__wfig, .consult__wait:focus-visible .consult__wfig { translate: none; }
+  }
 
   .consult__cta {
     display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem 1.8rem;
@@ -103,37 +187,210 @@ const offers = [
   .consult__email:hover { color: var(--teal-deep); border-color: var(--teal-deep); }
   .consult__note { color: var(--mut); font-size: var(--step--1); flex-basis: 100%; }
 
-  @media (max-width: 52rem) {
+  /* Small screens: the stage relaxes into a stacked ledger, everything visible;
+     each figure stands on its own baked baseline. */
+  @media (max-width: 56rem) {
     .consult__head { grid-template-columns: 1fr; gap: 1rem; align-items: start; }
     .consult__lede { max-width: none; }
-    .consult__spot { display: block; }
-    .consult__unit { display: block; border-top: 1px solid var(--line-strong); }
-    .consult__tab { border-top: 0; font-size: clamp(1.4rem, 1.1rem + 1.6vw, 1.8rem); }
-    .consult__detail { min-height: 0; padding: 0 0 1.5rem; }
+    .consult__line { display: none; }
+    .consult__grid { display: block; }
+    .consult__wings { display: none; }
+    :global(html.js) .consult__panel { grid-area: auto; visibility: visible; opacity: 1; }
+    .consult__panel { padding: 1.6rem 0; border-top: 1px solid var(--line-strong); }
+    .consult__panel:first-child { border-top: 0; padding-top: 0; }
+    .consult__t { font-size: var(--step-1); }
+    .consult__d { font-size: var(--step-0); }
+    .consult__fig { height: 10.5rem; margin-bottom: 0; }
+    .consult__reads { height: 10.5rem; }
+    .consult__read { white-space: normal; max-width: 100%; }
+    .consult.js-anim .consult__read { opacity: 1; translate: none; }
   }
 </style>
 
 <script>
-  // Spotlight swap: hover on pointer devices, click/tap and keyboard everywhere.
   const root = document.getElementById('consultancy');
   if (root) {
-    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('.consult__tab'));
-    const details = Array.from(root.querySelectorAll<HTMLElement>('.consult__detail'));
-    const activate = (key: string | undefined) => {
-      if (!key) return;
-      tabs.forEach((t) => {
-        const on = t.dataset.key === key;
-        t.classList.toggle('is-on', on);
-        t.setAttribute('aria-expanded', String(on));
-      });
-      details.forEach((d) => d.classList.toggle('is-on', d.dataset.key === key));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('.consult__panel'));
+    const waits = Array.from(root.querySelectorAll<HTMLButtonElement>('.consult__wait'));
+
+    /* ---------- live figures: replay each panel's bake on a canvas ---------- */
+    /* Same decode + draw math as src/lib/consult-figures.ts, so the canvas
+       frame is pixel-identical to the static SVG it replaces. Only the active
+       panel's canvas runs, and only while the section is on screen. */
+    type Bake = {
+      n: number; F: number; qbb: number[]; q: Uint16Array; ea: Uint16Array; eb: Uint16Array; er: Float32Array;
+      fc?: Uint16Array; fr?: Float32Array; dw?: { x: number[]; z: number[] };
     };
-    tabs.forEach((t) => {
-      t.addEventListener('click', () => activate(t.dataset.key));
-      t.addEventListener('focus', () => activate(t.dataset.key));
-    });
-    if (matchMedia('(hover: hover)').matches) {
-      tabs.forEach((t) => t.addEventListener('mouseenter', () => activate(t.dataset.key)));
+    const bakes = new Map<string, Promise<Bake>>();
+    const loadBake = (url: string): Promise<Bake> => {
+      if (!bakes.has(url)) bakes.set(url, fetch(url).then((r) => r.json()).then((raw) => {
+        const bin = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+        const d16 = (s: string) => { const b = bin(s); return new Uint16Array(b.buffer, 0, b.byteLength / 2); };
+        const f32 = (s: string) => { const b = bin(s); return new Float32Array(b.buffer, 0, b.byteLength / 4); };
+        return {
+          n: raw.n, F: raw.F, qbb: raw.qbb, q: d16(raw.pos), ea: d16(raw.ea), eb: d16(raw.eb), er: f32(raw.er),
+          fc: raw.fc ? d16(raw.fc) : undefined,
+          fr: raw.fr ? f32(raw.fr) : (raw.trS ? f32(raw.trS) : undefined),
+          dw: raw.dw,
+        };
+      }));
+      return bakes.get(url)!;
+    };
+    const hsh = (i: number) => { const x = Math.sin(i * 78.233 + 1.3) * 43758.5453; return x - Math.floor(x); };
+
+    let sectionOn = false, raf = 0;
+    let live: { stop: () => void } | null = null;
+
+    function startLive(panel: HTMLElement) {
+      live?.stop(); live = null;
+      const box = panel.querySelector<HTMLElement>('.consult__figbox');
+      const url = box?.dataset.bake;
+      if (!box || !url || reduce) return;
+      const svg = box.querySelector<SVGSVGElement>('.consult__fig')!;
+      const cv = box.querySelector<HTMLCanvasElement>('.consult__cv')!;
+      const vb = (svg.getAttribute('viewBox') || '0 0 1 1').split(' ').map(Number);
+      const proj = box.dataset.proj === 'front' ? { h: 0, d: 2 } : { h: 2, d: 0 };
+      const loop = Number(box.dataset.loop) || 2000;
+      const wantScan = box.dataset.scan === '1', wantTicks = box.dataset.ticks === '1';
+      let stopped = false;
+
+      loadBake(url).then((b) => {
+        if (stopped) return;
+        const ctx = cv.getContext('2d');
+        if (!ctx) return;
+        const world = (f: number, i: number, a: number) => b.qbb[a] + (b.q[(f * b.n + i) * 3 + a] / 65535) * (b.qbb[a + 3] - b.qbb[a]);
+        const px = new Float32Array(b.n), py = new Float32Array(b.n), pd = new Float32Array(b.n);
+        // depth tiers: per-frame mean centre + rest-pose span (matches the SVG build)
+        const w = b.dw ? (proj.d === 0 ? b.dw.x : b.dw.z) : null;
+        const span = w ? Math.max(1e-6, (w[1] - w[0]) * 2.2) : 0;
+        const dLo = b.qbb[proj.d], dHi = b.qbb[proj.d + 3];
+        const gy = Number(box.dataset.gy), fh = Number(box.dataset.fh);   // baseline + figure height in viewBox units (from the build)
+
+        const size = () => {
+          const r = box.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+          cv.width = Math.max(1, Math.round(r.width * dpr));
+          cv.height = Math.max(1, Math.round(r.height * dpr));
+        };
+        size();
+        if ('ResizeObserver' in window) new ResizeObserver(size).observe(box);
+
+        const t0 = performance.now();
+        const frame = () => {
+          if (stopped) return;
+          if (!sectionOn) { raf = requestAnimationFrame(frame); return; }
+          const t = performance.now() - t0;
+          const ff = ((t % loop) / loop) * b.F;
+          const fa = Math.floor(ff) % b.F, fb = (fa + 1) % b.F, ft = ff - Math.floor(ff);
+          let dSum = 0;
+          for (let i = 0; i < b.n; i++) {
+            const xa = world(fa, i, proj.h), xb2 = world(fb, i, proj.h);
+            const ya = -world(fa, i, 1), yb = -world(fb, i, 1);
+            const da = world(fa, i, proj.d), db = world(fb, i, proj.d);
+            px[i] = xa + (xb2 - xa) * ft; py[i] = ya + (yb - ya) * ft;
+            pd[i] = da + (db - da) * ft; dSum += pd[i];
+          }
+          if (w) {
+            const mean = dSum / b.n;
+            for (let i = 0; i < b.n; i++) pd[i] = Math.max(0, Math.min(1, 0.5 + (pd[i] - mean) / span));
+          } else {
+            for (let i = 0; i < b.n; i++) pd[i] = Math.max(0, Math.min(1, (pd[i] - dLo) / ((dHi - dLo) || 1)));
+          }
+          const s = cv.width / vb[2];
+          ctx.setTransform(s, 0, 0, s, -vb[0] * s, -vb[1] * s);
+          ctx.clearRect(vb[0], vb[1], vb[2], vb[3]);
+          ctx.lineWidth = 1 / s; ctx.lineCap = 'round';
+          // baseline + ticks
+          ctx.strokeStyle = 'rgba(2,171,191,0.35)';
+          ctx.beginPath(); ctx.moveTo(vb[0], gy); ctx.lineTo(vb[0] + vb[2], gy); ctx.stroke();
+          if (wantTicks) {
+            ctx.strokeStyle = 'rgba(2,171,191,0.42)'; ctx.beginPath();
+            for (let i = 0; i <= 24; i++) {
+              const x = vb[0] + vb[2] * (i / 24), tall = (i % 5 === 0 ? 0.03 : 0.015) * fh;
+              ctx.moveTo(x, gy); ctx.lineTo(x, gy - tall);
+            }
+            ctx.stroke();
+          }
+          // scan line sweeps the body; nearby nodes light up
+          let scanX = -1e9;
+          if (wantScan) {
+            const ph = (t % 3400) / 3400;
+            const u = ph < 0.5 ? ph * 2 : 2 - ph * 2;             // there and back
+            scanX = vb[0] + vb[2] * (0.18 + 0.64 * u);
+            ctx.strokeStyle = 'rgba(6,194,214,0.5)';
+            ctx.beginPath(); ctx.moveTo(scanX, vb[1] + vb[3] * 0.02); ctx.lineTo(scanX, gy); ctx.stroke();
+          }
+          // translucent depth-shaded face fills (the hero's volume device)
+          if (b.fc && b.fr) {
+            for (const [lo, hi, al] of [[0.12, 0.45, 0.035], [0.45, 0.7, 0.06], [0.7, 1.01, 0.095]]) {
+              ctx.fillStyle = `rgba(2,171,191,${al})`;
+              ctx.beginPath();
+              for (let i = 0; i < b.fr.length; i++) {
+                const a = b.fc[i * 3], c = b.fc[i * 3 + 1], e = b.fc[i * 3 + 2];
+                const pdAvg = (pd[a] + pd[c] + pd[e]) / 3;
+                if (pdAvg < lo || pdAvg >= hi) continue;
+                const m = Math.max(
+                  Math.hypot(px[a] - px[c], py[a] - py[c]),
+                  Math.hypot(px[c] - px[e], py[c] - py[e]),
+                  Math.hypot(px[a] - px[e], py[a] - py[e]));
+                if (m > b.fr[i] * 2.2) continue;
+                ctx.moveTo(px[a], py[a]); ctx.lineTo(px[c], py[c]); ctx.lineTo(px[e], py[e]); ctx.closePath();
+              }
+              ctx.fill();
+            }
+          }
+          // wireframe, 5 depth tiers
+          for (let tier = 0; tier < 5; tier++) {
+            ctx.strokeStyle = `rgba(2,171,191,${(0.28 + 0.5 * ((tier + 0.5) / 5)).toFixed(2)})`;
+            ctx.beginPath();
+            for (let e = 0; e < b.ea.length; e++) {
+              if ((e * 0.618034) % 1 >= (proj.h === 0 ? 0.74 : 0.6)) continue;   // front view keeps more mesh (matches the SVG build)
+              const a = b.ea[e], c = b.eb[e];
+              if (Math.min(4, Math.floor(((pd[a] + pd[c]) / 2) * 5)) !== tier) continue;
+              if (Math.hypot(px[a] - px[c], py[a] - py[c]) > b.er[e] * 2) continue;
+              ctx.moveTo(px[a], py[a]); ctx.lineTo(px[c], py[c]);
+            }
+            ctx.stroke();
+          }
+          // vertex dots (scan proximity brightens and enlarges them)
+          const rDot = fh * 0.014, scanBand = vb[2] * 0.06;
+          for (let i = 0; i < b.n; i++) {
+            const nearScan = wantScan && Math.abs(px[i] - scanX) < scanBand;
+            if (!nearScan && !(hsh(i) < 0.05 && pd[i] > 0.45)) continue;
+            ctx.fillStyle = nearScan ? 'rgba(6,194,214,0.95)' : `rgba(6,194,214,${(0.5 + 0.5 * pd[i]).toFixed(2)})`;
+            ctx.beginPath(); ctx.arc(px[i], py[i], nearScan ? rDot * 1.25 : rDot, 0, 6.2832); ctx.fill();
+          }
+          if (!box.classList.contains('is-live')) { cv.hidden = false; box.classList.add('is-live'); }
+          raf = requestAnimationFrame(frame);
+        };
+        raf = requestAnimationFrame(frame);
+      }).catch(() => { /* bake fetch failed: the static SVG stays */ });
+      live = { stop: () => { stopped = true; cancelAnimationFrame(raf); box.classList.remove('is-live'); cv.hidden = true; } };
+    }
+
+    /* ---------- switching ---------- */
+    const activate = (key: string | undefined, moveFocus: boolean) => {
+      if (!key) return;
+      panels.forEach((p) => p.classList.toggle('is-on', p.dataset.key === key));
+      waits.forEach((w) => w.classList.toggle('is-on', w.dataset.key === key));
+      const active = panels.find((p) => p.dataset.key === key);
+      if (active) startLive(active);
+      if (moveFocus) active?.querySelector<HTMLElement>('.consult__t')?.focus({ preventScroll: true });
+    };
+    waits.forEach((w) => w.addEventListener('click', () => activate(w.dataset.key, true)));
+
+    /* Readout choreography + canvas gating: everything visible without JS or
+       with reduced motion; canvases only run while the section is on screen. */
+    if (!reduce && 'IntersectionObserver' in window) {
+      root.classList.add('js-anim');
+      new IntersectionObserver((es) => {
+        sectionOn = es.some((e) => e.isIntersecting);
+        if (sectionOn) root.classList.add('in');
+      }, { threshold: 0.15 }).observe(root);
+      const first = panels.find((p) => p.classList.contains('is-on'));
+      if (first && matchMedia('(min-width: 56rem)').matches) startLive(first);
+    } else {
+      root.classList.add('in');
     }
   }
 </script>

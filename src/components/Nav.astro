@@ -4,12 +4,18 @@ const links = [
   { href: '/publications', label: 'Publications' },
   { href: '/#contact', label: 'Contact' },
 ];
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => href === path;
 ---
 <header class="nav">
   <div class="container nav__inner">
     <a class="nav__brand" href="/">Dr Scott Hannah<span aria-hidden="true">.</span></a>
     <nav class="nav__links" aria-label="Primary">
-      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      {links.map((l) => (
+        <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>
+          {l.label}{isCurrent(l.href) && <span class="nav__here" aria-hidden="true">.</span>}
+        </a>
+      ))}
     </nav>
   </div>
 </header>
@@ -20,8 +26,10 @@ const links = [
   .nav__brand { font-weight: 700; font-size: 1.02rem; color: var(--ink); letter-spacing: -0.02em; white-space: nowrap; }
   .nav__brand span { color: var(--teal); }
   .nav__links { display: flex; align-items: center; gap: 1.8rem; font-size: var(--step--1); }
-  .nav__links a { color: var(--mut); font-weight: 500; letter-spacing: 0.01em; }
+  .nav__links a { color: var(--mut); font-weight: 500; letter-spacing: 0.01em; padding-block: 0.55rem; }   /* padded hit area without moving the baseline */
   .nav__links a:hover { color: var(--ink); }
+  .nav__links a[aria-current='page'] { color: var(--ink); }
+  .nav__here { color: var(--teal); }
   @media (max-width: 34rem) {
     .nav__brand { font-size: 0.95rem; }
     .nav__links { gap: 0.9rem; }

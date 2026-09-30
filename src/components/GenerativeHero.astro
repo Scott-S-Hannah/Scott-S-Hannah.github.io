@@ -35,7 +35,6 @@
   .gh__name { font-weight: 700; font-size: clamp(44px, 7.8vw, 108px); line-height: 0.82; letter-spacing: -0.046em; margin: 0; }   /* name leads: prominent wordmark */
   .gh__name span { color: #02abbf; }
   .gh__role { font-size: clamp(15px, 1.5vw, 19px); font-weight: 600; margin: 20px 0 0; letter-spacing: -0.01em; color: var(--ink); }
-  .gh__org { color: var(--mut); font-weight: 400; }
   .gh__lede { font-size: clamp(14px, 1.25vw, 17px); line-height: 1.5; color: var(--ink-soft); max-width: 30em; margin: 16px 0 0; }
   @media (max-width: 760px) { .gh__id { width: 88%; } .gh__ovl { align-items: flex-start; padding-top: 28px; } .gh__poster { object-position: center bottom; } .gh__lede { max-width: 36em; } }
 </style>
@@ -61,6 +60,7 @@
     // per-sample buffers
     let sx = null, sy = null, sz = null, psx = null, psy = null; // screen + prev
     let bb = null, sc = 1, ox = 0, oy = 0;          // model-space bbox + screen fit
+    let wmY = 0, wmGateX = 0;                       // wake settle target: the wordmark's real position (measured in fit; layout differs on mobile)
 
     // ENERGY WAKE: the wireframe sheds its own nodes off the posterior (back + legs); each detached node
     // FLOWS off as a tapered trailing streak, with a few tumbling edge shards for the wireframe-coming-apart
@@ -78,9 +78,6 @@
     let bord = null, sox = null, soy = null, szNorm = null, emitX = 0, emitY = 0;   // construction-from-name: build order (feet->head), per-node source/emitter positions, depth, emitter point beside the wordmark
     let enHX = null, enHY = null, enHead = null; const EN_HIST = 8;   // inflow light-trails (accretion arcs): per-node ring buffer of recent positions
     let NPIECE = 0, introDX0 = 0, pc = null;             // NPIECE/pc come from the bake (regions); unused by the entry but kept
-    // PERSISTENT AMBIENT FIELD: a sparse, near-static "survey lattice" in the negative space around the runner that lives
-    // for the whole session (not just the 3.6s entry); same teal depth ramp as the figure; one shared breath; lifted by the wake.
-    let latN = 0, latX = null, latY = null, latT = null, latEdges = null, wakeEnergy = 0;
     let tris = null, triRest = null, triWy = null, triGd = null;   // mesh faces + rest size + per-face height (0=feet..1=head) + graph-dist-from-feet (for the shorts band)
     let shLo = 0.39, shHi = 0.57, shGArm = 0.66;         // SHORTS: world-height band mid-thigh -> waistband; shGArm excludes arms/hands that dip to that height
     // posterior emission picker: a body-node index biased to the BACK third (low x) + LEGS (high y),
@@ -135,7 +132,7 @@
     function fit() {                                 // model bbox -> figure box (right on desktop; lower-centre on mobile to clear the headline)
       const mw = bb.maxz - bb.minz, mh = bb.maxy - bb.miny;   // side profile: Z=horizontal, Y=vertical, X=depth
       const mobile = W < 760;
-      const targetH = H * (mobile ? 0.50 : 0.78); sc = targetH / mh;   // figure supports the name (not competing)
+      const targetH = H * (mobile ? 0.54 : 0.78); sc = targetH / mh;   // figure supports the name (not competing)
       const figW = mw * sc;
       if (mobile) {                                   // centred and sat at the bottom, below the stacked text
         ox = (W - figW) / 2 - bb.minz * sc;
@@ -143,6 +140,13 @@
       } else {
         ox = W - figW - W * 0.085 - bb.minz * sc;
         oy = H * 0.93 + bb.miny * sc;                 // stand the runner on the baseline (feet near the bottom), not floating centred
+      }
+      wmY = H * 0.80; wmGateX = W * 0.52;             // fallback ≈ desktop wordmark; measured below so the wake tracks the name on any layout
+      const name = document.querySelector('.gh__name');
+      if (name) {
+        const sr = stage.getBoundingClientRect(), nr = name.getBoundingClientRect();
+        wmY = nr.bottom - sr.top;
+        wmGateX = Math.min(Math.max(nr.right - sr.left + W * 0.08, W * 0.35), W * 0.6);   // name edge + margin ≈ the old 0.52W on desktop; clamped so mobile's 88%-wide name can't gate the whole stage
       }
     }
 
@@ -184,32 +188,6 @@
       ctx.globalCompositeOperation = 'source-over';         // crisp pass (the luminous core)
       for (let i = 0; i < n; i++) { const a = gpA[i]; if (a <= 0.006) continue; const d = gpD[i], rC = (1.5 + 1.4 * d) * gpS[i], aC = (0.64 + 0.36 * d) * a; ctx.globalAlpha = aC; ctx.drawImage(SPR_CRISP, gpX[i] - rC, gpY[i] - rC, rC * 2, rC * 2); }
       ctx.globalAlpha = 1;
-    }
-
-    function seedLattice() {                               // sparse persistent field in the negative space around the runner (right of the text on desktop; off on mobile for now)
-      const rnd = (i, s) => { const x = Math.sin((i + 1) * 12.9898 + s * 78.233) * 43758.5453; return x - Math.floor(x); };
-      latN = W < 760 ? 0 : 92;
-      latX = new Float32Array(latN); latY = new Float32Array(latN); latT = new Float32Array(latN);
-      for (let i = 0; i < latN; i++) { latX[i] = (0.44 + 0.54 * rnd(i, 11)) * W; latY[i] = (0.08 + 0.86 * rnd(i, 12)) * H; latT[i] = rnd(i, 13); }   // right of the .gh__id column; depth 0..1 (mist..core)
-      const le = [], maxD2 = (Math.min(W, H) * 0.18) ** 2;   // k=2 nearest links, built once
-      for (let i = 0; i < latN; i++) { let n1 = -1, n2 = -1, d1 = 1e18, d2 = 1e18; for (let j = 0; j < latN; j++) { if (j === i) continue; const dx = latX[i] - latX[j], dy = latY[i] - latY[j], d = dx * dx + dy * dy; if (d < d1) { d2 = d1; n2 = n1; d1 = d; n1 = j; } else if (d < d2) { d2 = d; n2 = j; } } if (n1 > i && d1 < maxD2) le.push(i, n1); if (n2 > i && d2 < maxD2) le.push(i, n2); }
-      latEdges = new Int32Array(le);
-    }
-    function drawLattice(gFade) {                          // one shared slow breath, depth-toned with the figure's own ramp, faded out over the left text column
-      if (!latN || gFade <= 0.001) return;
-      const sway = Math.sin(tflow * 0.22) * 1.6, sway2 = Math.cos(tflow * 0.17) * 1.0, lift = 1 + wakeEnergy * 0.5;
-      const fx0 = W * 0.30, fx1 = W * 0.45, maxL2 = (Math.min(W, H) * 0.21) ** 2;
-      ctx.strokeStyle = `rgba(${BODY},${(0.075 * gFade).toFixed(3)})`; ctx.beginPath();   // links (single batched stroke)
-      for (let e = 0; e < latEdges.length; e += 2) { const a = latEdges[e], b = latEdges[e + 1], ax = latX[a] + sway * latT[a], ay = latY[a] + sway2 * latT[a], bx = latX[b] + sway * latT[b], by = latY[b] + sway2 * latT[b], dx = ax - bx, dy = ay - by; if (dx * dx + dy * dy > maxL2 || (ax < fx0 && bx < fx0)) continue; ctx.moveTo(ax, ay); ctx.lineTo(bx, by); }
-      ctx.stroke();
-      ctx.save();                                          // glow points: shared breath + a small per-point drift (alive but restrained)
-      drawGlowField(latN,
-        i => latX[i] + sway * latT[i] + Math.sin(tflow * 0.48 + latT[i] * 6.2832 + i * 0.7) * 0.7,
-        i => latY[i] + sway2 * latT[i] + Math.cos(tflow * 0.416 + (latT[i] * 6.2832 + i * 0.7) * 1.3) * 0.7,
-        i => latT[i],
-        i => gFade * lift * smooth(fx0, fx1, latX[i] + sway * latT[i]),
-        i => 0.7 + 0.95 * hsh(i + 131));                     // varied ambient point sizes
-      ctx.restore();
     }
 
     function draw() {
@@ -289,7 +267,7 @@
         const sw = Math.cos(a1) * 0.9 - Math.cos(a2) * 0.5, cfy = -Math.max(0, sw) * SH_CURL;   // UP-only swells: curl up now and again, never down
         let fx = -SH_DRIFT + cfx, fy = -SH_LIFT + cfy;
         if (mOn) { const dx = x - mX, dy = y - mY, d = Math.hypot(dx, dy); if (d < 140) { const f = (1 - d / 140) * 280, ii = 1 / (d + 1); fx += dx * ii * f; fy += dy * ii * f; } }
-        const wmY = H * 0.80; if (x < W * 0.52) { const g = (1 - x / (W * 0.52)); fy = fy * (1 - g) + (wmY - y) * 0.05 * g; }   // spent wake settles toward the wordmark (lower-left)
+        if (x < wmGateX) { const g = (1 - x / wmGateX); fy = fy * (1 - g) + (wmY - y) * 0.05 * g; }   // spent wake settles toward the wordmark (measured in fit)
         shVX[i] += (fx - shVX[i]) * SH_RELAX; shVY[i] += (fy - shVY[i]) * SH_RELAX;
         const sp2 = shVX[i] * shVX[i] + shVY[i] * shVY[i]; if (sp2 > SH_VMAX * SH_VMAX) { const cl = SH_VMAX / Math.sqrt(sp2); shVX[i] *= cl; shVY[i] *= cl; }   // cap speed -> no long stray streaks from the fast toe-off ejecta
         shX[i] = x + shVX[i] * dt; shY[i] = y + shVY[i] * dt;
@@ -517,7 +495,5 @@
     }
     stage.addEventListener('pointermove', (e) => { const r = stage.getBoundingClientRect(); mX = e.clientX - r.left; mY = e.clientY - r.top; mOn = true; });
     stage.addEventListener('pointerleave', () => { mOn = false; });
-    window.__sim = (m) => { cancelAnimationFrame(raf); let ms = 0; last = 0; for (let q = 0; q < m; q++) { ms += 16.7; const T = ms / 1000; let dt = T - last; last = T; step(dt); } return { phase, ready, clipT: +clipT.toFixed(3) }; }; // TEMP verify (removed in final cleanup)
-    window.__asm = () => { cancelAnimationFrame(raf); flyin ? setupAssembly() : setupEntry(); return 'reset to entry'; }; // TEMP verify
   }
 </script>

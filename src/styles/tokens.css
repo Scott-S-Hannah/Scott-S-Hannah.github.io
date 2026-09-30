@@ -5,20 +5,21 @@
   --surface-2: #eaeef1;
   --ink: #10161a;
   --ink-soft: #2b3238;
-  --mut: #697178;
-  --faint: #98a1a8;
+  --mut: #5b636a;
+  --faint: #697178;
+  --ghost: #7d868e; /* large/bold de-emphasis only (3:1 floor); never body-size text */
   --line: #e1e6e9;
   --line-strong: #d2d8dc;
 
   /* Teal as data ink. Deep for text links on light; bright for marks on dark slate. */
   --teal: #02abbf;
-  --teal-deep: #0a7d8b;
+  --teal-deep: #09747f;
   --teal-bright: #06c2d6;
   --teal-wash: #e3f3f4;
   --feature: #10161a;
   --on-feature: #eef1f3;
   --on-feature-mut: #8c949b;
-  --on-feature-faint: #6c747b;
+  --on-feature-faint: #828b93;
 
   /* One family, four weights. Tabular figures via .mono / font-variant-numeric. */
   --font: 'Switzer', 'Helvetica Neue', Helvetica, Arial, sans-serif;

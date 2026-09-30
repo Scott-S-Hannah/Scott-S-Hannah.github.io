@@ -6,17 +6,11 @@
 import { runnerGlyph } from '../lib/runner-glyph';
 const glyph = runnerGlyph();
 const year = new Date().getFullYear();
-const email = 'Scott.Hannah@Winchester.ac.uk';
+import { email, profiles } from '../data/site';
 const site = [
   { href: '/#focus', label: 'Research' },
   { href: '/publications', label: 'Publications' },
   { href: '/#contact', label: 'Contact' },
-];
-const social = [
-  { href: 'https://orcid.org/0000-0003-2761-2798', label: 'ORCID' },
-  { href: 'https://www.researchgate.net/profile/Scott-Hannah', label: 'ResearchGate' },
-  { href: 'https://uk.linkedin.com/in/dr-scott-hannah', label: 'LinkedIn' },
-  { href: 'https://x.com/Scott_Hannah_v2', label: 'X' },
 ];
 ---
 <footer class="footer">
@@ -41,7 +35,7 @@ const social = [
       </nav>
       <nav class="footer__col" aria-label="Profiles">
         <p class="footer__col-h">Profiles</p>
-        {social.map((s) => <a href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
+        {profiles.map((s) => <a href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
       </nav>
     </div>
     <div class="footer__bot">
@@ -73,7 +67,8 @@ const social = [
   .footer__mail { display: inline-block; margin-top: 1.2rem; color: var(--on-feature); font-weight: 500; font-size: var(--step-0); border-bottom: 1px solid rgba(238,241,243,0.28); padding-bottom: 2px; }
   .footer__mail:hover { color: var(--teal-bright); border-color: var(--teal-bright); }
 
-  .footer__col { display: flex; flex-direction: column; gap: 0.55rem; }
+  .footer__col { display: flex; flex-direction: column; gap: 0.15rem; }
+  .footer__col a { padding-block: 0.3rem; }   /* padded hit area; gap shrinks to keep the same rhythm */
   .footer__col-h { font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-feature-faint); margin-bottom: 0.4rem; }
   .footer__col a { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; }
   .footer__col a:hover { color: var(--teal-bright); }

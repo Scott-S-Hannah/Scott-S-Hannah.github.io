@@ -2,13 +2,43 @@
 import Base from '../layouts/Base.astro';
 import PublicationItem from '../components/PublicationItem.astro';
 import { byYearDesc, AREAS, areaOf } from '../lib/publications';
+import { profiles } from '../data/site';
 
 const areaKeys = Object.keys(AREAS).filter((a) => byYearDesc.some((p) => areaOf(p.theme) === a));
 const countOf = (a: string) => byYearDesc.filter((p) => areaOf(p.theme) === a).length;
 const years = [...new Set(byYearDesc.map((p) => p.year))];
 const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.year === y) }));
+
+/* Structured data: the scholar and the works. This is how a Google search on
+   the name or a paper title learns the archive is the canonical hub. */
+const personId = new URL('/#person', Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': personId,
+      name: 'Dr Scott Hannah',
+      jobTitle: 'Exercise Physiologist',
+      url: Astro.site?.href,
+      sameAs: profiles.map((p) => p.href),
+    },
+    ...byYearDesc.map((p) => ({
+      '@type': 'ScholarlyArticle',
+      headline: p.title,
+      author: p.authors.map((a) =>
+        a.isOwner ? { '@id': personId } : { '@type': 'Person', name: a.name },
+      ),
+      datePublished: p.year ? String(p.year) : undefined,
+      publisher: p.journal,
+      sameAs: p.doi ? `https://doi.org/${p.doi}` : undefined,
+      abstract: p.abstract || undefined,
+    })),
+  ],
+};
 ---
 <Base title="Publications | Dr Scott Hannah" description="Peer-reviewed research by Dr Scott Hannah on cardiovascular physiology, clinical exercise rehabilitation, and athlete health.">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <section class="section container">
     <p class="kicker">Publications</p>
     <h1 class="pubs__head">Peer-reviewed research</h1>
@@ -46,8 +76,8 @@ const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.yea
   }
   .filter__n { font-size: 0.85em; color: var(--faint); transition: color 0.2s ease; }
   .filter:hover { border-color: var(--teal); color: var(--teal-deep); }
-  .filter.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .filter.is-active .filter__n { color: var(--on-feature-mut); }
+  .filter.is-active { background: var(--teal-deep); color: var(--paper); border-color: var(--teal-deep); }
+  .filter.is-active .filter__n { color: var(--teal-wash); }
 
   .pubyear {
     display: grid; grid-template-columns: clamp(5rem, 10vw, 8rem) minmax(0, 1fr);
@@ -86,9 +116,28 @@ const groups = years.map((y) => ({ year: y, pubs: byYearDesc.filter((p) => p.yea
     });
   };
 
-  buttons.forEach((btn) => btn.addEventListener('click', () => apply(btn.dataset.filter ?? 'all')));
+  buttons.forEach((btn) => btn.addEventListener('click', () => {
+    const f = btn.dataset.filter ?? 'all';
+    apply(f);
+    // Filters live in the URL, so a filtered view can be shared, bookmarked, and indexed.
+    const url = new URL(location.href);
+    if (f === 'all') url.searchParams.delete('area'); else url.searchParams.set('area', f);
+    history.replaceState(null, '', url);
+  }));
 
-  // Deep link from the Areas of focus section: /publications?area=mechanisms
+  // Deep link from the Research section: /publications?area=mechanisms
   const wanted = new URLSearchParams(location.search).get('area');
   if (wanted && Array.from(buttons).some((b) => b.dataset.filter === wanted)) apply(wanted);
+
+  // Copy citation: clipboard write with a brief inline confirmation.
+  document.querySelectorAll<HTMLButtonElement>('.pub__cite').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.citation ?? '');
+        const was = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = was; }, 1600);
+      } catch { /* clipboard unavailable (http, permissions): leave the button as-is */ }
+    });
+  });
 </script>
