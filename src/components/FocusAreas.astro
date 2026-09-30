@@ -5,15 +5,15 @@
    abstracted, travels the line continuously, brightening each area's period
    as it passes beneath. CSS-only motion; static under reduced motion. */
 const areas = [
-  { short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.', href: '/publications?area=mechanisms' },
-  { short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.', href: '/publications?area=rehabilitation' },
-  { short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.', href: '/publications?area=performance' },
+  { short: 'Mechanisms', t: 'Mechanistic exercise physiology', d: 'How the body responds and adapts to exercise, across the cardiovascular system and bone.', href: '/publications/?area=mechanisms' },
+  { short: 'Rehabilitation', t: 'Clinical exercise rehabilitation', d: 'Rebuilding function and health after injury and illness, with clinical and NHS partners.', href: '/publications/?area=rehabilitation' },
+  { short: 'Performance', t: 'Applied performance physiology', d: 'Assessment and training for elite sport, from the laboratory to the field.', href: '/publications/?area=performance' },
 ];
 ---
 <section id="focus" class="focus section">
   <div class="container">
     <div class="focus__head reveal">
-      <h2 class="focus__h">Research</h2>
+      <h2 class="focus__h">Research<span class="focus__hdot" aria-hidden="true">.</span></h2>
       <p class="focus__intro">Three threads run through the research, the clinic, and the field.</p>
     </div>
     <div class="focus__wrap">
@@ -48,6 +48,7 @@ const areas = [
     padding-bottom: 0.45rem;   /* the words stand on the line, not float above it */
   }
   .focus__dot { color: var(--teal-bright); }
+  .focus__hdot { color: var(--teal-bright); }
 
   /* The baseline: full-bleed, sitting directly under the words. */
   .focus__rule {
@@ -65,7 +66,7 @@ const areas = [
   .focus__cell:hover { color: inherit; }
   .focus__meta { margin-top: 1.15rem; }
   .focus__ft { color: var(--on-feature-mut); font-size: var(--step--1); font-weight: 500; transition: color 0.25s ease; }
-  .focus__d { color: var(--on-feature-mut); font-size: var(--step--1); line-height: 1.55; margin-top: 0.6rem; max-width: 32ch; }
+  .focus__d { color: var(--on-feature-mut); font-size: var(--step-0); line-height: 1.55; margin-top: 0.6rem; max-width: 36ch; }
 
   /* Hover speaks the light's language: the arrow arrives and the period flares, same as when the runner passes. */
   .focus__go { display: inline-block; opacity: 0; translate: -5px 0; transition: opacity 0.3s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1); }

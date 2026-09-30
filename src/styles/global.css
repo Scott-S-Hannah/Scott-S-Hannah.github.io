@@ -20,6 +20,7 @@ a:hover { color: var(--ink); }
 img { max-width: 100%; height: auto; display: block; }
 
 :focus-visible { outline: 2px solid var(--teal-deep); outline-offset: 3px; }
+.focus :focus-visible, .cta :focus-visible, .footer :focus-visible { outline-color: var(--teal-bright); }   /* dark bands: the bright teal holds contrast on slate */
 
 .container { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
 .section { padding-block: clamp(4rem, 3rem + 6vw, 8rem); }

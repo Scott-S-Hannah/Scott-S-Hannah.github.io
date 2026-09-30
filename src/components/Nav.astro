@@ -1,11 +1,11 @@
 ---
 const links = [
   { href: '/#focus', label: 'Research' },
-  { href: '/publications', label: 'Publications' },
+  { href: '/publications/', label: 'Publications' },
   { href: '/#contact', label: 'Contact' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isCurrent = (href: string) => href === path;
+const isCurrent = (href: string) => (href.replace(/\/$/, '') || '/') === path;
 ---
 <header class="nav">
   <div class="container nav__inner">

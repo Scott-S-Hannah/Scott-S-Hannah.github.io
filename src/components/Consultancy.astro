@@ -54,7 +54,7 @@ const offers = [
 ---
 <section id="consultancy" class="consult section">
   <div class="container consult__head">
-    <h2 class="consult__title reveal">Work with me</h2>
+    <h2 class="consult__title reveal">Work with me<span class="consult__hdot" aria-hidden="true">.</span></h2>
     <p class="consult__lede reveal">Consultancy for teams, clinicians, and organisations that need physiology they can act on.</p>
   </div>
 
@@ -85,7 +85,7 @@ const offers = [
       </div>
       <div class="consult__wings">
         {offers.map((o, i) => (
-          <button class={`consult__wait${i === 0 ? ' is-on' : ''}`} data-key={o.key} aria-controls={`consult-${o.key}`}>
+          <button class={`consult__wait${i === 0 ? ' is-on' : ''}`} data-key={o.key} aria-controls={`consult-${o.key}`} aria-expanded={i === 0 ? 'true' : 'false'}>
             <svg class="consult__wfig" viewBox={wings[o.key].viewBox} xmlns="http://www.w3.org/2000/svg" aria-hidden="true" set:html={wings[o.key].body} />
             <span class="consult__wname">{o.t}</span>
           </button>
@@ -96,7 +96,6 @@ const offers = [
 
   <div class="container consult__cta reveal">
     <a class="consult__btn" href={`mailto:${email}?subject=Working%20together`}>Start a conversation<span aria-hidden="true"> &nearr;</span></a>
-    <a class="consult__email" href={`mailto:${email}?subject=Working%20together`}>{email}</a>
     <p class="consult__note">One email is enough to find out whether I can help.</p>
   </div>
 </section>
@@ -123,6 +122,7 @@ const offers = [
   .consult__panel { display: flex; flex-direction: column; padding-bottom: var(--strip); }
   .consult__t { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.025em; outline: none; }
   .consult__dot { color: var(--teal); }
+  .consult__hdot { color: var(--teal); }
   .consult__d { color: var(--ink-soft); font-size: var(--step-1); line-height: 1.4; letter-spacing: -0.01em; max-width: 36ch; margin-top: 0.7rem; }
   .consult__subject { display: flex; align-items: flex-end; gap: clamp(1.2rem, 2.5vw, 2rem); margin-top: clamp(1.4rem, 2.5vw, 2.2rem); }
   .consult__figbox { position: relative; flex: none; margin-bottom: -1px; }   /* the figure's baked baseline sits ON the stage line */
@@ -180,11 +180,6 @@ const offers = [
     transition: background 0.25s ease;
   }
   .consult__btn:hover { background: var(--teal-deep); color: var(--paper); }
-  .consult__email {
-    color: var(--ink); font-weight: 500; font-size: var(--step-0);
-    border-bottom: 1px solid var(--line-strong); padding-bottom: 2px;
-  }
-  .consult__email:hover { color: var(--teal-deep); border-color: var(--teal-deep); }
   .consult__note { color: var(--mut); font-size: var(--step--1); flex-basis: 100%; }
 
   /* Small screens: the stage relaxes into a stacked ledger, everything visible;
@@ -372,7 +367,7 @@ const offers = [
     const activate = (key: string | undefined, moveFocus: boolean) => {
       if (!key) return;
       panels.forEach((p) => p.classList.toggle('is-on', p.dataset.key === key));
-      waits.forEach((w) => w.classList.toggle('is-on', w.dataset.key === key));
+      waits.forEach((w) => { const on = w.dataset.key === key; w.classList.toggle('is-on', on); w.setAttribute('aria-expanded', String(on)); });
       const active = panels.find((p) => p.dataset.key === key);
       if (active) startLive(active);
       if (moveFocus) active?.querySelector<HTMLElement>('.consult__t')?.focus({ preventScroll: true });

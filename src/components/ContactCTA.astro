@@ -9,7 +9,7 @@ import { email } from '../data/site';
     <div class="cta__contact reveal">
       <a class="cta__email" href={`mailto:${email}`}>{email}</a>
     </div>
-    <p class="cta__creds reveal">Fellow, Higher Education Academy · Full Member, The Physiological Society · Programme Leader, BSc Sport and Exercise Science</p>
+    <p class="cta__creds reveal"><span>Fellow, Higher Education Academy</span><span aria-hidden="true" class="cta__sep"> · </span><span>Full Member, The Physiological Society</span></p>
   </div>
 </section>
 
@@ -24,5 +24,7 @@ import { email } from '../data/site';
   .cta__email { font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em; color: var(--on-feature); border-bottom: 1px solid rgba(238,241,243,0.32); padding-bottom: 4px; }
   .cta__email:hover { color: var(--teal-bright); border-color: var(--teal-bright); }
   .cta__creds { color: var(--on-feature-faint); font-size: var(--step--1); margin-top: clamp(2rem, 4vw, 3rem); max-width: 60ch; line-height: 1.6; }
+  .cta__creds span { white-space: nowrap; }
+  @media (max-width: 42rem) { .cta__creds span:not(.cta__sep) { display: block; } .cta__sep { display: none; } }   /* stacked on phones: no orphaned separator */
   @media (max-width: 42rem) { .cta__email { font-size: var(--step-1); word-break: break-word; } }
 </style>

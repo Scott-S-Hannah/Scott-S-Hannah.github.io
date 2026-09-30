@@ -1,5 +1,27 @@
 [
   {
+    "id": "fda8cb0f15f548e7893321e01139a3ed",
+    "type": "article",
+    "title": "Body Image, Disordered Eating, and Relative Energy Deficiency in Sport Risk in Female Athletes: Associations Across Psychological and Behavioral Factors",
+    "authors": [
+      {
+        "name": "Josh Williamson",
+        "isOwner": false
+      },
+      {
+        "name": "Scott Hannah",
+        "isOwner": true
+      }
+    ],
+    "year": 2026,
+    "month": 9,
+    "journal": "Sports Health",
+    "doi": "10.1177/19417381261486290",
+    "abstract": "Background: Relative Energy Deficiency in Sport (REDs) is traditionally conceptualised as a physiological consequence of low energy availability, yet emerging evidence implicates psychological and behavioural mechanisms in its development. This study examined the associations among body image, disordered eating, social physique anxiety, and female health knowledge to clarify psychosocial antecedents of REDs risk in female athletes. Methods: 105 female athletes (mean age = 21.7 ± 3.4 years) completed validated measures assessing body image, social physique anxiety, disordered eating, REDs risk, and female health knowledge. Pearson correlations, multiple regression, and mediation analyses were performed to examine psychological predictors and mediating pathways of REDs risk. Results: Negative body image was strongly associated with REDs risk (r = .61, p < .001) and remained the dominant independent predictor (β = .58, p < .001). Disordered eating partially mediated this relationship (indirect = 1.10, 95% CI [0.88, 1.36]), while the direct effect persisted(c′ = 1.10, 95% CI [0.85, 1.34], p < .001). Positive body image exerted a protective influence (B = −1.47, p < .001), and social physique anxiety contributed modestly (β = .18, p = .013). Female health knowledge was inversely related to REDs risk (r = −.28, p = .002). The model explained 44 % of variance (R² = .44, p < .001). Conclusions: Findings support a psychological–behavioural framework in which body-image disturbance amplifies REDs vulnerability through both direct and disordered-eating-mediated pathways. Conversely, positive body image and female health literacy may serve protective roles. Integrating psychological screening and assets-based education into REDs prevention could shift practice from reactive physiological detection toward proactive, holistic athlete health care.",
+    "featured": false,
+    "theme": "athlete-health"
+  },
+  {
     "id": "453c7d02a48846b68609f38ce66a05d0",
     "type": "article",
     "title": "When Load Does not Tell the Whole Story: Acute Effects of Effort Matched Resistance Training Protocols on Arterial Stiffness",
@@ -62,7 +84,7 @@
   {
     "id": "eb2be5cc35ca48498dc9565700f5391a",
     "type": "article",
-    "title": "The implementation of robot-assisted gait training in a UK NHS stroke service.",
+    "title": "The implementation of robot-assisted gait training in a UK NHS stroke service",
     "authors": [
       {
         "name": "Andrew Reid",
@@ -90,31 +112,9 @@
     "theme": "clinical-rehab"
   },
   {
-    "id": "fda8cb0f15f548e7893321e01139a3ed",
-    "type": "article",
-    "title": "Body Image, Disordered Eating, and the Behavioural Pathways to Relative Energy Deficiency in Sport: Evidence for a Biopsychosocial Model",
-    "authors": [
-      {
-        "name": "Josh Williamson",
-        "isOwner": false
-      },
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      }
-    ],
-    "year": 2025,
-    "month": 11,
-    "journal": "Sports Health",
-    "doi": "",
-    "abstract": "Background: Relative Energy Deficiency in Sport (REDs) is traditionally conceptualised as a physiological consequence of low energy availability, yet emerging evidence implicates psychological and behavioural mechanisms in its development. This study examined the associations among body image, disordered eating, social physique anxiety, and female health knowledge to clarify psychosocial antecedents of REDs risk in female athletes. Methods: 105 female athletes (mean age = 21.7 ± 3.4 years) completed validated measures assessing body image, social physique anxiety, disordered eating, REDs risk, and female health knowledge. Pearson correlations, multiple regression, and mediation analyses were performed to examine psychological predictors and mediating pathways of REDs risk. Results: Negative body image was strongly associated with REDs risk (r = .61, p < .001) and remained the dominant independent predictor (β = .58, p < .001). Disordered eating partially mediated this relationship (indirect = 1.10, 95% CI [0.88, 1.36]), while the direct effect persisted(c′ = 1.10, 95% CI [0.85, 1.34], p < .001). Positive body image exerted a protective influence (B = −1.47, p < .001), and social physique anxiety contributed modestly (β = .18, p = .013). Female health knowledge was inversely related to REDs risk (r = −.28, p = .002). The model explained 44 % of variance (R² = .44, p < .001). Conclusions: Findings support a psychological–behavioural framework in which body-image disturbance amplifies REDs vulnerability through both direct and disordered-eating-mediated pathways. Conversely, positive body image and female health literacy may serve protective roles. Integrating psychological screening and assets-based education into REDs prevention could shift practice from reactive physiological detection toward proactive, holistic athlete health care.",
-    "featured": false,
-    "theme": "athlete-health"
-  },
-  {
     "id": "398c22c632914f3aa028f5adf35110c6",
     "type": "article",
-    "title": "Prolonged cooling with a Physiolab S1 cryocompression device and its effect on skin temperature reduction and control: a safety and feasibility pilot.",
+    "title": "Prolonged cooling with a Physiolab S1 cryocompression device and its effect on skin temperature reduction and control: a safety and feasibility pilot",
     "authors": [
       {
         "name": "James Belsey",
@@ -186,7 +186,7 @@
   {
     "id": "33d7955279a1410aabdfc0527264980d",
     "type": "conference",
-    "title": "Arterial stiffness following heavy and moderate resistance training to volitional failure.",
+    "title": "Arterial stiffness following heavy and moderate resistance training to volitional failure",
     "authors": [
       {
         "name": "Eleftherios Karanasios",
@@ -207,7 +207,7 @@
     ],
     "year": 2025,
     "month": 6,
-    "journal": "Chartered Association of Sport and Exercise Science : Physical Activity for Health Division Day",
+    "journal": "Chartered Association of Sport and Exercise Science: Physical Activity for Health Division Day",
     "doi": "",
     "abstract": "Arterial stiffness (AS) is an independent predictor of cardiovascular disease (CVD). The impact of RT on AS is not fully elucidated. Loading intensity (LI) is a well-researched training variable particularly in the field of muscular hypertrophy, yet there is a paucity of research directly examining the effects of different LIs on AS.Recent evidence suggests that LI is the key variable determining arterial responses to RT. It was observed that low to moderate LIs (< 70% 1RM) tend to decrease AS, whereas high LIs (> 70% 1RM) seem to increase AS. Nonetheless, the lack of control over proximity to failure in previous reports may be a confounding factor when interpreting these findings. Percentage-based load prescription (e.g., 10 repetitions at 75 %1RM) in previous studies may lead in ambiguity regarding how close to failure each participant approached. Evidence shows a great inter- individual variability in the number of repetitions performed in a given relative load, and proximity to failure is a main determinant of cardiovascular responses. Standardisation of effort allows for a more appropriate comparison of other training variables, such as load, since it ensures a more uniform stimulus among the conditions under investigation There is no study that has directly compared the effects of load on AS while standardising proximity to failure. Thus, the purpose of this study was to compare indices of AS between a strength-type RT scheme using heavier loads (4RM) and lower repetitions with a hypertrophy-type RT protocol using moderate loads and repetitions (12RM) while maintaining intensity of effort constant.",
     "featured": false,
@@ -246,7 +246,7 @@
   {
     "id": "2630a36dee224e868cb4f8192627ca0a",
     "type": "article",
-    "title": "The effect of different proximities to failure on arterial stiffness following resistance training protocols matched for volume-load.",
+    "title": "The effect of different proximities to failure on arterial stiffness following resistance training protocols matched for volume-load",
     "authors": [
       {
         "name": "Eleftherios Karanasios",
@@ -309,7 +309,7 @@
     ],
     "year": 2025,
     "month": 2,
-    "journal": "PLoS ONE",
+    "journal": "PLOS ONE",
     "doi": "10.1371/journal.pone.0318942",
     "abstract": "Background: Intermittent pneumatic compression (IPC) therapy may benefit stroke patients by eliciting more intensive training sessions that may result in better health, mobility and ultimately quality of life. The purpose of this randomized controlled trial was to assess the effect of using a home-based IPC device on functional outcomes and vascular health in individuals with chronic stroke. Methods: Thirty-one stroke survivors (64.3 ± 14.3y; 4.3 ± 2.7y since stroke) completed pre- and post-intervention assessments of functional capacity (six-minute walk test [6MWT], timed-up-and-go, 10m walk test), vascular health (pulse wave analysis, carotid-femoral pulse wave velocity), and physical activity. Following the pre-assessment, individuals were randomly assigned to either a daily, 12-week, home-based IPC group, or to a usual care control (CON) group. Outcomes were assessed using analysis of covariance (ANCOVA), controlling for age and any baseline differences. Results: Following ANCOVA, a significant increase in 6MWT walking distance was observed post-assessment for the IPC (Mean ± SD [95%CI]; 188 ± 19 m [177–199m]) but not the CON group (167 ± 19 m [157–178m]) (p < 0.05). A significant reduction in peripheral systolic blood pressure was reported at the post-assessment for the IPC group (136.2 ± 8.0 mmHg [131.9–140.4 mmHg]) but not for CON (142.2 ± 8.0 mmHg [138.1–144.6 mmHg]) (p < 0.05). Similar findings were observed for central systolic blood pressure. Physical activity levels significantly increased at the post-assessment for IPC (1857 ± 879 MET·min−1·week−1 [1390–2325 MET·min−1·week−1]) but not for the CON group (1161 ± 879 MET·min−1·week−1 [677–1645 MET·min−1·week−1]), while for time spent sitting, a significantly greater reduction was observed at the post-assessment for the IPC group (396 ± 86 mins [350–442 mins]) compared to CON (486 ± 86 mins [439–534 mins]) (both p < 0.05). Conclusions: The observed improvements in functional mobility, cardiovascular health, increased physical activity and reduced sedentary time demonstrates important clinical implications of ‘home-based’ IPC therapy as a clinical training aid for stroke rehabilitation. Home-based IPC therapy could serve as an adjunct to conventional rehabilitation, however, further research is needed to determine whether IPC therapy can sustain or improve function over time for individuals in the chronic stage of recovery.",
     "featured": true,
@@ -318,7 +318,7 @@
   {
     "id": "c95dee245942458dacc1a4e17b902ad9",
     "type": "conference",
-    "title": "The effect of uninterrupted and interrupted sitting on vascular health and cognitive function in people with Long COVID.",
+    "title": "The effect of uninterrupted and interrupted sitting on vascular health and cognitive function in people with Long COVID",
     "authors": [
       {
         "name": "Nicholas Hudson",
@@ -352,7 +352,7 @@
   {
     "id": "fc41f0c473f444fa8c7c9c7e207b552e",
     "type": "conference",
-    "title": "The effect of exercise intensity on calcium metabolism.",
+    "title": "The effect of exercise intensity on calcium metabolism",
     "authors": [
       {
         "name": "Scott Hannah",
@@ -412,7 +412,7 @@
   {
     "id": "ebf45ee4c62d47ee841d55fc47ec9bb2",
     "type": "conference",
-    "title": "The Effect of Acute Hypoxic Exercise on Calcium Metabolism.",
+    "title": "The Effect of Acute Hypoxic Exercise on Calcium Metabolism",
     "authors": [
       {
         "name": "Scott Hannah",
@@ -442,7 +442,7 @@
   {
     "id": "cae97c69998443f7b5db0ae72485b542",
     "type": "conference",
-    "title": "The Effect of Postural Position on Arterial Occlusion Pressure in the Lower Body: A Methodological Consideration for Blood Flow Restriction Training.",
+    "title": "The Effect of Postural Position on Arterial Occlusion Pressure in the Lower Body: A Methodological Consideration for Blood Flow Restriction Training",
     "authors": [
       {
         "name": "Scott Hannah",

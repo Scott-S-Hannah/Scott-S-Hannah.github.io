@@ -5,7 +5,7 @@
     "headline": "Robot-assisted gait training, carried from trial evidence into a working NHS stroke service",
     "detail": "The implementation of robot-assisted gait training in a UK NHS stroke service",
     "source": "Clinical Rehabilitation",
-    "href": "/publications?area=rehabilitation",
+    "href": "/publications/?area=rehabilitation",
     "cta": "See the work",
     "external": false
   },
@@ -24,7 +24,7 @@
     "year": 2025,
     "headline": "A therapy people can use at home improved function and vascular health after stroke",
     "detail": "Effect of using home-based dynamic intermittent pneumatic compression therapy during periods of physical activity on functional and vascular health outcomes in chronic stroke: A randomized controlled clinical trial",
-    "source": "PLoS ONE",
+    "source": "PLOS ONE",
     "href": "https://doi.org/10.1371/journal.pone.0318942",
     "cta": "Read the paper",
     "external": true

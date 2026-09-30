@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapCslToPublication, assignTheme } from './map-publication.mjs';
+import { mapCslToPublication, assignTheme, cleanText } from './map-publication.mjs';
 
 const sampleCsl = {
   id: 'jch70020',
@@ -103,5 +103,22 @@ describe('assignTheme', () => {
   });
   it('falls back to arterial-rt for resistance-training / pulse-wave work', () => {
     expect(assignTheme('Effort matched resistance training protocols on arterial stiffness', 'pulse wave velocity')).toBe('arterial-rt');
+  });
+});
+
+describe('cleanText', () => {
+  it('drops a trailing full stop and the space before a colon', () => {
+    expect(cleanText('Arterial stiffness after training.')).toBe('Arterial stiffness after training');
+    expect(cleanText('CASES : Physical Activity for Health')).toBe('CASES: Physical Activity for Health');
+  });
+  it('keeps closing question marks and collapses whitespace', () => {
+    expect(cleanText('  Take My Bone   Away? ')).toBe('Take My Bone Away?');
+  });
+});
+
+describe('mapCslToPublication – venue styling', () => {
+  it('styles PLOS ONE as the publisher does', () => {
+    const pub = mapCslToPublication({ id: 'x', type: 'article-journal', title: 'T', 'container-title': 'PLoS ONE' });
+    expect(pub.journal).toBe('PLOS ONE');
   });
 });

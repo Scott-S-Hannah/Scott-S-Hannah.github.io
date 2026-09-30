@@ -27,6 +27,15 @@ export function assignTheme(title = '', keywords = '') {
   return 'arterial-rt';
 }
 
+/* Venue names as the publishers themselves style them. */
+const VENUE_FIXES = { 'PLoS ONE': 'PLOS ONE' };
+
+/* Tidy a title or venue string: collapse whitespace, no space before a colon,
+   no trailing full stop (headings on the site don't carry one). */
+export function cleanText(s = '') {
+  return s.replace(/\s+/g, ' ').replace(/\s+:/g, ':').trim().replace(/\.$/, '');
+}
+
 function fullName(author) {
   return [author.given, author.family].filter(Boolean).join(' ').trim();
 }
@@ -36,19 +45,19 @@ export function mapCslToPublication(csl) {
     ? csl.issued['date-parts'][0]
     : [];
   const keywords = Array.isArray(csl.keyword) ? csl.keyword.join(' ') : (csl.keyword || '');
-  const noteVenue = (csl.note || '').split(/\s*;\s*Conference date/i)[0].trim();
+  const noteVenue = cleanText((csl.note || '').split(/\s*;\s*Conference date/i)[0]);
   const publisher = Array.isArray(csl.publisher) ? csl.publisher.join(' ') : (csl.publisher || '');
   return {
     id: csl.id,
     type: TYPE_MAP[csl.type] || 'article',
-    title: (csl.title || '').replace(/\s+/g, ' ').trim(),
+    title: cleanText(csl.title),
     authors: (csl.author || []).map((a) => {
       const name = fullName(a);
       return { name, isOwner: a.family === 'Hannah' && /scott/i.test(a.given || '') };
     }),
     year: dateParts[0] ?? null,
     month: dateParts[1] ?? null,
-    journal: csl['container-title'] || noteVenue || publisher || '',
+    journal: VENUE_FIXES[csl['container-title']] || csl['container-title'] || noteVenue || publisher || '',
     doi: csl.DOI || '',
     abstract: (csl.abstract || '').replace(/\s+/g, ' ').trim(),
     featured: csl.DOI ? FEATURED_DOIS.has(csl.DOI) : false,
