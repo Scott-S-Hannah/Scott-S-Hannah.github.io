@@ -82,62 +82,6 @@
     "theme": "clinical-rehab"
   },
   {
-    "id": "eb2be5cc35ca48498dc9565700f5391a",
-    "type": "article",
-    "title": "The implementation of robot-assisted gait training in a UK NHS stroke service",
-    "authors": [
-      {
-        "name": "Andrew Reid",
-        "isOwner": false
-      },
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "Louise Johnson",
-        "isOwner": false
-      },
-      {
-        "name": "James Faulkner",
-        "isOwner": false
-      }
-    ],
-    "year": 2026,
-    "month": 1,
-    "journal": "Clinical Rehabilitation",
-    "doi": "",
-    "abstract": "",
-    "featured": false,
-    "theme": "clinical-rehab"
-  },
-  {
-    "id": "398c22c632914f3aa028f5adf35110c6",
-    "type": "article",
-    "title": "Prolonged cooling with a Physiolab S1 cryocompression device and its effect on skin temperature reduction and control: a safety and feasibility pilot",
-    "authors": [
-      {
-        "name": "James Belsey",
-        "isOwner": false
-      },
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "James Faulkner",
-        "isOwner": false
-      }
-    ],
-    "year": 2025,
-    "month": 10,
-    "journal": "Frontiers in Medical Technology",
-    "doi": "",
-    "abstract": "",
-    "featured": false,
-    "theme": "clinical-rehab"
-  },
-  {
     "id": "96a4e988f1cc46c1a8b19ff5f158a070",
     "type": "article",
     "title": "The effect of uninterrupted and interrupted sitting on vascular function in adults with Long COVID",
@@ -182,36 +126,6 @@
     "abstract": "Acute prolonged sitting increases blood pressure (BP) and arterial stiffness (AS). Both of these may be mitigated via light physical activity (LPA). Whether long COVID (LC), which partly manifests as vascular sequelae, predisposes a heightened sensitivity to sitting or diminished benefits from its interruption is unknown. The aims of this study were to identify whether individuals with LC: (i) exhibit a worse BP/AS response to uninterrupted sitting and (ii) a diminished mitigation of BP/AS response to sitting interrupted with LPA, compared to healthy controls. Thirty participants with LC and 15 controls completed 2 h of uninterrupted sitting and sitting interrupted with LPA. Central and peripheral systolic and diastolic BP and carotid‐femoral pulse wave velocity (cfPWV) were determined pre and post sitting. Linear mixed‐effects models demonstrated no three‐way or two‐way interactions for any variable. There was a significant main effect of time, with increases in central systolic (MD = 3.37 mmHg, SE = 0.93 mmHg, p < 0.001) and central diastolic (MD = 3.00 mmHg, SE = 0.58 mmHg, p < 0.001) BP. cfPWV was not altered in sitting in either group (MD = 0.13 m/s, SE = 0.09 m/s, p = 0.170). Uninterrupted sitting increases BP similarly, but AS is unchanged. Interrupting sitting with LPA did not mitigate sitting‐induced increase in BP regardless of LC diagnosis.",
     "featured": false,
     "theme": "sedentary-vascular"
-  },
-  {
-    "id": "33d7955279a1410aabdfc0527264980d",
-    "type": "conference",
-    "title": "Arterial stiffness following heavy and moderate resistance training to volitional failure",
-    "authors": [
-      {
-        "name": "Eleftherios Karanasios",
-        "isOwner": false
-      },
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "Helen Ryan-Stewart",
-        "isOwner": false
-      },
-      {
-        "name": "James Faulkner",
-        "isOwner": false
-      }
-    ],
-    "year": 2025,
-    "month": 6,
-    "journal": "Chartered Association of Sport and Exercise Science: Physical Activity for Health Division Day",
-    "doi": "",
-    "abstract": "Arterial stiffness (AS) is an independent predictor of cardiovascular disease (CVD). The impact of RT on AS is not fully elucidated. Loading intensity (LI) is a well-researched training variable particularly in the field of muscular hypertrophy, yet there is a paucity of research directly examining the effects of different LIs on AS.Recent evidence suggests that LI is the key variable determining arterial responses to RT. It was observed that low to moderate LIs (< 70% 1RM) tend to decrease AS, whereas high LIs (> 70% 1RM) seem to increase AS. Nonetheless, the lack of control over proximity to failure in previous reports may be a confounding factor when interpreting these findings. Percentage-based load prescription (e.g., 10 repetitions at 75 %1RM) in previous studies may lead in ambiguity regarding how close to failure each participant approached. Evidence shows a great inter- individual variability in the number of repetitions performed in a given relative load, and proximity to failure is a main determinant of cardiovascular responses. Standardisation of effort allows for a more appropriate comparison of other training variables, such as load, since it ensures a more uniform stimulus among the conditions under investigation There is no study that has directly compared the effects of load on AS while standardising proximity to failure. Thus, the purpose of this study was to compare indices of AS between a strength-type RT scheme using heavier loads (4RM) and lower repetitions with a hypertrophy-type RT protocol using moderate loads and repetitions (12RM) while maintaining intensity of effort constant.",
-    "featured": false,
-    "theme": "arterial-rt"
   },
   {
     "id": "908805a671c543bda528de85f98edbcd",
@@ -316,70 +230,6 @@
     "theme": "clinical-rehab"
   },
   {
-    "id": "c95dee245942458dacc1a4e17b902ad9",
-    "type": "conference",
-    "title": "The effect of uninterrupted and interrupted sitting on vascular health and cognitive function in people with Long COVID",
-    "authors": [
-      {
-        "name": "Nicholas Hudson",
-        "isOwner": false
-      },
-      {
-        "name": "Simon Fryer",
-        "isOwner": false
-      },
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "Mark Rickenbach",
-        "isOwner": false
-      },
-      {
-        "name": "James Faulkner",
-        "isOwner": false
-      }
-    ],
-    "year": 2023,
-    "month": 7,
-    "journal": "Physiology 2023",
-    "doi": "",
-    "abstract": "Long COVID-19 is defined as signs, symptoms and conditions that develop after initial SARS-CoV-2 infection. Two million people in the UK in private households are currently experiencing self-reported long COVID, of which 61% of these people have been living with symptoms for more than a year. (Office for National Statistics, 2023). There have been over fifty different symptoms attributed to long COVID. The most commonly presented symptom is fatigue (Aiyegbusi et al., 2021). Fatigue can cause behavioural changes, resulting in increased sedentary time. This can have an adverse effect on vascular function, and increased risk of cardiovascular disease (Natelson, Brunjes and Mancini, 2021). Sitting for periods as little as an hour can worsen vascular function (Taylor et al., 2022). Interrupting this period with short bouts of movement has been shown to mitigate the negative effect on vascular health (Paterson et al., 2020). The mechanisms which cause Long COVID are still mainly undetermined, however, it is evident that physical exertion, cognitive effort, and stress can lead to relapses which result in worsened symptoms for hours up to months in Long COVID populations. This study used questionnaires (DePaul Symptom Questionnaire Post-Exertional Malaise) and telephone conversations to ensure that participants felt they were able to undertake the activity outlined and to ensure they were not suffering from irregular post-exertional malaise (PEM) following involvement. Ethical approval was obtained by Health and Care Research Wales (IRAS: 309606 22/SC/0120). This study aimed to investigate whether interrupting continuous sitting in people with Long COVID with movement could prevent the decline in vascular health. Inclusion criteria required a clinical diagnosis of Long COVID. Activities chosen represent movements that would occur during daily living. Interruption includes three bouts of five sit-to-stands, five calf raises, and three minutes of self-paced walking. Measures of central and peripheral blood pressure, arterial stiffness (SphygmCor XCEL), executive function (TrailMaking Tasks), and cerebral oxygenation (Near Infrared Spectroscopy) were recorded at baseline, during, and following two hours of interrupted or uninterrupted sitting. This study is currently still collecting data. To date, one participant with Long COVID has fully completed the testing procedure. Six additional participants have begun testing (59.25 ± 13.84 years, symptoms lasting >12 months), and three are scheduled to be familiarised and completed in the coming month, with more than 14 others expressing interest, with initial contact made. Preliminary results demonstrate an observed, yet insignificant increase in seated pulse wave velocity from baseline, 0.4 ± 0.14m/s (uninterrupted) and 0.6 ± 0.24m/s (interrupted). This research could provide rationale for future policies at a government level and advice from a GP surgery to be centred towards reducing the length people with Long COVID are sitting for continuously, to mitigate any detrimental impact on their vascular health. Additionally, results with respect to cognition and cerebral oxygenation may provide a rationale for people with Long COVID, including those still having to work while symptomatic, engaging in cognitively stimulating tasks following light physical activity i.e. making a cup of tea.",
-    "featured": false,
-    "theme": "sedentary-vascular"
-  },
-  {
-    "id": "fc41f0c473f444fa8c7c9c7e207b552e",
-    "type": "conference",
-    "title": "The effect of exercise intensity on calcium metabolism",
-    "authors": [
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "Conor McClean",
-        "isOwner": false
-      },
-      {
-        "name": "Sonyia McFadden",
-        "isOwner": false
-      },
-      {
-        "name": "Andrea McNeilly",
-        "isOwner": false
-      }
-    ],
-    "year": 2023,
-    "month": 7,
-    "journal": "Physiology 2023",
-    "doi": "",
-    "abstract": "Introduction: Recent investigations suggest that acute exercise decreases Ca2+, subsequently stimulating parathyroid hormone (PTH) and bone breakdown (Townsend et al., 2016; Kohrt et al., 2018). It has been suggested the exercise-induced decrease of Ca2+ may contribute to the low bone mineral density phenomenon observed in many endurance athletes (Duckham et al., 2012; Scofield and Hecht, 2012). The aim of this study was to investigate the effect of exercise intensity, and the associated acid-base changes, on Ca2+ and PTH. Methods: Twelve healthy males (n = 12) completed a three-arm, randomised-counterbalanced design experiment. Physiological thresholds and associated workloads were identified from a maximal cardiopulmonary exercise test. Participants completed 30-minutes (or until volitional fatigue) of cycle exercise below gas exchange threshold (GET), above GET, or 10W above the estimated critical power (Above RCP). Blood samples were taken every 5 minutes for 35 minutes, or until volitional fatigue. Ca2+ and pH were analysed using an i-STAT point of care device and EG7+ cartridge system. PTH was analysed using ELICA. Data were analysed using linear mixed effects models and omnibus ANOVAs of fixed terms (R Core Team, 2020). Results: Exercise produced a biphasic intensity-dependent Ca2+ response to exercise (F (12, 189.83) = 3.45, p <.001). Exercise below GET did not alter Ca2+ when referenced to baseline (Mdiff = -0.01–0.02 mmol⋅L-1, SE = 0.01, p > 0.05), but exercise above GET (including above RCP) significantly increased Ca2+, peaking at 10-minutes (Mdiff = 0.04–0.07, SE = 0.01, p < 0.001). Plasma-volume adjusted PTH (PTHAdj) was significantly decreased in the initial 10-minutes of exercise above GET/RCP (Mdiff = -15.81 – -10.61 , SE = 3.30, p < 0.001). Ca2+ decreased throughout the remainder of exercise above GET and RCP, returning to baseline concentrations. PTHAdj mirrored Ca2+’s response: PTHAdj increased from 10 minutes above GET and above RCP, but was only significantly greater than baseline following above GET exercise (Mdiff = 30.93, SE= 3.38, t(189.33) = 9.14, p < 0.001). Introducing pH as a covariate in the Ca2+ model (b = -0.27, SE = 0.06, t(189.30) = -4.11, p < 0.001) removed significant interactions at 5 and 10-minutes between exercise below GET and above RCP. However, pH could not account for all Ca2+ variation, as the main effect of time (F (7, 191.77) = 13.85, p < 0.001), and its interaction with condition (F (12, 190.17) = 4.37, p < 0.001), remained significant. Pooled concentrations of PTHAdj were negatively associated with Ca2+ (R = -0.6, p < 0.001). Conclusion: These findings suggest GET may act as an intensity threshold for eliciting significant biphasic response in Ca2+ and PTHAdj. pH may explain the intensity-dependency of Ca2+ during exercise, likely due to the physiochemical competitive binding model (Pedersen, 1972; Fogh-Andersen et al., 1993). However, pH could not account for the entirety of Ca2+’s temporal response, suggesting other exercise-mediated effects may play a role in calcium regulation. It appears Ca2+ is important for mediating PTH response to exercise, but that other exercise-induced responses may also influence PTH and subsequent bone metabolism.",
-    "featured": false,
-    "theme": "bone-calcium"
-  },
-  {
     "id": "83e8141cb0dc4841990f90e7ffd2704e",
     "type": "article",
     "title": "“Take My Bone Away?” Hypoxia and bone: A narrative review",
@@ -408,57 +258,5 @@
     "abstract": "To maintain normal cellular and physiological function, sufficient oxygen is required. Recently, evidence has suggested that hypoxia, either pathological or environmental, may influence bone health. It appears that bone cells are distinctly responsive to hypoxic stimuli; for better or worse, this is still yet to be elucidated. Hypoxia has been shown to offer potentially therapeutic effects for bone by inducing an osteogenic–angiogenic response, although, others have noted excessive osteoclastic bone resorption instead. Much evidence suggests that the hypoxic-inducible pathway is integral in mediating the changes in bone metabolism. Furthermore, many factors associated with hypoxia including changes in energy metabolism, acid–base balance and the increased generation of reactive oxygen species, are known to influence bone metabolism. This review aims to examine some of the putative mechanisms responsible for hypoxic-induced alterations of bone metabolism, with regard to osteoclasts and osteoblasts, both positive and negative.",
     "featured": true,
     "theme": "bone-calcium"
-  },
-  {
-    "id": "ebf45ee4c62d47ee841d55fc47ec9bb2",
-    "type": "conference",
-    "title": "The Effect of Acute Hypoxic Exercise on Calcium Metabolism",
-    "authors": [
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "Sonyia McFadden",
-        "isOwner": false
-      },
-      {
-        "name": "Andrea McNeilly",
-        "isOwner": false
-      },
-      {
-        "name": "Conor McClean",
-        "isOwner": false
-      }
-    ],
-    "year": 2020,
-    "month": 7,
-    "journal": "Future Physiology 2020",
-    "doi": "",
-    "abstract": "Several investigations show exercise induces a decrease of ionised calcium which may be responsible for increased bone breakdown following acute exercise (1-3). While the general mechanism of decreased Ca2+stimulating PTH and subsequent bone resorption has been comprehensively detailed (1-2), what causes Ca2+ to decrease remains unknown. We suggest it may be the result of the complex acid-base changes seen during exercise (4) as Ca2+ is heavily influenced by pH. We investigated whether pH alterations, achieved by use of exercise and hypoxia, influenced calcium metabolism. Sixteen healthy physically active males volunteered for our study ([mean ± 1 SD] age 24 ± 5 years, height 1.80 ± 0.08m, body mass ± 78.5 ± 12.6kg), approved by the University’s Research Ethics Committee and in accordance with the Declaration of Helsinki. Participants were randomly assigned in a counter-balanced manner to perform two V̇O2max tests on a cycle ergometer in either normoxia (21% FiO2) or hypoxia (13% FiO2), one week apart. Participants then completed 60 minutes of cycle exercise at 70% of their respective V̇O2max/peak in both conditions. Venous blood was collected via venepuncture: pre-exercise; immediately post- exercise; and 1h, 4h and 24h post exercise, to measure markers of calcium metabolism. A sub-sample of participants (n = 5) provided additional blood samples during the exercise trials (see Figure 1a) for analysis of Ca2+ and pH. Data were analysed using two-way repeated measures ANOVAs and regression. We observed that exercise caused a transient increase in Ca2+ at the onset of exercise and later decrease until cessation (Figure 1a). Ca2+ was positively correlated with PTH (Figure 1d: R = -0.82, p < .001) further supporting previous observations. Although hypoxic exercise reduced relative Ca2+ to a greater degree, and despite pH being higher during hypoxia (Figure 1c: Condition*Time p = .01), the interaction of time and condition was non-significant. The respiratory alkalosis during hypoxia appeared to reduce competition for albumin binding positions, demonstrated by the positive correlation between pH and albumin (Figure 2b: R = 0.7, p < .001). We speculate that a greater sample size may observe a difference between conditions. The higher total calcium concentration following hypoxic exercise (Figure 3c; MD = 0.04±0.01, p < .001) and the negative correlation between Ca2+ and pH (Figure 2c-d: R = -0.57, p < 0.0001) support that Ca2+ is bound to albumin during respiratory alkalosis. Hypoxia attenuated the phosphate response to exercise, demonstrated at the post exercise time point (Figure 3d: MD = -0.21±0.02, p < .001), which may be explained by hypocapnia. The reduced CO2 increased pH (Figure 2a), known to stimulate the glycolytic system and the production of phosphofructokinase (PFK). PFK enhances sugar phosphate production and subsequently stimulates phosphate entry to muscle (5). It is possible that the decrease in phosphate may have been compounded by the hypoxic-induced transcription of fibroblast growth factor 23 (FGF23). FGF23 is known to reduce serum phosphate concentrations and negatively regulate PTH, possibly explaining the lower PTH response post hypoxic exercise (Figure 3f; MD = -0.11 ± 0.05, p < .05).",
-    "featured": false,
-    "theme": "bone-calcium"
-  },
-  {
-    "id": "cae97c69998443f7b5db0ae72485b542",
-    "type": "conference",
-    "title": "The Effect of Postural Position on Arterial Occlusion Pressure in the Lower Body: A Methodological Consideration for Blood Flow Restriction Training",
-    "authors": [
-      {
-        "name": "Scott Hannah",
-        "isOwner": true
-      },
-      {
-        "name": "Stuart Miller",
-        "isOwner": false
-      }
-    ],
-    "year": 2018,
-    "month": 7,
-    "journal": "23rd Annual Congress of the European College of Sport Science",
-    "doi": "",
-    "abstract": "INTRODUCTION: Low intensity resistance training, with partial blood flow restriction (BFR), has repeatedly shown increases in both muscle size and strength. Despite the growing interest in BFR, there lacks a consensus regarding its methodological application. Perhaps one of the most obvious and overlooked considerations with BFR is postural position. Many reports have demonstrated significant haemody- namic changes with postural position but few BFR studies have considered this. Therefore, it is suggestible that arterial blood flow differs between position when under restriction and that previous studies have large variations in the level of BFR. Fundamental haemodynam- ics are largely influenced by gravitational forces exerting hydrostatic pressures within blood vessel. We hypothesised that arterial occlu- sion pressure (AOP) would be significantly higher when seated due to gravitational-induced hydrostatic pressure seen with upright haemodynamics. METHODS: Twenty participants (15 Male & 5 Female) visited the laboratory for one testing session. Basic anthropometric data were meas- ured including height, mass and thigh circumference. Systolic (SBP) and diastolic (DBP) brachial pressures were measured using an automatic blood pressure cuff. A 14.5 cm wide cuff (Delfi Medical, Vancouver BC, Canada) was then placed around the most proximal portion of the right leg. Arterial blood flow was measured at the posterior tibial artery using audio and visual signals from a handheld Doppler probe (Esaote MyLab 25cv). The cuff was inflated to 50mmHg for 30 s and then deflated for a 10 s interval to familiarise subjects. The cuff was then inflated to the participants brachial SBP for 30 s and deflated for 10 s. Following these initial inflation periods, pressure was increased by 40 mmHg for 30 s with 10 s deflation period. This was repeated until arterial blood flow was no longer detected from which point pressure was decreased by 10mmHg until arterial flow was present. The AOP was recorded as the last 10mmHg where blood flow was not detect- ed.The above procedures were repeated after 5 min rest period in an upright-seated position. RESULTS: Seated AOP was significantly higher than when supine (p < 0.001, 24±11.8mmHg). Regression analysis revealed thigh circum- ference and diastolic blood pressure were significant predictors of supine AOP (p = 0.001, r2 = 0.55), but not seated AOP; height was the only significant predictor of seated AOP (p = 0.017, r2 = 0.277). CONCLUSION: In conclusion, AOP was significantly greater when seated with height accounting for 27% of the variance. This suggests that gravity induced-hydrostatic pressure and the height of the hydrostatic column significantly alter the AOP. In future, postural position should be considered when utilising BFR training. Using thigh circumference and diastolic blood pressure, we are able to estimate supine AOP with a 14.5cm cuff, but not seated AOP. Based on our findings, we conclude that postural position significantly effects arterial occlusion pressure.",
-    "featured": false,
-    "theme": "arterial-rt"
   }
 ]

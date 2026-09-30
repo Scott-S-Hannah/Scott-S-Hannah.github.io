@@ -1,13 +1,13 @@
 [
   {
-    "type": "Project",
+    "type": "Paper",
     "year": 2026,
-    "headline": "Robot-assisted gait training, carried from trial evidence into a working NHS stroke service",
-    "detail": "The implementation of robot-assisted gait training in a UK NHS stroke service",
+    "headline": "Across 30 studies, robot-assisted gait training got people with spinal cord injury walking further and for longer",
+    "detail": "The effect of robot-assisted gait training on physical activity outcomes in people with spinal cord injury: A systematic review",
     "source": "Clinical Rehabilitation",
-    "href": "/publications/?area=rehabilitation",
-    "cta": "See the work",
-    "external": false
+    "href": "https://doi.org/10.1177/02692155251411864",
+    "cta": "Read the paper",
+    "external": true
   },
   {
     "type": "Paper",
